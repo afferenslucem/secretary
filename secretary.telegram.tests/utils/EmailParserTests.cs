@@ -5,59 +5,59 @@ namespace secretary.telegram.tests.utils;
 
 public class EmailParserTests
 {
-    public EmailParser parser = null!;
+    public EmailParser Parser = null!;
     
     [SetUp]
     public void Setup()
     {
-        this.parser = new EmailParser();
+        this.Parser = new EmailParser();
     }
 
     [Test]
     public void ShouldCreate()
     {
-        Assert.NotNull(parser);
+        Assert.NotNull(Parser);
     }
 
     [Test]
     public void ShouldParseEmailWithName()
     {
-        var result = parser.Parse("a.pushkin@infinnity.ru (Александр Пушкин)");
+        var result = Parser.Parse("a.pushkin@infinnity.ru (Александр Пушкин)");
 
-        Assert.AreEqual(result, new Email
+        Assert.That(new Email
         {
             Address = "a.pushkin@infinnity.ru",
             DisplayName = "Александр Пушкин"
-        });
+        }, Is.EqualTo(result));
     }
 
     [Test]
     public void ShouldParseEmailWithoutName()
     {
-        var result = parser.Parse("a.pushkin@infinnity.ru");
+        var result = Parser.Parse("a.pushkin@infinnity.ru");
 
-        Assert.AreEqual(result, new Email
+        Assert.That(new Email
         {
             Address = "a.pushkin@infinnity.ru"
-        });
+        }, Is.EqualTo(result));
     }
 
     [Test]
     public void ShouldParseEmailWithIncorrectName()
     {
-        var result = parser.Parse("a.pushkin@infinnity.ru (Александр Пушкин");
+        var result = Parser.Parse("a.pushkin@infinnity.ru (Александр Пушкин");
 
-        Assert.AreEqual(result, new Email
+        Assert.That(new Email
         {
             Address = "a.pushkin@infinnity.ru"
-        });
+        }, Is.EqualTo(result));
     }
 
     [Test]
     public void ShouldThrowErrorForIncorrectEmail()
     {
         Assert.Throws<FormatException>(
-            () => parser.Parse("a.pushkin@companyru (Александр Пушкин"),
+            () => Parser.Parse("a.pushkin@companyru (Александр Пушкин"),
             "Address \"a.pushkin@companyru (Александр Пушкин\" has invalid format"
         );
     }
@@ -66,7 +66,7 @@ public class EmailParserTests
     [Test]
     public void ShouldParseManyEmails()
     {
-        var result = parser.ParseMany(
+        var result = Parser.ParseMany(
             "a.pushkin@infinnity.ru (Александр Пушкин)\n" +
             "s.esenin@infinnity.ru (Сергей Есенин)\n" +
             "v.mayakovskii@infinnity.ru");

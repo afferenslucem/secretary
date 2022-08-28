@@ -256,7 +256,7 @@ public class SendDocumentCommandTests
         {
             new SecretaryMailAddress("a.pushkin@infinnity.ru", "Александр Пушкин"),
             new SecretaryMailAddress("s.esenin@infinnity.ru", "Сергей Есенин"),
-            new SecretaryMailAddress("v.mayakovskii@infinnity.ru", null),
+            new SecretaryMailAddress("v.mayakovskii@infinnity.ru", null!),
             new SecretaryMailAddress("user@infinnity.ru", "Пользовалель Пользователев"),
         };
         

@@ -6,56 +6,56 @@ namespace secretary.telegram.tests.commands;
 
 public class CommandContextTests
 {
-    private Mock<ISessionStorage> storage;
-    private CommandContext context;
+    private Mock<ISessionStorage> _storage = null!;
+    private CommandContext _context = null!;
         
     [SetUp]
     public void Setup()
     {
-        this.storage = new Mock<ISessionStorage>();
+        this._storage = new Mock<ISessionStorage>();
 
-        this.context = new CommandContext();
+        this._context = new CommandContext();
 
-        context.SessionStorage = this.storage.Object;
+        _context.SessionStorage = this._storage.Object;
     }
     
     [Test]
     public async Task ShouldFindSessionForChatId()
     {
-        context.ChatId = 2517;
+        _context.ChatId = 2517;
         
-        storage.Setup(obj => obj.GetSession(It.IsAny<long>())).ReturnsAsync((Session?)null);
+        _storage.Setup(obj => obj.GetSession(It.IsAny<long>())).ReturnsAsync((Session?)null);
 
-        var result = await this.context.GetSession();
+        var result = await this._context.GetSession();
         
-        this.storage.Verify(target => target.GetSession(2517));
+        this._storage.Verify(target => target.GetSession(2517));
     }
     
     [Test]
     public async Task ShouldSaveSession()
     {
-        context.ChatId = 2517;
+        _context.ChatId = 2517;
         
-        storage.Setup(obj => obj.SaveSession(It.IsAny<long>(), It.IsAny<Session>()));
+        _storage.Setup(obj => obj.SaveSession(It.IsAny<long>(), It.IsAny<Session>()));
 
-        await this.context.SaveSession(null);
+        await this._context.SaveSession(null!);
         
-        this.storage.Verify(target => target.SaveSession(2517, It.IsAny<Session>()));
+        this._storage.Verify(target => target.SaveSession(2517, It.IsAny<Session>()));
     }
     
     [Test]
     public void ShouldThrowSessionStorageIsNullForGetSession()
     {
-        context.SessionStorage = null;
+        _context.SessionStorage = null!;
         
-        Assert.ThrowsAsync<NullReferenceException>(async () => await this.context.GetSession());
+        Assert.ThrowsAsync<NullReferenceException>(async () => await this._context.GetSession());
     }
     
     [Test]
     public void ShouldThrowSessionStorageIsNullForSaveSession()
     {
-        context.SessionStorage = null;
+        _context.SessionStorage = null!;
         
-        Assert.ThrowsAsync<NullReferenceException>(async () => await this.context.SaveSession(null));
+        Assert.ThrowsAsync<NullReferenceException>(async () => await this._context.SaveSession(null!));
     }
 }
