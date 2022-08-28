@@ -25,6 +25,14 @@ public class CommandsListeningChainTests
     }
 
     [Test]
+    public void ShouldStartCommand()
+    {
+        var result = this.chain.Get("/start");
+        
+        Assert.IsInstanceOf<StartCommand>(result);
+    }
+
+    [Test]
     public void ShouldReturnTimeOffCommand()
     {
         var result = this.chain.Get(TimeOffCommand.Key);

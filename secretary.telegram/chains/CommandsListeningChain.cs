@@ -12,9 +12,10 @@ public class CommandsListeningChain
 
     public CommandsListeningChain()
     {
-        this.commandsChain.Add(TimeOffCommand.Key, new TimeOffCommandFactory());
-        this.commandsChain.Add(RegisterMailCommand.Key, new RegisterMailCommandFactory());
+        this.commandsChain.Add(StartCommand.Key, new StartCommandFactory());
         this.commandsChain.Add(RegisterUserCommand.Key, new RegisterUserCommandFactory());
+        this.commandsChain.Add(RegisterMailCommand.Key, new RegisterMailCommandFactory());
+        this.commandsChain.Add(TimeOffCommand.Key, new TimeOffCommandFactory());
         this.commandsChain.Add(NullCommand.Key, new NullCommandFactory());
     }
 
