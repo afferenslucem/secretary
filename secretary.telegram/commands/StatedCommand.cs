@@ -1,0 +1,48 @@
+﻿namespace secretary.telegram.commands;
+
+public abstract class StatedCommand: Command {
+    protected List<Command> states;
+
+    protected StatedCommand() : base()
+    {
+        this.states = this.ConfigureStates();
+    }
+
+    protected override async Task ExecuteRoutine()
+    {
+        await this.OnMessageRoutine();
+        await this.ExecuteNextState(Context);
+        await Context.SaveSession(this);
+    }
+
+    protected override Task OnMessageRoutine()
+    {
+        if (this.states.Count > 0)
+        {
+            var toRun = this.states[0];
+            return toRun.OnMessage(Context, this);
+        }
+        else
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    private Task ExecuteNextState(CommandContext context)
+    {
+        if (this.states.Count > 1)
+        {
+            this.states.RemoveAt(0);
+
+            var first = states.First();
+            
+            return first.Execute(context, this);
+        }
+        else
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    public abstract List<Command> ConfigureStates();
+}
