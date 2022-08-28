@@ -1,46 +1,43 @@
 ﻿using Moq;
 using secretary.storage;
 using secretary.telegram.commands;
-using secretary.telegram.commands.timeoff;
+using secretary.telegram.commands.registeruser;
 using secretary.telegram.sessions;
 
-namespace secretary.telegram.tests.commands.timeoff;
+namespace secretary.telegram.tests.commands.regusteruser;
 
-public class TimeOffCommandTests
+public class RegisterUserCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
-    private Mock<ISessionStorage> _sessionStorage = null!;
     private Mock<IUserStorage> _userStorage = null!;
-    
-    private TimeOffCommand _command = null!;
+    private Mock<ISessionStorage> _sessionStorage = null!;
     private CommandContext _context = null!;
+    private RegisterUserCommand _command = null!;
         
     [SetUp]
     public void Setup()
     {
         this._client = new Mock<ITelegramClient>();
-
+        this._userStorage = new Mock<IUserStorage>();
         this._sessionStorage = new Mock<ISessionStorage>();
 
-        this._userStorage = new Mock<IUserStorage>();
-
-        this._command = new TimeOffCommand();
-        
         this._context = new CommandContext()
-            { 
-                ChatId = 2517, 
-                TelegramClient = this._client.Object, 
-                SessionStorage = _sessionStorage.Object, 
-                UserStorage = _userStorage.Object
-            };
+        {
+            ChatId = 2517, 
+            TelegramClient = this._client.Object, 
+            SessionStorage = _sessionStorage.Object, 
+            UserStorage = _userStorage.Object,
+        };
+
+        this._command = new RegisterUserCommand();
     }
-    
+
     [Test]
     public void ShouldCreate()
     {
         Assert.Pass();
     }
-    
+        
     [Test]
     public async Task ShouldSaveSessionOnExecute()
     {
