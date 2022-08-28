@@ -39,10 +39,4 @@ public class TimeOffCommand: StatedCommand
             new SendDocumentCommand(),
         };
     }
-
-    protected override async Task OnMessageRoutine()
-    {
-        this.states[0].Context = Context;
-        await this.states[0].OnMessage(Context, this);
-    }
 }

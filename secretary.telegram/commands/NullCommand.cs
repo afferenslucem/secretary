@@ -10,6 +10,6 @@ public class NullCommand: Command
         
         if (session == null || session.LastCommand == null) return;
         
-        await session.LastCommand.Execute(Context, this);
+        await session.LastCommand.OnMessage(Context, this);
     }
 }

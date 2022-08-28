@@ -10,21 +10,18 @@ public abstract class StatedCommand: Command {
 
     protected override async Task ExecuteRoutine()
     {
-        await this.OnMessageRoutine();
-        await this.ExecuteNextState(Context);
+        await ExecuteNextState(Context);
         await Context.SaveSession(this);
     }
 
-    protected override Task OnMessageRoutine()
+    protected override async Task OnMessageRoutine()
     {
         if (this.states.Count > 0)
         {
             var toRun = this.states[0];
-            return toRun.OnMessage(Context, this);
-        }
-        else
-        {
-            return Task.CompletedTask;
+            await toRun.OnMessage(Context, this);
+            await ExecuteNextState(Context);
+            await Context.SaveSession(this);
         }
     }
 
