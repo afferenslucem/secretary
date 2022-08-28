@@ -1,5 +1,6 @@
 using secretary.telegram.chains;
 using secretary.telegram.commands;
+using secretary.telegram.commands.registermail;
 using secretary.telegram.commands.registeruser;
 using secretary.telegram.commands.timeoff;
 

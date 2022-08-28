@@ -1,4 +1,6 @@
-﻿namespace secretary.telegram.commands.factories;
+﻿using secretary.telegram.commands.registermail;
+
+namespace secretary.telegram.commands.factories;
 
 public class RegisterMailCommandFactory: ICommandFactory
 {
