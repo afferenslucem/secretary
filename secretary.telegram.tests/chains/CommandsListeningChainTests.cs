@@ -33,6 +33,14 @@ public class CommandsListeningChainTests
     }
 
     [Test]
+    public void ShouldCancelCommand()
+    {
+        var result = this.chain.Get("/cancel");
+        
+        Assert.IsInstanceOf<CancelCommand>(result);
+    }
+
+    [Test]
     public void ShouldReturnTimeOffCommand()
     {
         var result = this.chain.Get(TimeOffCommand.Key);

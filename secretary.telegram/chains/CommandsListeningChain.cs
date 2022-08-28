@@ -16,6 +16,7 @@ public class CommandsListeningChain
         this.commandsChain.Add(RegisterUserCommand.Key, new RegisterUserCommandFactory());
         this.commandsChain.Add(RegisterMailCommand.Key, new RegisterMailCommandFactory());
         this.commandsChain.Add(TimeOffCommand.Key, new TimeOffCommandFactory());
+        this.commandsChain.Add(CancelCommand.Key, new CancelCommandFactory());
         this.commandsChain.Add(NullCommand.Key, new NullCommandFactory());
     }
 

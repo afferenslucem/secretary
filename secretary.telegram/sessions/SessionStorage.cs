@@ -2,7 +2,7 @@
 
 public class SessionStorage: ISessionStorage
 {
-    private readonly Dictionary<long, Session> sessions = new Dictionary<long, Session>();
+    private readonly Dictionary<long, Session> sessions = new();
 
     public Task<Session?> GetSession(long chatId)
     {
@@ -16,5 +16,16 @@ public class SessionStorage: ISessionStorage
         this.sessions[chatId] = session;
         
         return Task.CompletedTask;
+    }
+
+    public Task DeleteSession(long chatId)
+    {
+        return Task.Run(() =>
+        {
+            if (sessions.ContainsKey(chatId))
+            {
+                sessions.Remove(chatId);
+            }
+        });
     }
 }
