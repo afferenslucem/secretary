@@ -7,9 +7,14 @@ public class NullCommand: Command
     protected override async Task ExecuteRoutine()
     {
         var session = await Context.GetSession();
+
+        if (session == null || session.LastCommand == null)
+        {
+            await Context.TelegramClient.SendMessage(ChatId, "Извините, я не понял\r\nОтправьте команду");
+            
+            return;
+        };
         
-        if (session == null || session.LastCommand == null) return;
-        
-        await session.LastCommand.OnMessage(Context, this);
+        await session.LastCommand.OnMessage(Context);
     }
 }

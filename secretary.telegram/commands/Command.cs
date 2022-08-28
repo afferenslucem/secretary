@@ -23,7 +23,7 @@ public abstract class Command
 
     protected abstract Task ExecuteRoutine();
 
-    public Task OnMessage(CommandContext context, Command? parentCommand = null)
+    public virtual Task OnMessage(CommandContext context, Command? parentCommand = null)
     {
         this.Context = context;
         ParentCommand = parentCommand;
