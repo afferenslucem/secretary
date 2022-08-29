@@ -75,17 +75,26 @@ public class TelegramBot: ITelegramClient
 
         var command = this._chain.Get(message.Text)!;
 
-        await command.Execute(new CommandContext(
-            message.Chat.Id,
-            this,
-            this._sessionStorage,
-            this._database.UserStorage,
-            this._database.DocumentStorage,
-            this._database.EmailStorage,
-            this._yandexAuthenticator,
-            this._mailClient,
-            message.Text
-        ));
+        try
+        {
+            await command.Execute(new CommandContext(
+                message.Chat.Id,
+                this,
+                this._sessionStorage,
+                this._database.UserStorage,
+                this._database.DocumentStorage,
+                this._database.EmailStorage,
+                this._yandexAuthenticator,
+                this._mailClient,
+                message.Text
+            ));
+            
+            Console.WriteLine($"Executed command { command.GetType().Name }");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 
     Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
@@ -120,10 +129,8 @@ public class TelegramBot: ITelegramClient
     {
         await using var fileStream = File.OpenRead(path);
         
-        var result = await this._telegramClient.SendDocumentAsync(
+        await this._telegramClient.SendDocumentAsync(
             chatId: chatId,
             document: new InputOnlineFile(content: fileStream, fileName: fileName), cancellationToken: this._cancellationToken.Token);
-        
-        Console.WriteLine(result.MessageId);
     }
 }
