@@ -64,37 +64,43 @@ public class TelegramBot: ITelegramClient
         }
     }
     
-    async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
         var message = update.Message;
 
         if (message?.Text == null)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         var command = this._chain.Get(message.Text)!;
+        
+        var execution = command.Execute(new CommandContext(
+            message.Chat.Id,
+            this,
+            this._sessionStorage,
+            this._database.UserStorage,
+            this._database.DocumentStorage,
+            this._database.EmailStorage,
+            this._yandexAuthenticator,
+            this._mailClient,
+            message.Text
+        ));
+        
+        execution.ContinueWith(_ =>
+        {
+            Console.WriteLine($"Executed command {command.GetType().Name}");
+        });
 
-        try
+        execution.ContinueWith(task =>
         {
-            await command.Execute(new CommandContext(
-                message.Chat.Id,
-                this,
-                this._sessionStorage,
-                this._database.UserStorage,
-                this._database.DocumentStorage,
-                this._database.EmailStorage,
-                this._yandexAuthenticator,
-                this._mailClient,
-                message.Text
-            ));
-            
-            Console.WriteLine($"Executed command { command.GetType().Name }");
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+            if (task.IsFaulted)
+            {
+                Console.WriteLine(task.Exception);
+            }
+        });
+
+        return Task.CompletedTask;
     }
 
     Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
