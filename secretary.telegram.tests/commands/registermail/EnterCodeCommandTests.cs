@@ -45,7 +45,7 @@ public class EnterCodeCommandTests
             }
         );
 
-        _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>()))
+        _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TokenData() { access_token = "token"});
         
         await this._command.Execute(_context);
@@ -75,7 +75,7 @@ public class EnterCodeCommandTests
 
         _userStorage.Setup(obj => obj.GetUser(It.IsAny<long>())).ReturnsAsync(oldUser);
         
-        _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>()))
+        _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TokenData() { access_token = "token"});
         
         await this._command.Execute(_context);
@@ -87,7 +87,7 @@ public class EnterCodeCommandTests
     [Test]
     public async Task ShouldUpdateTokens()
     {
-        _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>()))
+        _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TokenData() { access_token = "access_token", refresh_token = "refresh_token", expires_in = 500 });
         
         _yandexAuthenticator.Setup(target => target.GetAuthenticationCode()).ReturnsAsync(

@@ -5,13 +5,20 @@ namespace secretary.telegram.commands;
 
 public abstract class Command
 {
-    public CommandContext Context { get; set; }
+    protected CancellationTokenSource CancellationToken;
+
+    public CommandContext Context { get; set; } = null!;
 
     protected long ChatId => Context.ChatId;
 
     protected string Message => Context.Message;
-    
-    public Command? ParentCommand { get; set; }
+
+    public Command? ParentCommand { get; set; } = null!;
+
+    protected Command()
+    {
+        CancellationToken = new CancellationTokenSource();
+    }
 
     public Task Execute(CommandContext context, Command? parentCommand = null)
     {
@@ -39,5 +46,10 @@ public abstract class Command
     protected virtual Task OnMessageRoutine()
     {
         return Task.CompletedTask;
+    }
+
+    public virtual void Cancel()
+    {
+        this.CancellationToken.Cancel();
     }
 }

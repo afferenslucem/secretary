@@ -13,7 +13,7 @@ public class EnterCodeCommand: Command
             $"Пожалуйста, <strong>УБЕДИТЕСЬ</strong>, что вы авторизуетесь в рабочей почте!\r\n" +
             $"Введите этот код: <code>{data.user_code}</code> в поле ввода по этой ссылке: {data.verification_url}");
 
-        var tokenData = await this.AskRegistration(Context.YandexAuthenticator, data);
+        var tokenData = await this.AskRegistration(Context.YandexAuthenticator, data, DateTime.Now);
 
         if (tokenData != null)
         {
@@ -22,20 +22,20 @@ public class EnterCodeCommand: Command
         }
     }
 
-    private async Task<TokenData?> AskRegistration(IYandexAuthenticator client, AuthenticationData data)
+    private async Task<TokenData?> AskRegistration(IYandexAuthenticator client, AuthenticationData data, DateTime startTime)
     {
-        var startTime = DateTime.Now;
-        
-        while ((DateTime.Now - startTime).TotalSeconds < data.expires_in)
+        if (DateTime.Now >= startTime.AddSeconds(data.expires_in) || this.CancellationToken.IsCancellationRequested)
         {
-            var token = await client.CheckToken(data);
-
-            if (token?.access_token != null) return token;
-
-            await Task.Delay((int) (data.interval * 1000 * 1.5));
+            return null;
         }
+        
+        var token = await client.CheckToken(data, CancellationToken.Token);
 
-        return null;
+        if (token?.access_token != null) return token;
+
+        await Task.Delay(data.interval * 1000, CancellationToken.Token);
+
+        return await this.AskRegistration(client, data, startTime);
     }
     
     

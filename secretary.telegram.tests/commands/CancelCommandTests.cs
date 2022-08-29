@@ -38,4 +38,21 @@ public class CancelCommandTests
         this._sessionStorage.Verify(target => target.DeleteSession(2517));
         this._client.Verify(target => target.SendMessage(2517, "Дальнейшее выполнение команды прервано"));
     }
+    
+    [Test]
+    public async Task ShouldCancelCommand()
+    {
+        var commandMock = new Mock<Command>();
+
+        var session = new Session()
+        {
+            LastCommand = commandMock.Object,
+        };
+
+        _sessionStorage.Setup(target => target.GetSession(It.IsAny<long>())).ReturnsAsync(session);
+        
+        await this._command.Execute(_context);
+        
+        commandMock.Verify(target => target.Cancel(), Times.Once);
+    }
 }

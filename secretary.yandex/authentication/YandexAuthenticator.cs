@@ -32,13 +32,13 @@ public class YandexAuthenticator: IYandexAuthenticator
         return result;
     }
 
-    public async Task<TokenData?> CheckToken(AuthenticationData data)
+    public async Task<TokenData?> CheckToken(AuthenticationData data, CancellationToken cancellationToken)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "https://oauth.yandex.ru/token");
 
         request.Content = new StringContent($"grant_type=device_code&code={data.device_code}&client_id={_mailConfig.ClientId}&client_secret={_mailConfig.ClientSecret}");
 
-        var response = await _httpClient.SendAsync(request);
+        var response = await _httpClient.SendAsync(request, cancellationToken);
 
         var responseData = await response.Content.ReadAsStringAsync();
 

@@ -7,7 +7,9 @@ public abstract class StatedCommand: Command {
     {
         this.states = this.ConfigureStates();
     }
-
+    
+    public abstract List<Command> ConfigureStates();
+    
     protected override async Task ExecuteRoutine()
     {
         await ExecuteNextState(Context);
@@ -22,6 +24,17 @@ public abstract class StatedCommand: Command {
             await toRun.OnMessage(Context, this);
             await ExecuteNextState(Context);
             await Context.SaveSession(this);
+        }
+    }
+
+    public override void Cancel()
+    {
+        base.Cancel();
+        
+        if (this.states.Count > 0)
+        {
+            var toRun = this.states[0];
+            toRun.Cancel();
         }
     }
 
@@ -40,6 +53,4 @@ public abstract class StatedCommand: Command {
             return Task.CompletedTask;
         }
     }
-
-    public abstract List<Command> ConfigureStates();
 }
