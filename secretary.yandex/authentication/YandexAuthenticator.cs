@@ -1,8 +1,6 @@
 ﻿using System.Text.Json;
-using MailKit.Net.Smtp;
-using MailKit.Security;
-using MimeKit;
 using secretary.configuration;
+using secretary.yandex.exceptions;
 
 namespace secretary.mail.Authentication;
 
@@ -17,33 +15,81 @@ public class YandexAuthenticator: IYandexAuthenticator
     }
 
     
-    public async Task<AuthenticationData?> GetAuthenticationCode()
+    public Task<AuthenticationData?> GetAuthenticationCode(CancellationToken cancellationToken)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "https://oauth.yandex.ru/device/code");
-
-        request.Content = new StringContent($"client_id={_mailConfig.ClientId}");
-
-        var response = await _httpClient.SendAsync(request);
-
-        var responseStream = await response.Content.ReadAsStringAsync();
-
-        var result = JsonSerializer.Deserialize<AuthenticationData>(responseStream);
-
-        return result;
+        return Retry(
+            () => this.SendAuthenticationCodeRequest(cancellationToken),
+            cancellationToken
+        );
     }
 
-    public async Task<TokenData?> CheckToken(AuthenticationData data, CancellationToken cancellationToken)
+    public Task<TokenData?> CheckToken(AuthenticationData data, CancellationToken cancellationToken)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "https://oauth.yandex.ru/token");
+        return Retry(
+            () => this.SendCheckTokenRequest(data, cancellationToken),
+            cancellationToken
+        );
+    }
 
-        request.Content = new StringContent($"grant_type=device_code&code={data.device_code}&client_id={_mailConfig.ClientId}&client_secret={_mailConfig.ClientSecret}");
+    private async Task<T> Retry<T>(Func<Task<T>> action, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await action();
+        }
+        catch (Exception e)
+        {
+            await Task.Delay(10000, cancellationToken);
+            return await action();
+        }
+    }
 
-        var response = await _httpClient.SendAsync(request, cancellationToken);
+    private async Task<AuthenticationData?> SendAuthenticationCodeRequest(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://oauth.yandex.ru/device/code");
 
-        var responseData = await response.Content.ReadAsStringAsync();
+            request.Content = new StringContent($"client_id={_mailConfig.ClientId}");
 
-        var result = JsonSerializer.Deserialize<TokenData>(responseData);
+            var response = await _httpClient.SendAsync(request, cancellationToken);
 
-        return result;
+            var responseStream = await response.Content.ReadAsStringAsync();
+
+            var result = JsonSerializer.Deserialize<AuthenticationData>(responseStream);
+
+            return result;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new YandexAuthenticationException("Could not get auth data", e);
+        }
+    }
+    
+    private async Task<TokenData?> SendCheckTokenRequest(AuthenticationData data, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://oauth.yandex.ru/token");
+
+            request.Content =
+                new StringContent(
+                    $"grant_type=device_code&code={data.device_code}&client_id={_mailConfig.ClientId}&client_secret={_mailConfig.ClientSecret}");
+
+            var response = await _httpClient.SendAsync(request, cancellationToken);
+
+            var responseData = await response.Content.ReadAsStringAsync();
+
+            var result = JsonSerializer.Deserialize<TokenData>(responseData);
+
+            return result;
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new YandexAuthenticationException("Could not get token", e);
+        }
     }
 }

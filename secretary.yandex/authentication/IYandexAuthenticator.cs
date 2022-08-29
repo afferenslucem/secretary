@@ -2,7 +2,7 @@
 
 public interface IYandexAuthenticator
 {
-    Task<AuthenticationData?> GetAuthenticationCode();
+    Task<AuthenticationData?> GetAuthenticationCode(CancellationToken cancellationToken);
 
     Task<TokenData?> CheckToken(AuthenticationData data, CancellationToken cancellationToken);
 }
