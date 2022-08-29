@@ -5,6 +5,7 @@ using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.registermail;
 using secretary.telegram.sessions;
+using secretary.yandex.exceptions;
 
 namespace secretary.telegram.tests.commands.registermail;
 
@@ -37,7 +38,7 @@ public class EnterCodeCommandTests
     [Test]
     public async Task ShouldSendCode()
     {
-        _yandexAuthenticator.Setup(target => target.GetAuthenticationCode()).ReturnsAsync(
+        _yandexAuthenticator.Setup(target => target.GetAuthenticationCode(It.IsAny<CancellationToken>())).ReturnsAsync(
             new AuthenticationData()
             {
                 user_code = "code",
@@ -53,12 +54,26 @@ public class EnterCodeCommandTests
         this._client.Verify(target => target.SendMessage(2517, "Пожалуйста, <strong>УБЕДИТЕСЬ</strong>, что вы авторизуетесь в рабочей почте!\r\n" +
                                                               "Введите этот код: <code>code</code> в поле ввода по этой ссылке: url"));
     }
+        
+    [Test]
+    public async Task ShouldSendSorryForYandexGetAuthCode()
+    {
+        _yandexAuthenticator
+            .Setup(target => target.GetAuthenticationCode(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new YandexAuthenticationException());
+        
+        await this._command.Execute(_context);
+        
+        this._client.Verify(target => target.SendMessage(2517, 
+            "При запросе токена для авторизации произошла ошибка:(\r\n" +
+            "Попробуйте через пару минут, если не сработает, то обратитесь по вот этому адресу @hrodveetnir"));
+    }
     
         
     [Test]
     public async Task ShouldSendDone()
     {
-        _yandexAuthenticator.Setup(target => target.GetAuthenticationCode()).ReturnsAsync(
+        _yandexAuthenticator.Setup(target => target.GetAuthenticationCode(It.IsAny<CancellationToken>())).ReturnsAsync(
             new AuthenticationData()
             {
                 user_code = "code",
@@ -90,7 +105,7 @@ public class EnterCodeCommandTests
         _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TokenData() { access_token = "access_token", refresh_token = "refresh_token", expires_in = 500 });
         
-        _yandexAuthenticator.Setup(target => target.GetAuthenticationCode()).ReturnsAsync(
+        _yandexAuthenticator.Setup(target => target.GetAuthenticationCode(It.IsAny<CancellationToken>())).ReturnsAsync(
             new AuthenticationData()
             {
                 user_code = "code",
@@ -111,5 +126,28 @@ public class EnterCodeCommandTests
         _userStorage.Verify(target => target.UpdateUser(It.Is<User>(
             user => user.ChatId == 2517 && user.Name == "Александр Пушкин" && user.AccessToken == "access_token" && user.RefreshToken == "refresh_token"
         )));
+    }
+    
+    [Test]
+    public async Task ShouldSendSorryForYandexCheckCode()
+    {
+        _yandexAuthenticator.Setup(target => target.GetAuthenticationCode(It.IsAny<CancellationToken>())).ReturnsAsync(
+            new AuthenticationData()
+            {
+                user_code = "code",
+                verification_url = "url",
+                expires_in = 300,
+            }
+        );
+        
+        _yandexAuthenticator
+            .Setup(target =>  target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new YandexAuthenticationException());
+        
+        await this._command.Execute(_context);
+        
+        this._client.Verify(target => target.SendMessage(2517, 
+            "При запросе токена для авторизации произошла ошибка:(\r\n" +
+            "Попробуйте через пару минут, если не сработает, то обратитесь по вот этому адресу @hrodveetnir"));
     }
 }
