@@ -1,0 +1,9 @@
+{
+    "TelegramApiKey": "",
+    "MailConfig": {
+      "ClientId": "",
+      "ClientSecret": ""
+    },
+    "DbPath": "",
+    "TemplatesPath": "../../../../templates"
+  }
