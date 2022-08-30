@@ -84,7 +84,7 @@ public class TimeOffCommandTests
         _context.Message = "Отработаю на следующей неделе";
         await this._command.OnMessage(_context);
         Assert.That(_command.Data.WorkingOff, Is.EqualTo("Отработаю на следующей неделе"));
-        _client.Verify(target => target.SendDocument(2517, It.IsAny<string>(), It.IsAny<string>()));
+        _client.Verify(target => target.SendDocument(2517, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
         _documentStorage
             .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))
