@@ -1,6 +1,5 @@
 ﻿using HtmlAgilityPack;
 using secretary.configuration;
-using secretary.documents.templates.docx;
 using secretary.documents.templates.html;
 
 namespace secretary.documents.tests.templates.html

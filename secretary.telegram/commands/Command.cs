@@ -1,7 +1,4 @@
-﻿using secretary.mail;
-using secretary.storage;
-
-namespace secretary.telegram.commands;
+﻿namespace secretary.telegram.commands;
 
 public abstract class Command
 {

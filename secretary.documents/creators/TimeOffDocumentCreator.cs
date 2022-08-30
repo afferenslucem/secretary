@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using secretary.documents.templates;
 using secretary.documents.templates.docx;
 
 namespace secretary.documents.creators;

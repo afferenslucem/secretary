@@ -1,17 +1,16 @@
-﻿using System.IO;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace secretary.configuration;
 
 public class Config
 {
-    public string TelegramApiKey { get; set; }
+    public string TelegramApiKey { get; set; } = null!;
 
-    public MailConfig MailConfig { get; set; }
+    public MailConfig MailConfig { get; set; } = null!;
     
-    public string DbPath { get; set; }
+    public string DbPath { get; set; } = null!;
     
-    public string TemplatesPath { get; set; }
+    public string TemplatesPath { get; set; } = null!;
 
     public static Config Instance { get; set; }
 
@@ -19,6 +18,8 @@ public class Config
     {
         var data = File.ReadAllText("config.json");
 
-        Instance = JsonSerializer.Deserialize<Config>(data);
+        var config = JsonSerializer.Deserialize<Config>(data);
+
+        Instance = config ?? throw new JsonException("Wrong config format");
     }
 }

@@ -1,7 +1,5 @@
 ﻿using Moq;
-using secretary.storage;
 using secretary.telegram.commands;
-using secretary.telegram.commands.registeruser;
 using secretary.telegram.sessions;
 
 namespace secretary.telegram.tests.commands;

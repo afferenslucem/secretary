@@ -1,7 +1,6 @@
-﻿using secretary.mail;
-using secretary.mail.Authentication;
-using secretary.telegram.sessions;
+﻿using secretary.mail.Authentication;
 using secretary.storage;
+using secretary.telegram.sessions;
 using secretary.yandex.mail;
 
 namespace secretary.telegram.commands;

@@ -1,6 +1,5 @@
 ﻿using secretary.telegram.commands;
 using secretary.telegram.commands.factories;
-using secretary.telegram.commands.factories;
 
 namespace secretary.telegram.chains;
 

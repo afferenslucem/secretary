@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using Xceed.Words.NET;
 
 namespace secretary.documents;
@@ -13,7 +11,7 @@ public class DocumentTemplatesStorage
 
     static DocumentTemplatesStorage()
     {
-        DocumentTemplatesStorage.Instance = new DocumentTemplatesStorage();
+        Instance = new DocumentTemplatesStorage();
     }
 
     public static void Initialize(string path)

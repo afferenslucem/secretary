@@ -1,10 +1,8 @@
 ﻿using Moq;
-using secretary.mail.Authentication;
 using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.registermail;
-using secretary.telegram.sessions;
 
 namespace secretary.telegram.tests.commands.registermail;
 

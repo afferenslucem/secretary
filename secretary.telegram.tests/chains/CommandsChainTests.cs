@@ -1,6 +1,6 @@
+using secretary.telegram.chains;
 using secretary.telegram.commands;
 using secretary.telegram.commands.factories;
-using secretary.telegram.chains;
 using secretary.telegram.commands.timeoff;
 
 namespace secretary.telegram.tests.chains;

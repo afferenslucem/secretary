@@ -1,6 +1,4 @@
 ﻿using secretary.documents.creators;
-using secretary.documents.templates;
-using Xceed.Words.NET;
 
 namespace secretary.documents.tests.templates
 {
