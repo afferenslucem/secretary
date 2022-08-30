@@ -1,6 +1,7 @@
 ﻿using Moq;
 using secretary.mail.Authentication;
 using secretary.storage;
+using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.registermail;
 using secretary.telegram.sessions;
@@ -42,4 +43,25 @@ public class RegisterMailCommandTests
         Assert.Pass();
     }
 
+
+    [Test]
+    public async Task ShouldRunFully()
+    {
+        _userStorage.Setup(target => target.GetUser(2517)).ReturnsAsync(() => new User());
+        
+        _context.Message = "/registermail";
+        await _command.Execute(_context);
+
+        _mailClient
+            .Setup(target => target.GetAuthenticationCode(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AuthenticationData() { expires_in = 300 } );
+        _mailClient
+            .Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new TokenData() { access_token = "access", refresh_token = "refresh"});
+        
+        _context.Message = "a.pushkin@infinnity.ru";
+        await _command.OnMessage(_context);
+        _userStorage.Verify(target => target.SetUser(It.Is<User>(user => user.Email == "a.pushkin@infinnity.ru")), Times.Once);
+        _userStorage.Verify(target => target.UpdateUser(It.Is<User>(user => user.AccessToken == "access" && user.RefreshToken == "refresh")), Times.Once);
+    }
 }
