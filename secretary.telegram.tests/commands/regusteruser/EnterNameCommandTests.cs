@@ -29,6 +29,8 @@ public class EnterNameCommandTests
             TelegramClient = this._client.Object, 
             UserStorage = this._userStorage.Object,
         };
+        
+        this._command.Context = _context;
     }
     
     [Test]
@@ -36,7 +38,7 @@ public class EnterNameCommandTests
     {
         _client.Setup(obj => obj.SendMessage(It.IsAny<long>(), It.IsAny<string>()));
 
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, "Введите ваши имя и фамилию в именительном падеже.\r\n" +
                                                               "Так они будут указаны в почтовом ящике, с которого будет отправляться письмо.\r\n" +
@@ -50,7 +52,7 @@ public class EnterNameCommandTests
 
         _context.Message = "Александр Пушкин";
         
-        await this._command.OnMessage(_context);
+        await this._command.OnMessage();
         
         this._userStorage.Verify(target => target.SetUser(
             It.Is<User>(user => user.ChatId == 2517 && user.Name == "Александр Пушкин")
@@ -70,7 +72,7 @@ public class EnterNameCommandTests
 
         _context.Message = "Александр Пушкин";
         
-        await this._command.OnMessage(_context);
+        await this._command.OnMessage();
         
         this._userStorage.Verify(target => target.SetUser(
             It.Is<User>(user => user.ChatId == 2517 && user.Name == "Александр Пушкин" && user.Email == "a.pushkin@infinnity.ru")

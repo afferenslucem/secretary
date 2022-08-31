@@ -1,6 +1,13 @@
-﻿namespace secretary.telegram.commands;
+﻿using Microsoft.Extensions.Logging;
+using secretary.logging;
+using secretary.telegram.exceptions;
 
-public abstract class StatedCommand: Command {
+namespace secretary.telegram.commands;
+
+public abstract class StatedCommand: Command
+{
+    private ILogger<StatedCommand> _logger = LogPoint.GetLogger<StatedCommand>();
+
     protected List<Command> states;
 
     protected StatedCommand() : base()
@@ -12,7 +19,7 @@ public abstract class StatedCommand: Command {
     
     protected override async Task ExecuteRoutine()
     {
-        await ExecuteNextState(Context);
+        await ExecuteNextState();
         await Context.SaveSession(this);
     }
 
@@ -21,9 +28,20 @@ public abstract class StatedCommand: Command {
         if (this.states.Count > 0)
         {
             var toRun = this.states[0];
-            await toRun.OnMessage(Context, this);
-            await ExecuteNextState(Context);
-            await Context.SaveSession(this);
+            toRun.Context = Context;
+            toRun.ParentCommand = this;
+
+            try
+            {
+                await toRun.ValidateMessage();
+                await toRun.OnMessage();
+                await ExecuteNextState();
+                await Context.SaveSession(this);
+            }
+            catch (IncorrectFormatException e)
+            {
+                _logger.LogWarning(e, $"Некорректный формат команды {toRun.GetType().Name}: \"{Context.Message}\"");
+            }
         }
     }
 
@@ -38,15 +56,18 @@ public abstract class StatedCommand: Command {
         }
     }
 
-    private Task ExecuteNextState(CommandContext context)
+    private Task ExecuteNextState()
     {
         if (this.states.Count > 1)
         {
             this.states.RemoveAt(0);
-
-            var first = states.First();
             
-            return first.Execute(context, this);
+            var first = states.First();
+
+            first.Context = Context;
+            first.ParentCommand = this;
+            
+            return first.Execute();
         }
         else
         {

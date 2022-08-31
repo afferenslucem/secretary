@@ -1,4 +1,6 @@
-﻿using secretary.storage.models;
+﻿using System.Text.RegularExpressions;
+using secretary.storage.models;
+using secretary.telegram.exceptions;
 
 namespace secretary.telegram.commands.registermail;
 
@@ -22,5 +24,16 @@ public class EnterEmailCommand : Command
         user.Email = Message;
 
         await Context.UserStorage.SetUser(user);
+    }
+
+    public override async Task ValidateMessage()
+    {
+        var emailRegex = new Regex(@"^[\w_\-\.]+@([\w\-_]+\.)+[\w-]{2,4}");
+
+        if (!emailRegex.IsMatch(Message))
+        {
+            await this.Context.TelegramClient.SendMessage(ChatId, "Некорректный формат почты. Введите почту еще раз");
+            throw new IncorrectFormatException();
+        }
     }
 }

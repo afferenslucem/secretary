@@ -29,12 +29,14 @@ public class EnterJobTitleGenitiveCommandTests
             TelegramClient = this._client.Object, 
             UserStorage = this._userStorage.Object,
         };
+        
+        this._command.Context = _context;
     }
     
     [Test]
     public async Task ShouldSendJobTitleGenitiveCommand()
     {
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, "Введите вашу должность в родительном падеже.\r\n" +
                                                               "Так она будут указана в графе \"от кого\".\r\n" +
@@ -56,7 +58,7 @@ public class EnterJobTitleGenitiveCommandTests
 
         _context.Message = "поэта";
         
-        await this._command.OnMessage(_context);
+        await this._command.OnMessage();
         
         this._userStorage.Verify(target => target.UpdateUser(
             It.Is<User>(user => user.ChatId == 2517 && user.JobTitleGenitive == "поэта" && user.JobTitle == "поэт" && user.NameGenitive == "Пушкина Александра Сергеевича" && user.Name == "Александр Пушкин")

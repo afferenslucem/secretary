@@ -26,12 +26,14 @@ public class CancelCommandTests
             SessionStorage = this._sessionStorage.Object, 
             TelegramClient = this._client.Object,
         };
+
+        this._command.Context = _context;
     }
     
     [Test]
     public async Task ShouldBreakCommand()
     {
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._sessionStorage.Verify(target => target.DeleteSession(2517));
         this._client.Verify(target => target.SendMessage(2517, "Дальнейшее выполнение команды прервано"));
@@ -49,7 +51,7 @@ public class CancelCommandTests
 
         _sessionStorage.Setup(target => target.GetSession(It.IsAny<long>())).ReturnsAsync(session);
         
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         commandMock.Verify(target => target.Cancel(), Times.Once);
     }

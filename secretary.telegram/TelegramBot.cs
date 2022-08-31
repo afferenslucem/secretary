@@ -51,8 +51,8 @@ public class TelegramBot
         try
         {
             _logger.LogInformation($"Start execute command {command.GetType().Name}");
-            
-            await command.Execute(new CommandContext(
+
+            command.Context = new CommandContext(
                 message.ChatId,
                 _telegramClient,
                 _sessionStorage,
@@ -62,7 +62,8 @@ public class TelegramBot
                 _yandexAuthenticator,
                 _mailClient,
                 message.Text
-            ));
+            );
+            await command.Execute();
 
             _logger.LogInformation($"Сommand executed {command.GetType().Name}");
         }

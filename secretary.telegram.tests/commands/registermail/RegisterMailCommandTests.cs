@@ -35,6 +35,8 @@ public class RegisterMailCommandTests
         };
 
         this._command = new RegisterMailCommand();
+        
+        this._command.Context = _context;
     }
 
     [Test]
@@ -42,15 +44,14 @@ public class RegisterMailCommandTests
     {
         Assert.Pass();
     }
-
-
+    
     [Test]
     public async Task ShouldRunFully()
     {
         _userStorage.Setup(target => target.GetUser(2517)).ReturnsAsync(() => new User());
         
         _context.Message = "/registermail";
-        await _command.Execute(_context);
+        await _command.Execute();
 
         _mailClient
             .Setup(target => target.GetAuthenticationCode(It.IsAny<CancellationToken>()))
@@ -60,7 +61,48 @@ public class RegisterMailCommandTests
             .ReturnsAsync(new TokenData() { access_token = "access", refresh_token = "refresh"});
         
         _context.Message = "a.pushkin@infinnity.ru";
-        await _command.OnMessage(_context);
+        await _command.OnMessage();
+        _userStorage.Verify(target => target.SetUser(It.Is<User>(user => user.Email == "a.pushkin@infinnity.ru")), Times.Once);
+        _userStorage.Verify(target => target.UpdateUser(It.Is<User>(user => user.AccessToken == "access" && user.RefreshToken == "refresh")), Times.Once);
+    }
+    
+    [Test]
+    public async Task ShouldAskEmailAgainForIncorrectEmail()
+    {
+        _userStorage.Setup(target => target.GetUser(2517)).ReturnsAsync(() => new User());
+        
+        _context.Message = "/registermail";
+        await _command.Execute();
+
+        _context.Message = "a.pushkin";
+
+        await _command.OnMessage();
+        _client.Verify(target => target.SendMessage(2517, "Некорректный формат почты. Введите почту еще раз"));
+    }
+    
+    [Test]
+    public async Task ShouldPassExecutionAfterIncorrectMail()
+    {
+        _userStorage.Setup(target => target.GetUser(2517)).ReturnsAsync(() => new User());
+        
+        _context.Message = "/registermail";
+        await _command.Execute();
+
+        _context.Message = "a.pushkin";
+
+        await _command.OnMessage();
+        _client.Verify(target => target.SendMessage(2517, "Некорректный формат почты. Введите почту еще раз"));
+        
+        _mailClient
+            .Setup(target => target.GetAuthenticationCode(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AuthenticationData() { expires_in = 300 } );
+        _mailClient
+            .Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new TokenData() { access_token = "access", refresh_token = "refresh"});
+        
+        _context.Message = "a.pushkin@infinnity.ru";
+        
+        await _command.OnMessage();
         _userStorage.Verify(target => target.SetUser(It.Is<User>(user => user.Email == "a.pushkin@infinnity.ru")), Times.Once);
         _userStorage.Verify(target => target.UpdateUser(It.Is<User>(user => user.AccessToken == "access" && user.RefreshToken == "refresh")), Times.Once);
     }

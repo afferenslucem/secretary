@@ -14,7 +14,10 @@ public class NullCommand: Command
             
             return;
         };
+
+        var command = session.LastCommand;
+        command.Context = Context;
         
-        await session.LastCommand.OnMessage(Context);
+        await command.OnMessage();
     }
 }

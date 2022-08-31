@@ -35,6 +35,9 @@ public class CheckDocumentCommandTests
             TelegramClient = this._client.Object, 
             UserStorage = this._userStorage.Object,
         };
+        
+        this._command.Context = _context;
+        this._command.ParentCommand = _parent;
     }
     
     [Test]
@@ -49,7 +52,7 @@ public class CheckDocumentCommandTests
         _creator.Setup(target => target.Create(It.IsAny<TimeOffData>())).Returns("timeoff-path.docx");
 
         _context.Message = "Да";
-        await this._command.Execute(_context, this._parent);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, "Проверьте документ"));
         this._client.Verify(target => target.SendDocument(2517, "timeoff-path.docx", "Александр-Пушкин-08.12.2022-Отгул.docx"));
