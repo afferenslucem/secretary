@@ -10,14 +10,14 @@ public class EnterReasonCommand : Command
             new [] {"Пропустить"});
     }
 
-    public override Task OnMessage()
+    public override Task<int> OnMessage()
     {
-        if (Message == "Пропустить") return Task.CompletedTask;
+        if (Message == "Пропустить") return Task.FromResult(RunNext);
         
         var parent = this.ParentCommand as TimeOffCommand;
         
         parent!.Data.Reason = Message;
         
-        return Task.CompletedTask;
+        return Task.FromResult(RunNext);
     }
 }

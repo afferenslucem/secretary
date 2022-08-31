@@ -11,12 +11,12 @@ public class EnterPeriodCommand : Command
                                                           "Лучше соблюдать форматы даты и всемени, потому что со временем я хочу еще сделать создание события в календаре яндекса:)");
     }
     
-    public override Task OnMessage()
+    public override Task<int> OnMessage()
     {
         var parent = this.ParentCommand as TimeOffCommand;
         
         parent!.Data.Period = Message;
         
-        return Task.CompletedTask;
+        return Task.FromResult(RunNext);
     }
 }

@@ -25,9 +25,11 @@ public abstract class StatedCommand: Command
         await Context.SaveSession(this);
     }
 
-    public override async Task OnMessage() {
+    public override async Task<int> OnMessage() {
         await Clip.Run(Context);
         await Context.SaveSession(this);
+        
+        return RunNext;
     }
 
     public override async Task Cancel()

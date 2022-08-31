@@ -11,7 +11,7 @@ public class EnterNameCommand : Command
                                                           @"Например: <i>Александр Пушкин</i>");
     }
 
-    public override async Task OnMessage()
+    public override async Task<int> OnMessage()
     {
         var user = await Context.UserStorage.GetUser(ChatId);
 
@@ -23,5 +23,7 @@ public class EnterNameCommand : Command
         user.Name = Message;
 
         await Context.UserStorage.SetUser(user);
+        
+        return RunNext;
     }
 }

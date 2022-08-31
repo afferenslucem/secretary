@@ -30,9 +30,9 @@ public class CommandClip
             var firstPartExecutor = new ChildCommandExecutor(firstPartCommand, context, _parentCommand);
 
             await firstPartExecutor.ValidateMessage();
-            await firstPartExecutor.OnMessage();
+            var increment = await firstPartExecutor.OnMessage();
 
-            _runIndex++;
+            _runIndex += increment;
 
             if (_runIndex == this._states.Length) return;
 

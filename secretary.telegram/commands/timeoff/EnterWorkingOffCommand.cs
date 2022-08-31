@@ -12,14 +12,14 @@ public class EnterWorkingOffCommand : Command
             new [] { "Пропустить" });
     }
     
-    public override Task OnMessage()
+    public override Task<int> OnMessage()
     {
-        if (Message == "Пропустить") return Task.CompletedTask;
+        if (Message == "Пропустить") return Task.FromResult(RunNext);
         
         var parent = this.ParentCommand as TimeOffCommand;
         
         parent!.Data.WorkingOff = Message;
         
-        return Task.CompletedTask;
+        return Task.FromResult(RunNext);
     }
 }

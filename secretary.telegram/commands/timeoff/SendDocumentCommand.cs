@@ -74,7 +74,7 @@ public class SendDocumentCommand : Command
         return Context.TelegramClient.SendMessageWithKeyBoard(ChatId, message, new [] { "Повторить" });
     }
 
-    public override async Task OnMessage()
+    public override async Task<int> OnMessage()
     {
         var document = await Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);
         var user = await Context.UserStorage.GetUser(ChatId);
@@ -94,6 +94,8 @@ public class SendDocumentCommand : Command
         var message = this.GetMailMessage(user, emails);
 
         await SendMail(message);
+        
+        return RunNext;
     }
 
     public SecretaryMailMessage GetMailMessage(User user, IEnumerable<Email> emails)
