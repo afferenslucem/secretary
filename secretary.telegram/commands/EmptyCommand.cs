@@ -2,7 +2,7 @@
 
 public class EmptyCommand: Command
 {
-    protected override Task ExecuteRoutine()
+    public override Task Execute()
     {
         return Task.CompletedTask;
     }

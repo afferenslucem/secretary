@@ -12,7 +12,7 @@ public class CheckDocumentCommand : Command
         this.Creator = new TimeOffDocumentCreator();
     }
     
-    protected override async Task ExecuteRoutine()
+    public override async Task Execute()
     {
         var parent = ParentCommand as TimeOffCommand;
 

@@ -4,14 +4,14 @@ namespace secretary.telegram.commands.registeruser;
 
 public class EnterJobTitleCommand : Command
 {
-    protected override Task ExecuteRoutine()
+    public override Task Execute()
     {
         return Context.TelegramClient.SendMessage(ChatId, "Введите вашу должность в именительном падеже.\r\n" +
                                                           "Так она будут указана в подписи письма.\r\n" +
                                                           @"Например: С уважением, <i>поэт</i> Александр Пушкин");
     }
 
-    protected override async Task OnMessageRoutine()
+    public override async Task OnMessage()
     {
         var user = await Context.UserStorage.GetUser(ChatId);
 

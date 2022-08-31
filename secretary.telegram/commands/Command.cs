@@ -17,30 +17,22 @@ public abstract class Command
         CancellationToken = new CancellationTokenSource();
     }
 
-    public Task Execute()
-    {
-        return this.ExecuteRoutine();
-    }
-
-    protected abstract Task ExecuteRoutine();
+    public abstract Task Execute();
 
     public virtual Task OnMessage()
     {
-        return this.OnMessageRoutine();
+        return Task.CompletedTask;
     }
 
     public virtual Task ValidateMessage()
     {
         return Task.CompletedTask;
     }
-    
-    protected virtual Task OnMessageRoutine()
-    {
-        return Task.CompletedTask;
-    }
 
-    public virtual void Cancel()
+    public virtual Task Cancel()
     {
         this.CancellationToken.Cancel();
+        
+        return Task.CompletedTask;
     }
 }

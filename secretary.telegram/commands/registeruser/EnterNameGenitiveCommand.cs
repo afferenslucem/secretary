@@ -4,14 +4,14 @@ namespace secretary.telegram.commands.registeruser;
 
 public class EnterNameGenitiveCommand : Command
 {
-    protected override Task ExecuteRoutine()
+    public override Task Execute()
     {
         return Context.TelegramClient.SendMessage(ChatId, "Введите ваши имя и фамилию в родительном падеже.\r\n" +
                                                           "Так они будут указаны в отправоляемом документе в графе \"от кого\".\r\n" +
                                                           @"Например: От <i>Пушкина Александра Сергеевича</i>");
     }
 
-    protected override async Task OnMessageRoutine()
+    public override async Task OnMessage()
     {
         var user = await Context.UserStorage.GetUser(ChatId);
 

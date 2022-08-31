@@ -18,7 +18,7 @@ public class SendDocumentCommand : Command
         MessageCreator = new TimeOffMessageCreator();
     }
 
-    protected override async Task ExecuteRoutine()
+    public override async Task Execute()
     {
         if (Message != "Да") return;
 
@@ -64,7 +64,7 @@ public class SendDocumentCommand : Command
         return Context.TelegramClient.SendMessageWithKeyBoard(ChatId, message, new [] { "Повторить" });
     }
 
-    protected override async Task OnMessageRoutine()
+    public override async Task OnMessage()
     {
         var document = await Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);
         var user = await Context.UserStorage.GetUser(ChatId);

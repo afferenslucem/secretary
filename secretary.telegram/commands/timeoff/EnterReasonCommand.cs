@@ -2,7 +2,7 @@
 
 public class EnterReasonCommand : Command
 {
-    protected override Task ExecuteRoutine()
+    public override Task Execute()
     {
         return Context.TelegramClient.SendMessageWithKeyBoard(ChatId, 
             "Введите причину отгула, это опционально, если вы нажмете \"Пропустить\", то этой графы не будет в заявлении.\r\n" +
@@ -10,7 +10,7 @@ public class EnterReasonCommand : Command
             new [] {"Пропустить"});
     }
 
-    protected override Task OnMessageRoutine()
+    public override Task OnMessage()
     {
         if (Message == "Пропустить") return Task.CompletedTask;
         

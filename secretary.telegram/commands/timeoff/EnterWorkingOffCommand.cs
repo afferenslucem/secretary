@@ -2,7 +2,7 @@
 
 public class EnterWorkingOffCommand : Command
 {
-    protected override Task ExecuteRoutine()
+    public override Task Execute()
     {
         return Context.TelegramClient.SendMessageWithKeyBoard(ChatId, 
             "Введите данные об отработке в свободном формате.\r\n" +
@@ -12,7 +12,7 @@ public class EnterWorkingOffCommand : Command
             new [] { "Пропустить" });
     }
     
-    protected override Task OnMessageRoutine()
+    public override Task OnMessage()
     {
         if (Message == "Пропустить") return Task.CompletedTask;
         

@@ -1,10 +1,12 @@
-﻿namespace secretary.telegram.commands;
+﻿using secretary.telegram.commands.executors;
+
+namespace secretary.telegram.commands;
 
 public class NullCommand: Command
 {
     public const string Key = "*";
     
-    protected override async Task ExecuteRoutine()
+    public override async Task Execute()
     {
         var session = await Context.GetSession();
 
@@ -15,9 +17,6 @@ public class NullCommand: Command
             return;
         };
 
-        var command = session.LastCommand;
-        command.Context = Context;
-        
-        await command.OnMessage();
+        await new CommandExecutor(session.LastCommand, Context).OnMessage();
     }
 }
