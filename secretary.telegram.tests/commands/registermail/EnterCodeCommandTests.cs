@@ -32,6 +32,8 @@ public class EnterCodeCommandTests
         };
 
         this._command = new EnterCodeCommand();
+        
+        this._command.Context = _context;
     }
     
     [Test]
@@ -48,7 +50,7 @@ public class EnterCodeCommandTests
         _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TokenData() { access_token = "token"});
         
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, "Пожалуйста, <strong>УБЕДИТЕСЬ</strong>, что вы авторизуетесь в рабочей почте!\r\n" +
                                                               "Введите этот код: <code>code</code> в поле ввода по этой ссылке: url"));
@@ -61,7 +63,7 @@ public class EnterCodeCommandTests
             .Setup(target => target.GetAuthenticationCode(It.IsAny<CancellationToken>()))
             .ThrowsAsync(new YandexAuthenticationException());
         
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, 
             "При запросе токена для авторизации произошла ошибка:(\r\n" +
@@ -92,7 +94,7 @@ public class EnterCodeCommandTests
         _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TokenData() { access_token = "token"});
         
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, "Ура, вы успешно зарегистрировали почту"));
     }
@@ -120,7 +122,7 @@ public class EnterCodeCommandTests
         };
         _userStorage.Setup(obj => obj.GetUser(It.IsAny<long>())).ReturnsAsync(oldUser);
         
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         _userStorage.Verify(target => target.UpdateUser(It.Is<User>(
             user => user.ChatId == 2517 && user.Name == "Александр Пушкин" && user.AccessToken == "access_token" && user.RefreshToken == "refresh_token"
@@ -143,7 +145,7 @@ public class EnterCodeCommandTests
             .Setup(target =>  target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new YandexAuthenticationException());
         
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, 
             "При запросе токена для авторизации произошла ошибка:(\r\n" +

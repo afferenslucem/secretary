@@ -5,6 +5,7 @@ using secretary.mail.Authentication;
 using secretary.storage;
 using secretary.telegram.chains;
 using secretary.telegram.commands;
+using secretary.telegram.commands.executors;
 using secretary.telegram.sessions;
 using secretary.yandex.mail;
 
@@ -50,10 +51,9 @@ public class TelegramBot
         
         try
         {
-
             _logger.LogInformation($"Start execute command {command.GetType().Name}");
-            
-            await command.Execute(new CommandContext(
+
+            var context = new CommandContext(
                 message.ChatId,
                 _telegramClient,
                 _sessionStorage,
@@ -63,7 +63,9 @@ public class TelegramBot
                 _yandexAuthenticator,
                 _mailClient,
                 message.Text
-            ));
+            );
+
+            await new CommandExecutor(command, context).Execute();
 
             _logger.LogInformation($"Сommand executed {command.GetType().Name}");
         }

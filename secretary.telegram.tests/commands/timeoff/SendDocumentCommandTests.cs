@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using MailKit.Security;
+using Moq;
 using secretary.documents.creators;
 using secretary.storage;
 using secretary.storage.models;
@@ -48,6 +49,9 @@ public class SendDocumentCommandTests
             UserStorage = this._userStorage.Object,
             MailClient = this._mailClient.Object,
         };
+        
+        this._command.Context = _context;
+        this._command.ParentCommand = _parent;
     }
     
     [Test]
@@ -59,7 +63,7 @@ public class SendDocumentCommandTests
             .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))
             .ReturnsAsync(new Document());
 
-        await _command.Execute(_context);
+        await _command.Execute();
 
         _documentStorage
             .Verify(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()), Times.Never);
@@ -80,7 +84,7 @@ public class SendDocumentCommandTests
 
         _client.Setup(target => target.SendMessage(It.IsAny<long>(), It.IsAny<string>()));
 
-        await _command.Execute(_context);
+        await _command.Execute();
 
         _client.Verify(target => target.SendMessage(
             2517,
@@ -114,7 +118,7 @@ public class SendDocumentCommandTests
 
         _client.Setup(target => target.SendMessage(It.IsAny<long>(), It.IsAny<string>()));
 
-        await _command.Execute(_context);
+        await _command.Execute();
 
         _client.Verify(target => target.SendMessageWithKeyBoard(
             2517,
@@ -165,7 +169,7 @@ public class SendDocumentCommandTests
         _parent.Data.FilePath = "timeoff.docx";
         _parent.Data.Period = "28.08.2022";
 
-        await this._command.OnMessage(_context, _parent);
+        await this._command.OnMessage();
 
         var expectedReceivers = new[]
         {
@@ -250,7 +254,7 @@ public class SendDocumentCommandTests
         _parent.Data.FilePath = "timeoff.docx";
         _parent.Data.Period = "28.08.2022";
 
-        await this._command.OnMessage(_context, _parent);
+        await this._command.OnMessage();
 
         var expectedReceivers = new[]
         {
@@ -315,5 +319,24 @@ public class SendDocumentCommandTests
             ));
         
         _client.Verify(target => target.SendMessage(2517, "Заяление отправлено"));
+    }
+
+    [Test]
+    public async Task ShouldProtectIncorrectRights()
+    {
+        _mailClient.Setup(target => target.SendMail(It.IsAny<SecretaryMailMessage>()))
+            .ThrowsAsync(new AuthenticationException("This user does not have access rights to this service"));
+
+        _command.Context = _context;
+        await _command.SendMail(null!);
+        
+        _client.Verify(target => target.SendMessage(
+            2517, 
+            "Не достаточно прав для отправки письма!\r\n\r\n" +
+            "Убедитесь, что токен выдан для вашего рабочего почтового ящика.\r\n" +
+            "Если ящик нужный, то перейдите в <a href=\"https://mail.yandex.ru/#setup/client\">настройки</a> " +
+            "и разрешите отправку по OAuth-токену с сервера imap.\r\n" +
+            "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке"
+            ));
     }
 }

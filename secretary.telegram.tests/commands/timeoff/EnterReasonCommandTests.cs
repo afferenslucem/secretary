@@ -26,6 +26,9 @@ public class EnterReasonCommandTests
             ChatId = 2517, 
             TelegramClient = this._client.Object, 
         };
+        
+        this._command.Context = _context;
+        this._command.ParentCommand = _parent;
     }
     
     [Test]
@@ -33,7 +36,7 @@ public class EnterReasonCommandTests
     {
         _client.Setup(obj => obj.SendMessage(It.IsAny<long>(), It.IsAny<string>()));
         
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessageWithKeyBoard(2517, 
             "Введите причину отгула, это опционально, если вы нажмете \"Пропустить\", то этой графы не будет в заявлении.\r\n" +
@@ -46,7 +49,7 @@ public class EnterReasonCommandTests
     {
         _context.Message = "Поеду заниматься ремонтом";
 
-        await this._command.OnMessage(_context, _parent);
+        await this._command.OnMessage();
         
         Assert.That(_context.Message, Is.EqualTo(this._parent.Data.Reason));
     }
@@ -57,7 +60,7 @@ public class EnterReasonCommandTests
     {
         _context.Message = "Пропустить";
         
-        await this._command.OnMessage(_context, _parent);
+        await this._command.OnMessage();
         
         Assert.IsNull(_parent.Data.Reason);
     }

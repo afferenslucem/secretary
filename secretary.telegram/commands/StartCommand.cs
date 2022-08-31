@@ -4,7 +4,7 @@ public class StartCommand: Command
 {
     public const string Key = "/start";
     
-    protected override Task ExecuteRoutine()
+    public override Task Execute()
     {
         return this.Context.TelegramClient.SendMessage(
             ChatId, 

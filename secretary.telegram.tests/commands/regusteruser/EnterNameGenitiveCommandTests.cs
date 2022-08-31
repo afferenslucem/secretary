@@ -29,12 +29,14 @@ public class EnterNameGenitiveCommandTests
             TelegramClient = this._client.Object, 
             UserStorage = this._userStorage.Object,
         };
+        
+        this._command.Context = _context;
     }
     
     [Test]
     public async Task ShouldSendExample()
     {
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, "Введите ваши имя и фамилию в родительном падеже.\r\n" +
                                                                "Так они будут указаны в отправоляемом документе в графе \"от кого\".\r\n" +
@@ -54,7 +56,7 @@ public class EnterNameGenitiveCommandTests
 
         _context.Message = "Пушкина Александра Сергеевича";
         
-        await this._command.OnMessage(_context);
+        await this._command.OnMessage();
         
         this._userStorage.Verify(target => target.UpdateUser(
             It.Is<User>(user => user.ChatId == 2517 && user.NameGenitive == "Пушкина Александра Сергеевича" && user.Name == "Александр Пушкин")

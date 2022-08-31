@@ -1,6 +1,14 @@
-﻿namespace secretary.telegram.commands;
+﻿using Microsoft.Extensions.Logging;
+using secretary.logging;
+using secretary.telegram.commands.executors;
+using secretary.telegram.exceptions;
 
-public abstract class StatedCommand: Command {
+namespace secretary.telegram.commands;
+
+public abstract class StatedCommand: Command
+{
+    private ILogger<StatedCommand> _logger = LogPoint.GetLogger<StatedCommand>();
+
     protected List<Command> states;
 
     protected StatedCommand() : base()
@@ -10,43 +18,54 @@ public abstract class StatedCommand: Command {
     
     public abstract List<Command> ConfigureStates();
     
-    protected override async Task ExecuteRoutine()
+    public override async Task Execute()
     {
-        await ExecuteNextState(Context);
+        await ExecuteNextState();
         await Context.SaveSession(this);
     }
 
-    protected override async Task OnMessageRoutine()
+    public override async Task OnMessage()
     {
         if (this.states.Count > 0)
         {
-            var toRun = this.states[0];
-            await toRun.OnMessage(Context, this);
-            await ExecuteNextState(Context);
-            await Context.SaveSession(this);
+            var executor = new ChildCommandExecutor(this.states[0], Context, this);
+
+            try
+            {
+                await executor.ValidateMessage();
+                await executor.OnMessage();
+                await ExecuteNextState();
+                await Context.SaveSession(this);
+            }
+            catch (IncorrectFormatException e)
+            {
+                _logger.LogWarning(e, $"Некорректный формат команды {executor.Command.GetType().Name}: \"{Context.Message}\"");
+            }
         }
     }
 
-    public override void Cancel()
+    public override async Task Cancel()
     {
-        base.Cancel();
+        await base.Cancel();
         
         if (this.states.Count > 0)
         {
-            var toRun = this.states[0];
-            toRun.Cancel();
+            var executor = new ChildCommandExecutor(this.states[0], Context, this);
+            await executor.Cancel();
         }
     }
 
-    private Task ExecuteNextState(CommandContext context)
+    private Task ExecuteNextState()
     {
         if (this.states.Count > 1)
         {
             this.states.RemoveAt(0);
-
-            var first = states.First();
             
-            return first.Execute(context, this);
+            var first = states.First();
+
+            var executor = new ChildCommandExecutor(first, Context, this);
+            
+            return executor.Execute();
         }
         else
         {

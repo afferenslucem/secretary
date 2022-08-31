@@ -26,14 +26,18 @@ public class NullCommandTests
             SessionStorage = this._sessionStorage.Object, 
             TelegramClient = this._client.Object,
         };
+        
+        this._command.Context = _context;
     }
     
     [Test]
     public async Task ShouldReturnSorryForEmptySession()
     {
         _sessionStorage.Setup(target => target.GetSession(It.IsAny<long>())).ReturnsAsync((Session?)null);
+
+        _command.Context = _context;
         
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, "Извините, я не понял\r\nОтправьте команду"));
     }
@@ -43,7 +47,7 @@ public class NullCommandTests
     {
         _sessionStorage.Setup(target => target.GetSession(It.IsAny<long>())).ReturnsAsync(new Session());
         
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, "Извините, я не понял\r\nОтправьте команду"));
     }
@@ -57,8 +61,8 @@ public class NullCommandTests
             .Setup(target => target.GetSession(It.IsAny<long>()))
             .ReturnsAsync(new Session() { LastCommand = lastCommand.Object});
         
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
-        lastCommand.Verify(target => target.OnMessage(It.IsAny<CommandContext>(), null));
+        lastCommand.Verify(target => target.OnMessage());
     }
 }

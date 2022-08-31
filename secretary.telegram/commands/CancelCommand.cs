@@ -4,7 +4,7 @@ public class CancelCommand: Command
 {
     public const string Key = "/cancel";
     
-    protected override async Task ExecuteRoutine()
+    public override async Task Execute()
     {
         var session = await Context.GetSession();
         

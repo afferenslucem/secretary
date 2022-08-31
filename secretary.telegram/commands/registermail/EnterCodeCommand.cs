@@ -10,7 +10,7 @@ public class EnterCodeCommand: Command
 {
     private ILogger<EnterCodeCommand> _logger = LogPoint.GetLogger<EnterCodeCommand>();
 
-    protected override Task ExecuteRoutine()
+    public override Task Execute()
     {
         _ = this.RegisterMail();
         

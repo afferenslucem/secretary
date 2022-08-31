@@ -1,4 +1,6 @@
-﻿using MimeKit;
+﻿using System.Net.Mail;
+using MailKit.Security;
+using MimeKit;
 using secretary.documents.creators;
 using secretary.storage.models;
 using secretary.telegram.utils;
@@ -16,7 +18,7 @@ public class SendDocumentCommand : Command
         MessageCreator = new TimeOffMessageCreator();
     }
 
-    protected override async Task ExecuteRoutine()
+    public override async Task Execute()
     {
         if (Message != "Да") return;
 
@@ -62,7 +64,7 @@ public class SendDocumentCommand : Command
         return Context.TelegramClient.SendMessageWithKeyBoard(ChatId, message, new [] { "Повторить" });
     }
 
-    protected override async Task OnMessageRoutine()
+    public override async Task OnMessage()
     {
         var document = await Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);
         var user = await Context.UserStorage.GetUser(ChatId);
@@ -79,14 +81,12 @@ public class SendDocumentCommand : Command
             await Context.EmailStorage.SaveForDocument(document.Id, emails);
         }
 
-        var config = this.GetMailMessage(user, emails);
+        var message = this.GetMailMessage(user, emails);
 
-        await Context.MailClient.SendMail(config);
-
-        await Context.TelegramClient.SendMessage(ChatId, "Заяление отправлено");
+        await SendMail(message);
     }
 
-    private SecretaryMailMessage GetMailMessage(User user, IEnumerable<Email> emails)
+    public SecretaryMailMessage GetMailMessage(User user, IEnumerable<Email> emails)
     {
         var parent = (ParentCommand as TimeOffCommand)!;
         
@@ -117,5 +117,28 @@ public class SendDocumentCommand : Command
         };
 
         return result;
+    }
+
+    public async Task SendMail(SecretaryMailMessage message)
+    {
+        try
+        {
+            await Context.MailClient.SendMail(message);
+
+            await Context.TelegramClient.SendMessage(ChatId, "Заяление отправлено");
+        }
+        catch (AuthenticationException e)
+        {
+            if (e.Message.Contains("This user does not have access rights to this service"))
+            {
+                await Context.TelegramClient.SendMessage(ChatId, 
+                    "Не достаточно прав для отправки письма!\r\n\r\n" +
+                    "Убедитесь, что токен выдан для вашего рабочего почтового ящика.\r\n" +
+                    "Если ящик нужный, то перейдите в <a href=\"https://mail.yandex.ru/#setup/client\">настройки</a> " +
+                    "и разрешите отправку по OAuth-токену с сервера imap.\r\n" +
+                    "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке"
+                    );
+            }
+        }
     }
 }

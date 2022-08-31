@@ -26,6 +26,9 @@ public class EnterPeriodCommandTests
             ChatId = 2517, 
             TelegramClient = this._client.Object, 
         };
+        
+        this._command.Context = _context;
+        this._command.ParentCommand = _parent;
     }
     
     [Test]
@@ -33,7 +36,7 @@ public class EnterPeriodCommandTests
     {
         _client.Setup(obj => obj.SendMessage(It.IsAny<long>(), It.IsAny<string>()));
         
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, "Введите период отгула в формате <strong>DD.MM.YYYY[ с HH:mm до HH:mm]</strong>\r\n" +
                                                               "Например: <i>26.04.2020 c 9:00 до 13:00</i>\r\n" +
@@ -47,7 +50,7 @@ public class EnterPeriodCommandTests
     {
         _context.Message = "16.08.2022 c 13:00 до 17:00";
       
-        await this._command.OnMessage(_context, _parent);
+        await this._command.OnMessage();
         
         Assert.That(_context.Message, Is.EqualTo(_parent.Data.Period));
     }

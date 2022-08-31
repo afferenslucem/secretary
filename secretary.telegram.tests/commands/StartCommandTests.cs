@@ -22,12 +22,14 @@ public class StartCommandTests
             ChatId = 2517, 
             TelegramClient = this._client.Object, 
         };
+        
+        this._command.Context = _context;
     }
     
     [Test]
     public async Task ShouldSendExampleMessage()
     {
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, "Добро пожаловать!\r\n" +
                                                                "\r\n" +

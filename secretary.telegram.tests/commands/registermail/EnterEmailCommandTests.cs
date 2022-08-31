@@ -3,6 +3,7 @@ using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.registermail;
+using secretary.telegram.exceptions;
 
 namespace secretary.telegram.tests.commands.registermail;
 
@@ -27,6 +28,7 @@ public class EnterEmailCommandTests
         };
 
         this._command = new EnterEmailCommand();
+        this._command.Context = _context;
     }
 
     [Test]
@@ -38,13 +40,12 @@ public class EnterEmailCommandTests
     [Test]
     public async Task ShouldSendEnterEmail()
     {
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, "Введите вашу почту, с которой вы отправляете заявления.\r\n" +
                                                               @"Например: <i>a.pushkin@infinnity.ru</i>"));
     }
     
-            
     [Test]
     public async Task ShouldSetEmail()
     {
@@ -52,7 +53,7 @@ public class EnterEmailCommandTests
 
         _context.Message = "a.pushkin@infinnity.ru";
         
-        await this._command.OnMessage(_context);
+        await this._command.OnMessage();
         
         this._userStorage.Verify(target => target.SetUser(
             It.Is<User>(user => user.ChatId == 2517 && user.Email == "a.pushkin@infinnity.ru")
@@ -72,10 +73,21 @@ public class EnterEmailCommandTests
 
         _context.Message = "a.pushkin@infinnity.ru";
         
-        await this._command.OnMessage(_context);
+        await this._command.OnMessage();
         
         this._userStorage.Verify(target => target.SetUser(
             It.Is<User>(user => user.ChatId == 2517 && user.Name == "Александр Пушкин" && user.Email == "a.pushkin@infinnity.ru")
         ));
+    }
+        
+    [Test]
+    public void ShouldThrowErrorForIncorrectEmail()
+    {
+        _context.Message = "a.pushkin@infinnity";
+
+        _command.Context = _context;
+        
+        Assert.ThrowsAsync<IncorrectFormatException>(async () => await this._command.ValidateMessage());
+        _client.Verify(target => target.SendMessage(2517, "Некорректный формат почты. Введите почту еще раз"));
     }
 }

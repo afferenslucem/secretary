@@ -26,6 +26,9 @@ public class EnterWorkingOffCommandTests
             ChatId = 2517, 
             TelegramClient = this._client.Object, 
         };
+        
+        this._command.Context = _context;
+        this._command.ParentCommand = _parent;
     }
     
     [Test]
@@ -33,7 +36,7 @@ public class EnterWorkingOffCommandTests
     {
         _client.Setup(obj => obj.SendMessage(It.IsAny<long>(), It.IsAny<string>()));
         
-        await this._command.Execute(_context);
+        await this._command.Execute();
         
         this._client.Verify(target => target.SendMessageWithKeyBoard(2517, 
             "Введите данные об отработке в свободном формате.\r\n" +
@@ -48,7 +51,7 @@ public class EnterWorkingOffCommandTests
     {
         _context.Message = "Отгул обязуюсь отработать";
         
-        await this._command.OnMessage(_context, _parent);
+        await this._command.OnMessage();
         
         Assert.That(_context.Message, Is.EqualTo(this._parent.Data.WorkingOff));
     }
@@ -58,7 +61,7 @@ public class EnterWorkingOffCommandTests
     {
         _context.Message = "Пропустить";
         
-        await this._command.OnMessage(_context, _parent);
+        await this._command.OnMessage();
         
         Assert.IsNull(this._parent.Data.WorkingOff);
     }

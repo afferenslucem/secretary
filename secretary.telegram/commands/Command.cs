@@ -17,36 +17,22 @@ public abstract class Command
         CancellationToken = new CancellationTokenSource();
     }
 
-    public Task Execute(CommandContext context, Command? parentCommand = null)
-    {
-        this.Context = context;
-        ParentCommand = parentCommand;
+    public abstract Task Execute();
 
-        return this.ExecuteRoutine();
-    }
-
-    protected abstract Task ExecuteRoutine();
-
-    public virtual Task OnMessage(CommandContext context, Command? parentCommand = null)
-    {
-        this.Context = context;
-        ParentCommand = parentCommand;
-        
-        return this.OnMessageRoutine();
-    }
-
-    protected internal void ValidateMessage(string message)
-    {
-        
-    }
-    
-    protected virtual Task OnMessageRoutine()
+    public virtual Task OnMessage()
     {
         return Task.CompletedTask;
     }
 
-    public virtual void Cancel()
+    public virtual Task ValidateMessage()
+    {
+        return Task.CompletedTask;
+    }
+
+    public virtual Task Cancel()
     {
         this.CancellationToken.Cancel();
+        
+        return Task.CompletedTask;
     }
 }
