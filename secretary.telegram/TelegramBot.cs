@@ -50,7 +50,6 @@ public class TelegramBot
         
         try
         {
-
             _logger.LogInformation($"Start execute command {command.GetType().Name}");
             
             await command.Execute(new CommandContext(
