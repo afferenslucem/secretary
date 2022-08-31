@@ -107,4 +107,15 @@ public class CommandClipTests
         
         _secondState.Verify(target => target.Cancel(), Times.Once);
     }
+
+    [Test]
+    public async Task ShouldSetBackwardRedirectOnNegativeStepReturning()
+    {
+        _secondState.Setup(target => target.OnMessage()).ReturnsAsync(-1);
+        
+        await _clip.Run(_context);
+        await _clip.Run(_context);
+        
+        Assert.That(_context.BackwardRedirect, Is.True);
+    }
 }

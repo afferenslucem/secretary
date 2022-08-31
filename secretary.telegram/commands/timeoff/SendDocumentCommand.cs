@@ -21,81 +21,14 @@ public class SendDocumentCommand : Command
 
     public override async Task Execute()
     {
-        if (Message.ToLower() != "да")
-        {
-            await this.CancelCommand();
-            return;
-        }
-
-        var document = await this.Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);
-        var emails = await this.Context.EmailStorage.GetForDocument(document.Id);
-
-        if (emails.Count() > 0)
-        {
-            await this.SendRepeat(emails);
-        }
-        else
-        {
-            await this.SendAskEmails();
-        }
-    }
-
-    public Task CancelCommand()
-    {
-        return Context.TelegramClient.SendMessage(ChatId, "Дальнейшее выполнение команды прервано");
-    }
-
-    public Task SendAskEmails()
-    {
-        return Context.TelegramClient.SendMessage(ChatId, 
-            "Отправьте список адресов для рассылки в формате:\r\n" +
-            "<code>" +
-            "a.pushkin@infinnity.ru (Александр Пушкин)\r\n" +
-            "s.esenin@infinnity.ru (Сергей Есенин)\r\n" +
-            "v.mayakovskii@infinnity.ru\r\n" +
-            "</code>\r\n\r\n" +
-            "Если вы укажете адрес без имени в скобках, то в имени отправителя будет продублированпочтовый адрес");
-    }
-
-    public Task SendRepeat(IEnumerable<Email> emails)
-    {
-        var emailsPrints = emails
-            .Select(item => item.DisplayName != null ? $"{item.Address} ({item.DisplayName})" : item.Address);
-
-        var emailTable = string.Join("\r\n", emailsPrints);
-
-        var message = "В прошлый раз вы сделали рассылку на эти адреса:\r\n" +
-                      "<code>\r\n" +
-                      $"{emailTable}" +
-                      "</code>\r\n" +
-                      "\r\n" +
-                      "Повторить?";
-        
-        return Context.TelegramClient.SendMessageWithKeyBoard(ChatId, message, new [] { "Повторить" });
-    }
-
-    public override async Task<int> OnMessage()
-    {
         var document = await Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);
         var user = await Context.UserStorage.GetUser(ChatId);
 
-        IEnumerable<Email> emails;
-
-        if (Message == "Повторить")
-        {
-            emails = await this.Context.EmailStorage.GetForDocument(document.Id);
-        }
-        else
-        {
-            emails = new EmailParser().ParseMany(Message);
-            await Context.EmailStorage.SaveForDocument(document.Id, emails);
-        }
+        IEnumerable<Email> emails = await this.Context.EmailStorage.GetForDocument(document.Id);
 
         var message = this.GetMailMessage(user, emails);
 
         await SendMail(message);
-        
-        return RunNext;
     }
 
     public SecretaryMailMessage GetMailMessage(User user, IEnumerable<Email> emails)

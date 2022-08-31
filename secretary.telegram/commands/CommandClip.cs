@@ -32,6 +32,11 @@ public class CommandClip
             await firstPartExecutor.ValidateMessage();
             var increment = await firstPartExecutor.OnMessage();
 
+            if (increment <= 0)
+            {
+                context.BackwardRedirect = true;
+            }
+            
             _runIndex += increment;
 
             if (_runIndex == this._states.Length) return;

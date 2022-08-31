@@ -53,89 +53,9 @@ public class SendDocumentCommandTests
         this._command.Context = _context;
         this._command.ParentCommand = _parent;
     }
-    
-    [Test]
-    public async Task ShouldSkipRunCommandForNo()
-    {
-        _context.Message = "Нет";
-        
-        _documentStorage
-            .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))
-            .ReturnsAsync(new Document());
-
-        await _command.Execute();
-
-        _documentStorage
-            .Verify(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()), Times.Never);
-    }
-    
-    [Test]
-    public async Task ShouldAskEmails()
-    {
-        _context.Message = "Да";
-
-        _documentStorage
-            .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))
-            .ReturnsAsync(new Document() { Id = 0 });
-
-        _emailStorage
-            .Setup(target => target.GetForDocument(It.IsAny<long>()))
-            .ReturnsAsync(new Email[0]);
-
-        _client.Setup(target => target.SendMessage(It.IsAny<long>(), It.IsAny<string>()));
-
-        await _command.Execute();
-
-        _client.Verify(target => target.SendMessage(
-            2517,
-            "Отправьте список адресов для рассылки в формате:\r\n" +
-            "<code>" +
-            "a.pushkin@infinnity.ru (Александр Пушкин)\r\n" +
-            "s.esenin@infinnity.ru (Сергей Есенин)\r\n" +
-            "v.mayakovskii@infinnity.ru\r\n" +
-            "</code>\r\n\r\n" +
-            "Если вы укажете адрес без имени в скобках, то в имени отправителя будет продублированпочтовый адрес"
-        ));
-    }
-    
-    [Test]
-    public async Task ShouldAskRepeat()
-    {
-        _context.Message = "Да";
-
-        _documentStorage
-            .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))
-            .ReturnsAsync(new Document() { Id = 0 });
-
-        _emailStorage
-            .Setup(target => target.GetForDocument(It.IsAny<long>()))
-            .ReturnsAsync(new []
-            {
-                new Email() { Address = "a.pushkin@infinnity.ru", DisplayName = "Александр Пушкин"},
-                new Email() { Address = "s.esenin@infinnity.ru", DisplayName = "Сергей Есенин"},
-                new Email() { Address = "v.mayakovskii@infinnity.ru"},
-            });
-
-        _client.Setup(target => target.SendMessage(It.IsAny<long>(), It.IsAny<string>()));
-
-        await _command.Execute();
-
-        _client.Verify(target => target.SendMessageWithKeyBoard(
-            2517,
-            "В прошлый раз вы сделали рассылку на эти адреса:\r\n" +
-            "<code>\r\n" +
-            "a.pushkin@infinnity.ru (Александр Пушкин)\r\n" +
-            "s.esenin@infinnity.ru (Сергей Есенин)\r\n" +
-            "v.mayakovskii@infinnity.ru" +
-            "</code>\r\n" +
-            "\r\n" +
-            "Повторить?",
-            new []{ "Повторить" }
-        ));
-    }
 
     [Test]
-    public async Task ShouldRepeatMessages()
+    public async Task ShouldSendMessage()
     {
         var emails = new[]
         {
@@ -169,7 +89,7 @@ public class SendDocumentCommandTests
         _parent.Data.FilePath = "timeoff.docx";
         _parent.Data.Period = "28.08.2022";
 
-        await this._command.OnMessage();
+        await this._command.Execute();
 
         var expectedReceivers = new[]
         {
@@ -228,100 +148,6 @@ public class SendDocumentCommandTests
     }
 
     [Test]
-    public async Task ShouldParseMails()
-    {
-        var user = new User()
-        {
-            Email = "user@infinnity.ru",
-            Name = "Пользовалель Пользователев",
-            JobTitle = "инженер-программист"
-        };
-        
-        _documentStorage
-            .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))
-            .ReturnsAsync(new Document() { Id = 0 });
-
-        _userStorage
-            .Setup(target => target.GetUser(It.IsAny<long>()))
-            .ReturnsAsync(user);
-        
-        _timeOffCreator.Setup(target => target.Create(It.IsAny<TimeOffData>())).Returns("html");
-
-        _context.Message = "a.pushkin@infinnity.ru (Александр Пушкин)\n" +
-                           "s.esenin@infinnity.ru (Сергей Есенин)\n" +
-                           "v.mayakovskii@infinnity.ru";
-        
-        _parent.Data.FilePath = "timeoff.docx";
-        _parent.Data.Period = "28.08.2022";
-
-        await this._command.OnMessage();
-
-        var expectedReceivers = new[]
-        {
-            new SecretaryMailAddress("a.pushkin@infinnity.ru", "Александр Пушкин"),
-            new SecretaryMailAddress("s.esenin@infinnity.ru", "Сергей Есенин"),
-            new SecretaryMailAddress("v.mayakovskii@infinnity.ru", null!),
-            new SecretaryMailAddress("user@infinnity.ru", "Пользовалель Пользователев"),
-        };
-        
-        var expectedEmails = new[]
-        {
-            new Email() { Address = "a.pushkin@infinnity.ru", DisplayName = "Александр Пушкин" },
-            new Email() { Address = "s.esenin@infinnity.ru", DisplayName = "Сергей Есенин" },
-            new Email() { Address = "v.mayakovskii@infinnity.ru" },
-        };
-        
-        _emailStorage.Verify(target => target.SaveForDocument(0, expectedEmails));
-
-        _timeOffCreator.Verify(target => target.Create(
-                It.Is<TimeOffData>(
-                    data => data.Name == "Пользовалель Пользователев" &&
-                            data.JobTitle == "инженер-программист" && 
-                            data.Period == "28.08.2022"
-                )
-            )
-        );
-        
-        _mailClient
-            .Verify(target => target.SendMail(
-                    It.Is<SecretaryMailMessage>(data => data.Receivers.SequenceEqual(expectedReceivers))
-                )
-            );
-        
-        _mailClient
-            .Verify(target => target.SendMail(
-                    It.Is<SecretaryMailMessage>(data => data.Sender.Equals(new SecretaryMailAddress("user@infinnity.ru", "Пользовалель Пользователев")))
-                )
-            );
-        
-        _mailClient
-            .Verify(target => target.SendMail(
-                    It.Is<SecretaryMailMessage>(data => data.Theme == "[Отгул 28.08.2022]")
-                )
-            );
-        
-        _mailClient
-            .Verify(target => target.SendMail(
-                    It.Is<SecretaryMailMessage>(data => 
-                        data.Attachments.Count() == 1 &&
-                        data.Attachments.First().Path == "timeoff.docx" &&
-                        data.Attachments.First().FileName == "Заявление.docx" &&
-                        data.Attachments.First().ContentType.MediaType == "application" &&
-                        data.Attachments.First().ContentType.MediaSubtype == "vnd.openxmlformats-officedocument.wordprocessingml.document")
-                )
-            );
-        
-        _mailClient
-            .Verify(target => target.SendMail(
-                    It.Is<SecretaryMailMessage>(data => 
-                        data.HtmlBody == "html"
-                )
-            ));
-        
-        _client.Verify(target => target.SendMessage(2517, "Заяление отправлено"));
-    }
-
-    [Test]
     public async Task ShouldProtectIncorrectRights()
     {
         _mailClient.Setup(target => target.SendMail(It.IsAny<SecretaryMailMessage>()))
@@ -338,15 +164,5 @@ public class SendDocumentCommandTests
             "и разрешите отправку по OAuth-токену с сервера imap.\r\n" +
             "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке"
             ));
-    }
-
-    [Test]
-    public async Task ShouldCancelCommandForNo()
-    {
-        _context.Message = "Нет";
-
-        await _command.Execute();
-        
-        _client.Verify(target => target.SendMessage(2517, "Дальнейшее выполнение команды прервано"));
     }
 }

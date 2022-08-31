@@ -25,6 +25,8 @@ public class CommandContext
 
     public string Message = null!;
 
+    public bool BackwardRedirect = false;
+
     public CommandContext(
         long chatId, 
         ITelegramClient telegramClient, 
