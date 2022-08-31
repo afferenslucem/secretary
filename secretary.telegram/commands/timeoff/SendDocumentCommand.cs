@@ -21,7 +21,7 @@ public class SendDocumentCommand : Command
 
     public override async Task Execute()
     {
-        if (Message.ToLower() == "нет")
+        if (Message.ToLower() != "да")
         {
             await this.CancelCommand();
             return;
