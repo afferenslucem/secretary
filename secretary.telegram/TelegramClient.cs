@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+using secretary.logging;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -11,6 +13,7 @@ namespace secretary.telegram;
 
 public class TelegramClient: ITelegramClient
 {
+    private ILogger<TelegramClient> _logger = LogPoint.GetLogger<TelegramClient>();
     public event MessageReceive? OnMessage;
     
     private TelegramBotClient _botClient;
@@ -25,6 +28,8 @@ public class TelegramClient: ITelegramClient
 
     public async Task RunDriver()
     {
+        _logger.LogInformation("Started listen");
+        
         var receiverOptions = new ReceiverOptions
         {
             AllowedUpdates = new [] { UpdateType.Message }
@@ -48,12 +53,14 @@ public class TelegramClient: ITelegramClient
         {
             return Task.CompletedTask;
         }
-
+        
         var botMessage = new BotMessage(message.Chat.Id, message.Text);
         
-        this.OnMessage?.Invoke(botMessage);
+        _logger.LogDebug($"({botMessage.ChatId}): {botMessage.Text}");
+        
+        var task = this.OnMessage?.Invoke(botMessage);
 
-        return Task.CompletedTask;
+        return task == null ? Task.CompletedTask : task;
     }
 
     Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)

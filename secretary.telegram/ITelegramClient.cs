@@ -1,6 +1,6 @@
 ﻿namespace secretary.telegram;
 
-public delegate void MessageReceive(BotMessage message);
+public delegate Task MessageReceive(BotMessage message);
 
 public interface ITelegramClient
 {

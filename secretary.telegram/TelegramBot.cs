@@ -1,4 +1,6 @@
-﻿using secretary.configuration;
+﻿using Microsoft.Extensions.Logging;
+using secretary.configuration;
+using secretary.logging;
 using secretary.mail.Authentication;
 using secretary.storage;
 using secretary.telegram.chains;
@@ -10,6 +12,8 @@ namespace secretary.telegram;
 
 public class TelegramBot
 {
+    private readonly ILogger<TelegramBot> _logger = LogPoint.GetLogger<TelegramBot>();
+    
     private readonly CommandsListeningChain _chain;
 
     private readonly ISessionStorage _sessionStorage;
@@ -25,53 +29,53 @@ public class TelegramBot
 
     public TelegramBot(string telegramToken, MailConfig mailConfig, Database database)
     {
-        this._database = database;
+        _database = database;
 
-        this._sessionStorage = new SessionStorage();
+        _sessionStorage = new SessionStorage();
 
-        this._yandexAuthenticator = new YandexAuthenticator(mailConfig);
+        _yandexAuthenticator = new YandexAuthenticator(mailConfig);
 
-        this._chain = new CommandsListeningChain();
+        _chain = new CommandsListeningChain();
 
-        this._mailClient = new MailClient();
+        _mailClient = new MailClient();
 
-        this._telegramClient = new TelegramClient(telegramToken, _cancellationTokenSource.Token);
+        _telegramClient = new TelegramClient(telegramToken, _cancellationTokenSource.Token);
 
-        this._telegramClient.OnMessage += this.WorkWithMessage;
+        _telegramClient.OnMessage += this.WorkWithMessage;
     }
 
-    private void WorkWithMessage(BotMessage message)
+    private async Task WorkWithMessage(BotMessage message)
     {
-        var command = this._chain.Get(message.Text)!;
+        var command = _chain.Get(message.Text)!;
         
-        var execution = command.Execute(new CommandContext(
-            message.ChatId,
-            this._telegramClient,
-            this._sessionStorage,
-            this._database.UserStorage,
-            this._database.DocumentStorage,
-            this._database.EmailStorage,
-            this._yandexAuthenticator,
-            this._mailClient,
-            message.Text
-        ));
-        
-        execution.ContinueWith(_ =>
+        try
         {
-            Console.WriteLine($"Executed command {command.GetType().Name}");
-        });
 
-        execution.ContinueWith(task =>
+            _logger.LogInformation($"Start execute command {command.GetType().Name}");
+            
+            await command.Execute(new CommandContext(
+                message.ChatId,
+                _telegramClient,
+                _sessionStorage,
+                _database.UserStorage,
+                _database.DocumentStorage,
+                _database.EmailStorage,
+                _yandexAuthenticator,
+                _mailClient,
+                message.Text
+            ));
+
+            _logger.LogInformation($"Сommand executed {command.GetType().Name}");
+        }
+        catch (Exception e)
         {
-            if (task.IsFaulted)
-            {
-                Console.WriteLine(task.Exception);
-            }
-        });
+            _logger.LogError(e, $"Сommand execution fault {command.GetType().Name}");
+        }
     }
     
     public Task Listen()
     {
+        _logger.LogInformation("Start work");
         return this._telegramClient.RunDriver();
     }
 

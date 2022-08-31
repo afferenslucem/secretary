@@ -4,6 +4,7 @@ namespace secretary.configuration;
 
 public class Config
 {
+    public string? Environment { get; set; } = null;
     public string TelegramApiKey { get; set; } = null!;
 
     public MailConfig MailConfig { get; set; } = null!;
