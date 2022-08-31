@@ -339,4 +339,14 @@ public class SendDocumentCommandTests
             "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке"
             ));
     }
+
+    [Test]
+    public async Task ShouldCancelCommandForNo()
+    {
+        _context.Message = "Нет";
+
+        await _command.Execute();
+        
+        _client.Verify(target => target.SendMessage(2517, "Дальнейшее выполнение команды прервано"));
+    }
 }

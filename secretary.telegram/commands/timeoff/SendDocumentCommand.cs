@@ -3,6 +3,7 @@ using MailKit.Security;
 using MimeKit;
 using secretary.documents.creators;
 using secretary.storage.models;
+using secretary.telegram.exceptions;
 using secretary.telegram.utils;
 using secretary.yandex.mail;
 
@@ -20,7 +21,11 @@ public class SendDocumentCommand : Command
 
     public override async Task Execute()
     {
-        if (Message != "Да") return;
+        if (Message.ToLower() == "нет")
+        {
+            await this.CancelCommand();
+            return;
+        }
 
         var document = await this.Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);
         var emails = await this.Context.EmailStorage.GetForDocument(document.Id);
@@ -33,6 +38,11 @@ public class SendDocumentCommand : Command
         {
             await this.SendAskEmails();
         }
+    }
+
+    public Task CancelCommand()
+    {
+        return Context.TelegramClient.SendMessage(ChatId, "Дальнейшее выполнение команды прервано");
     }
 
     public Task SendAskEmails()
