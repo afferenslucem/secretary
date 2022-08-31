@@ -1,4 +1,5 @@
 ﻿using secretary.documents.creators;
+using secretary.telegram.commands.registermail;
 
 namespace secretary.telegram.commands.timeoff;
 
@@ -36,6 +37,8 @@ public class TimeOffCommand: StatedCommand
             new EnterReasonCommand(),
             new EnterWorkingOffCommand(),
             new CheckDocumentCommand(),
+            new SetEmailsCommand(),
+            new CheckEmailsCommand(),
             new SendDocumentCommand(),
         };
     }

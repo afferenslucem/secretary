@@ -78,7 +78,7 @@ public class TelegramClient: ITelegramClient
     
     public Task SendMessage(long chatId, string message)
     {
-        return this._botClient.SendTextMessageAsync(chatId, message, cancellationToken: this._cancellationToken, parseMode: ParseMode.Html);
+        return this._botClient.SendTextMessageAsync(chatId, message, cancellationToken: this._cancellationToken, parseMode: ParseMode.Html, replyMarkup: new ReplyKeyboardRemove());
     }
 
     public Task SendMessageWithKeyBoard(long chatId, string message, string[] choises)

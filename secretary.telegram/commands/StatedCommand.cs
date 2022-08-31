@@ -9,67 +9,33 @@ public abstract class StatedCommand: Command
 {
     private ILogger<StatedCommand> _logger = LogPoint.GetLogger<StatedCommand>();
 
-    protected List<Command> states;
+    protected CommandClip Clip;
 
     protected StatedCommand() : base()
     {
-        this.states = this.ConfigureStates();
+        var states = this.ConfigureStates();
+        this.Clip = new CommandClip(states, this);
     }
     
     public abstract List<Command> ConfigureStates();
     
     public override async Task Execute()
     {
-        await ExecuteNextState();
+        await Clip.Run(Context);
         await Context.SaveSession(this);
     }
 
-    public override async Task OnMessage()
-    {
-        if (this.states.Count > 0)
-        {
-            var executor = new ChildCommandExecutor(this.states[0], Context, this);
-
-            try
-            {
-                await executor.ValidateMessage();
-                await executor.OnMessage();
-                await ExecuteNextState();
-                await Context.SaveSession(this);
-            }
-            catch (IncorrectFormatException e)
-            {
-                _logger.LogWarning(e, $"Некорректный формат команды {executor.Command.GetType().Name}: \"{Context.Message}\"");
-            }
-        }
+    public override async Task<int> OnMessage() {
+        await Clip.Run(Context);
+        await Context.SaveSession(this);
+        
+        return RunNext;
     }
 
     public override async Task Cancel()
     {
         await base.Cancel();
         
-        if (this.states.Count > 0)
-        {
-            var executor = new ChildCommandExecutor(this.states[0], Context, this);
-            await executor.Cancel();
-        }
-    }
-
-    private Task ExecuteNextState()
-    {
-        if (this.states.Count > 1)
-        {
-            this.states.RemoveAt(0);
-            
-            var first = states.First();
-
-            var executor = new ChildCommandExecutor(first, Context, this);
-            
-            return executor.Execute();
-        }
-        else
-        {
-            return Task.CompletedTask;
-        }
+        await Clip.Cancel(Context);
     }
 }

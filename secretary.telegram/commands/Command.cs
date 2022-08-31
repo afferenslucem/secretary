@@ -2,6 +2,8 @@
 
 public abstract class Command
 {
+    protected const int RunNext = 1; 
+    
     protected readonly CancellationTokenSource CancellationToken;
 
     public CommandContext Context { get; set; } = null!;
@@ -19,9 +21,9 @@ public abstract class Command
 
     public abstract Task Execute();
 
-    public virtual Task OnMessage()
+    public virtual Task<int> OnMessage()
     {
-        return Task.CompletedTask;
+        return Task.FromResult(RunNext);
     }
 
     public virtual Task ValidateMessage()

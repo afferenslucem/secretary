@@ -16,7 +16,7 @@ public class CommandExecutor
         return Command.Execute();
     }
     
-    public Task OnMessage()
+    public Task<int> OnMessage()
     {
         return Command.OnMessage();
     }

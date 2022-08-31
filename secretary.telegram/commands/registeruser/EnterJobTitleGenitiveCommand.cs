@@ -11,7 +11,7 @@ public class EnterJobTitleGenitiveCommand : Command
                                                           @"Например: От <i>поэта</i> Пушкина Александра Сергеевича");
     }
 
-    public override async Task OnMessage()
+    public override async Task<int> OnMessage()
     {
         var user = await Context.UserStorage.GetUser(ChatId);
 
@@ -22,5 +22,7 @@ public class EnterJobTitleGenitiveCommand : Command
         await Context.UserStorage.UpdateUser(user);
 
         await Context.TelegramClient.SendMessage(ChatId, "Ваш пользователь успешно сохранен");
+        
+        return RunNext;
     }
 }

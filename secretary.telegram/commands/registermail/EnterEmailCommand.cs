@@ -12,7 +12,7 @@ public class EnterEmailCommand : Command
                                                           @"Например: <i>a.pushkin@infinnity.ru</i>");
     }
 
-    public override async Task OnMessage()
+    public override async Task<int> OnMessage()
     {
         var user = await Context.UserStorage.GetUser(ChatId);
 
@@ -24,6 +24,8 @@ public class EnterEmailCommand : Command
         user.Email = Message;
 
         await Context.UserStorage.SetUser(user);
+        
+        return RunNext;
     }
 
     public override async Task ValidateMessage()

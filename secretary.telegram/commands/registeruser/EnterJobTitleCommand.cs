@@ -11,7 +11,7 @@ public class EnterJobTitleCommand : Command
                                                           @"Например: С уважением, <i>поэт</i> Александр Пушкин");
     }
 
-    public override async Task OnMessage()
+    public override async Task<int> OnMessage()
     {
         var user = await Context.UserStorage.GetUser(ChatId);
 
@@ -20,5 +20,7 @@ public class EnterJobTitleCommand : Command
         user.JobTitle = Message;
 
         await Context.UserStorage.UpdateUser(user);
+        
+        return RunNext;
     }
 }

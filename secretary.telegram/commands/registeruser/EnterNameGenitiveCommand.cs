@@ -11,7 +11,7 @@ public class EnterNameGenitiveCommand : Command
                                                           @"Например: От <i>Пушкина Александра Сергеевича</i>");
     }
 
-    public override async Task OnMessage()
+    public override async Task<int> OnMessage()
     {
         var user = await Context.UserStorage.GetUser(ChatId);
 
@@ -20,5 +20,7 @@ public class EnterNameGenitiveCommand : Command
         user.NameGenitive = Message;
 
         await Context.UserStorage.UpdateUser(user);
+        
+        return RunNext;
     }
 }
