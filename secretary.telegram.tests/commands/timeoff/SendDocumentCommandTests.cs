@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using MailKit.Security;
+using Moq;
 using secretary.documents.creators;
 using secretary.storage;
 using secretary.storage.models;
@@ -315,5 +316,22 @@ public class SendDocumentCommandTests
             ));
         
         _client.Verify(target => target.SendMessage(2517, "Заяление отправлено"));
+    }
+
+    [Test]
+    public async Task ShouldProtectIncorrectRights()
+    {
+        _mailClient.Setup(target => target.SendMail(It.IsAny<SecretaryMailMessage>()))
+            .ThrowsAsync(new AuthenticationException("This user does not have access rights to this service"));
+
+        _command.Context = _context;
+        await _command.SendMail(null!);
+        
+        _client.Verify(target => target.SendMessage(
+            2517, 
+            "Не достаточно прав для отправки письма!\r\n\r\n" +
+            "Перейдите в <a href=\"https://mail.yandex.ru/#setup/client\">настройки почтового ящика</a>, c которого отправляете письмо, " +
+            "и разрешите отправку по OAuth-токену с сервера imap"
+            ));
     }
 }

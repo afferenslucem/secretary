@@ -1,4 +1,6 @@
-﻿using MimeKit;
+﻿using System.Net.Mail;
+using MailKit.Security;
+using MimeKit;
 using secretary.documents.creators;
 using secretary.storage.models;
 using secretary.telegram.utils;
@@ -79,14 +81,12 @@ public class SendDocumentCommand : Command
             await Context.EmailStorage.SaveForDocument(document.Id, emails);
         }
 
-        var config = this.GetMailMessage(user, emails);
+        var message = this.GetMailMessage(user, emails);
 
-        await Context.MailClient.SendMail(config);
-
-        await Context.TelegramClient.SendMessage(ChatId, "Заяление отправлено");
+        await SendMail(message);
     }
 
-    private SecretaryMailMessage GetMailMessage(User user, IEnumerable<Email> emails)
+    public SecretaryMailMessage GetMailMessage(User user, IEnumerable<Email> emails)
     {
         var parent = (ParentCommand as TimeOffCommand)!;
         
@@ -117,5 +117,26 @@ public class SendDocumentCommand : Command
         };
 
         return result;
+    }
+
+    public async Task SendMail(SecretaryMailMessage message)
+    {
+        try
+        {
+            await Context.MailClient.SendMail(message);
+
+            await Context.TelegramClient.SendMessage(ChatId, "Заяление отправлено");
+        }
+        catch (AuthenticationException e)
+        {
+            if (e.Message.Contains("This user does not have access rights to this service"))
+            {
+                await Context.TelegramClient.SendMessage(ChatId, 
+                    "Не достаточно прав для отправки письма!\r\n\r\n" +
+                    "Перейдите в <a href=\"https://mail.yandex.ru/#setup/client\">настройки почтового ящика</a>, c которого отправляете письмо, " +
+                    "и разрешите отправку по OAuth-токену с сервера imap"
+                    );
+            }
+        }
     }
 }
