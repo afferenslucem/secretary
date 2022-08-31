@@ -18,8 +18,8 @@ public class CommandsChainTests
     [Test]
     public void ShouldReturnNullCommandForEveryString()
     {
-        this.chain.Add(NullCommand.Key, new NullCommandFactory());
-        this.chain.Add(TimeOffCommand.Key, new TimeOffCommandFactory());
+        this.chain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
+        this.chain.Add(TimeOffCommand.Key, new CommandFactory<TimeOffCommand>());
         
         var result = this.chain.Get("random string");
         Assert.IsInstanceOf<NullCommand>(result);
@@ -36,8 +36,8 @@ public class CommandsChainTests
     [Test]
     public void ShouldReturnTimeOffCommand()
     {
-        this.chain.Add(TimeOffCommand.Key, new TimeOffCommandFactory());
-        this.chain.Add(NullCommand.Key, new NullCommandFactory());
+        this.chain.Add(TimeOffCommand.Key, new CommandFactory<TimeOffCommand>());
+        this.chain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
         
         var result = this.chain.Get(TimeOffCommand.Key);
         Assert.IsInstanceOf<TimeOffCommand>(result);

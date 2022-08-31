@@ -1,6 +1,12 @@
-﻿namespace secretary.telegram.commands.factories;
+﻿using secretary.telegram.commands.timeoff;
 
-public interface ICommandFactory
+namespace secretary.telegram.commands.factories;
+
+public class CommandFactory<T>: ICommandFactory
+    where T: Command, new()
 {
-    Command GetCommand();
+    public Command GetCommand()
+    {
+        return new T();
+    }
 }
