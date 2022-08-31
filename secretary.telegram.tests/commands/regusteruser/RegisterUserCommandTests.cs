@@ -1,5 +1,6 @@
 ﻿using Moq;
 using secretary.storage;
+using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.registeruser;
 using secretary.telegram.sessions;
@@ -46,5 +47,30 @@ public class RegisterUserCommandTests
         await this._command.Execute(_context);
         
         this._sessionStorage.Verify(target => target.SaveSession(2517, It.Is<Session>(session => session.ChaitId == 2517 && session.LastCommand == _command)));
+    }
+
+    [Test]
+    public async Task ShouldRunFully()
+    {
+        _userStorage.Setup(target => target.GetUser(2517)).ReturnsAsync(() => new User());
+        
+        _context.Message = "/registeruser";
+        await _command.Execute(_context);
+
+        _context.Message = "Александр Пушкин";
+        await _command.OnMessage(_context);
+        _userStorage.Verify(target => target.SetUser(It.Is<User>(user => user.Name == "Александр Пушкин")), Times.Once);
+
+        _context.Message = "Пушкина Александра Сергеевича";
+        await _command.OnMessage(_context);
+        _userStorage.Verify(target => target.UpdateUser(It.Is<User>(user => user.NameGenitive == "Пушкина Александра Сергеевича")), Times.Once);
+
+        _context.Message = "поэт";
+        await _command.OnMessage(_context);
+        _userStorage.Verify(target => target.UpdateUser(It.Is<User>(user => user.JobTitle == "поэт")), Times.Once);
+
+        _context.Message = "поэта";
+        await _command.OnMessage(_context);
+        _userStorage.Verify(target => target.UpdateUser(It.Is<User>(user => user.JobTitleGenitive == "поэта")), Times.Once);
     }
 }

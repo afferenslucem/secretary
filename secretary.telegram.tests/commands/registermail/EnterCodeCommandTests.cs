@@ -4,7 +4,6 @@ using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.registermail;
-using secretary.telegram.sessions;
 using secretary.yandex.exceptions;
 
 namespace secretary.telegram.tests.commands.registermail;

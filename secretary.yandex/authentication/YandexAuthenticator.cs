@@ -1,12 +1,16 @@
 ﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using secretary.configuration;
+using secretary.logging;
 using secretary.yandex.exceptions;
 
 namespace secretary.mail.Authentication;
 
 public class YandexAuthenticator: IYandexAuthenticator
 {
-    private readonly HttpClient _httpClient = new HttpClient();
+    private ILogger<YandexAuthenticator> _logger = LogPoint.GetLogger<YandexAuthenticator>();
+
+    private readonly HttpClient _httpClient = new();
     private MailConfig _mailConfig;
 
     public YandexAuthenticator(MailConfig mailConfig)
@@ -62,7 +66,7 @@ public class YandexAuthenticator: IYandexAuthenticator
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Ошибка при получении кода авторизации");
             throw new YandexAuthenticationException("Could not get auth data", e);
         }
     }
@@ -88,7 +92,7 @@ public class YandexAuthenticator: IYandexAuthenticator
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Ошибка при получении токена");
             throw new YandexAuthenticationException("Could not get token", e);
         }
     }

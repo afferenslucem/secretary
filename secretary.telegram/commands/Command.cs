@@ -1,11 +1,8 @@
-﻿using secretary.mail;
-using secretary.storage;
-
-namespace secretary.telegram.commands;
+﻿namespace secretary.telegram.commands;
 
 public abstract class Command
 {
-    protected CancellationTokenSource CancellationToken;
+    protected readonly CancellationTokenSource CancellationToken;
 
     public CommandContext Context { get; set; } = null!;
 
@@ -38,7 +35,7 @@ public abstract class Command
         return this.OnMessageRoutine();
     }
 
-    protected internal  void ValidateMessage(string message)
+    protected internal void ValidateMessage(string message)
     {
         
     }

@@ -6,9 +6,9 @@ public class Email: IEquatable<Email>
 {
     public long DocumentId { get; set; }
     public string Address { get; set; } = null!;
-    public string DisplayName { get; set; } = null!;
+    public string? DisplayName { get; set; } = null!;
     
-    public Email(string address, string? displayName)
+    public Email(string address, string? displayName = null)
     {
         Address = address;
         DisplayName = displayName;

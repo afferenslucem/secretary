@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using secretary.configuration;
 using secretary.documents;
-using secretary.telegram;
 using secretary.storage;
+using secretary.telegram;
 
 namespace secretary.console
 {

@@ -1,142 +1,86 @@
-﻿using secretary.configuration;
-using secretary.mail;
+﻿using Microsoft.Extensions.Logging;
+using secretary.configuration;
+using secretary.logging;
 using secretary.mail.Authentication;
+using secretary.storage;
 using secretary.telegram.chains;
 using secretary.telegram.commands;
 using secretary.telegram.sessions;
-using secretary.storage;
 using secretary.yandex.mail;
-using Telegram.Bot;
-using Telegram.Bot.Exceptions;
-using Telegram.Bot.Polling;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InputFiles;
-using Telegram.Bot.Types.ReplyMarkups;
-using File = System.IO.File;
 
 namespace secretary.telegram;
 
-public class TelegramBot: ITelegramClient
+public class TelegramBot
 {
-    private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
+    private readonly ILogger<TelegramBot> _logger = LogPoint.GetLogger<TelegramBot>();
     
-    private TelegramBotClient _telegramClient;
+    private readonly CommandsListeningChain _chain;
 
-    private CommandsListeningChain _chain;
+    private readonly ISessionStorage _sessionStorage;
 
-    private ISessionStorage _sessionStorage;
+    private readonly Database _database;
 
-    private Database _database;
+    private readonly IYandexAuthenticator _yandexAuthenticator;
+    private readonly IMailClient _mailClient;
 
-    private IYandexAuthenticator _yandexAuthenticator;
-    private IMailClient _mailClient;
+    private readonly ITelegramClient _telegramClient;
 
-    public TelegramBot(string token, MailConfig mailConfig, Database database)
+    private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
+    public TelegramBot(string telegramToken, MailConfig mailConfig, Database database)
     {
-        this._database = database;
+        _database = database;
 
-        this._telegramClient = new TelegramBotClient(token);
+        _sessionStorage = new SessionStorage();
 
-        this._sessionStorage = new SessionStorage();
+        _yandexAuthenticator = new YandexAuthenticator(mailConfig);
 
-        this._yandexAuthenticator = new YandexAuthenticator(mailConfig);
+        _chain = new CommandsListeningChain();
 
-        this._chain = new CommandsListeningChain();
+        _mailClient = new MailClient();
 
-        this._mailClient = new MailClient();
+        _telegramClient = new TelegramClient(telegramToken, _cancellationTokenSource.Token);
+
+        _telegramClient.OnMessage += this.WorkWithMessage;
     }
 
-    public async Task Listen()
+    private async Task WorkWithMessage(BotMessage message)
     {
-        var receiverOptions = new ReceiverOptions
-        {
-            AllowedUpdates = new [] { UpdateType.Message }
-        };
+        var command = _chain.Get(message.Text)!;
         
-        while (!this._cancellationToken.IsCancellationRequested)
+        try
         {
-            await this._telegramClient.ReceiveAsync(
-                updateHandler: this.HandleUpdateAsync,
-                pollingErrorHandler: this.HandlePollingErrorAsync,
-                receiverOptions: receiverOptions,
-                cancellationToken: this._cancellationToken.Token);
+
+            _logger.LogInformation($"Start execute command {command.GetType().Name}");
+            
+            await command.Execute(new CommandContext(
+                message.ChatId,
+                _telegramClient,
+                _sessionStorage,
+                _database.UserStorage,
+                _database.DocumentStorage,
+                _database.EmailStorage,
+                _yandexAuthenticator,
+                _mailClient,
+                message.Text
+            ));
+
+            _logger.LogInformation($"Сommand executed {command.GetType().Name}");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Сommand execution fault {command.GetType().Name}");
         }
     }
     
-    Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    public Task Listen()
     {
-        var message = update.Message;
-
-        if (message?.Text == null)
-        {
-            return Task.CompletedTask;
-        }
-
-        var command = this._chain.Get(message.Text)!;
-        
-        var execution = command.Execute(new CommandContext(
-            message.Chat.Id,
-            this,
-            this._sessionStorage,
-            this._database.UserStorage,
-            this._database.DocumentStorage,
-            this._database.EmailStorage,
-            this._yandexAuthenticator,
-            this._mailClient,
-            message.Text
-        ));
-        
-        execution.ContinueWith(_ =>
-        {
-            Console.WriteLine($"Executed command {command.GetType().Name}");
-        });
-
-        execution.ContinueWith(task =>
-        {
-            if (task.IsFaulted)
-            {
-                Console.WriteLine(task.Exception);
-            }
-        });
-
-        return Task.CompletedTask;
+        _logger.LogInformation("Start work");
+        return this._telegramClient.RunDriver();
     }
 
-    Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+    public void Cancel()
     {
-        var errorMessage = exception switch
-        {
-            ApiRequestException apiRequestException
-                => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
-            _ => exception.ToString()
-        };
-
-        Console.WriteLine(errorMessage);
-        return Task.CompletedTask;
-    }
-
-    public Task SendMessage(long chatId, string message)
-    {
-        return this._telegramClient.SendTextMessageAsync(chatId, message, cancellationToken: this._cancellationToken.Token, parseMode: ParseMode.Html);
-    }
-
-    public Task SendMessageWithKeyBoard(long chatId, string message, string[] choises)
-    {
-        var buttons = choises.Select(text => new KeyboardButton(text)).ToArray();
-        
-        var keyboard = new ReplyKeyboardMarkup(buttons);
-        keyboard.OneTimeKeyboard = true;
-        
-        return this._telegramClient.SendTextMessageAsync(chatId, message, parseMode: ParseMode.Html, replyMarkup: keyboard, cancellationToken: this._cancellationToken.Token);
-    }
-
-    public async Task SendDocument(long chatId, string path, string fileName)
-    {
-        await using var fileStream = File.OpenRead(path);
-        
-        await this._telegramClient.SendDocumentAsync(
-            chatId: chatId,
-            document: new InputOnlineFile(content: fileStream, fileName: fileName), cancellationToken: this._cancellationToken.Token);
+        this._cancellationTokenSource.Cancel();
     }
 }

@@ -1,4 +1,6 @@
-﻿using secretary.mail.Authentication;
+﻿using Microsoft.Extensions.Logging;
+using secretary.logging;
+using secretary.mail.Authentication;
 using secretary.telegram.exceptions;
 using secretary.yandex.exceptions;
 
@@ -6,7 +8,16 @@ namespace secretary.telegram.commands.registermail;
 
 public class EnterCodeCommand: Command
 {
-    protected override async Task ExecuteRoutine()
+    private ILogger<EnterCodeCommand> _logger = LogPoint.GetLogger<EnterCodeCommand>();
+
+    protected override Task ExecuteRoutine()
+    {
+        _ = this.RegisterMail();
+        
+        return Task.CompletedTask;
+    }
+
+    private async Task RegisterMail()
     {
         try
         {
@@ -24,13 +35,12 @@ public class EnterCodeCommand: Command
                 await Context.TelegramClient.SendMessage(ChatId, "Ура, вы успешно зарегистрировали почту");
             }
         }
-        catch (YandexAuthenticationException)
+        catch (YandexAuthenticationException e)
         {
             await this.Context.TelegramClient.SendMessage(ChatId,
                 "При запросе токена для авторизации произошла ошибка:(\r\n" +
                 "Попробуйте через пару минут, если не сработает, то обратитесь по вот этому адресу @hrodveetnir");
         }
-
     }
 
     private async Task<TokenData?> AskRegistration(IYandexAuthenticator client, AuthenticationData data,
@@ -49,7 +59,6 @@ public class EnterCodeCommand: Command
         await Task.Delay(data.interval * 1500, CancellationToken.Token);
 
         return await this.AskRegistration(client, data, startTime);
-
     }
 
     private async Task SetTokens(TokenData data)
