@@ -40,11 +40,6 @@ public abstract class Command
         return Task.CompletedTask;
     }
 
-    public virtual Task OnComplete()
-    {
-        return this.Context.SessionStorage.DeleteSession(ChatId);
-    }
-
     protected void ForceComplete()
     {
         throw new ForceCompleteCommandException(this.GetType().Name);

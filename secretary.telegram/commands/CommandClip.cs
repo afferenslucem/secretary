@@ -15,6 +15,27 @@ public class CommandClip
 
     public bool IsFinished => _runIndex == _states.Length;
 
+    public bool IsAsymmetric => _states[LastIndex].GetType() == typeof(AssymetricCompleteCommand);
+
+    private int LastIndex => _states.Length - 1;
+    
+    public bool IsAsymmetricCompleted
+    {
+        get
+        {
+            if (_runIndex != LastIndex - 1)
+            {
+                return false;
+            }
+            else
+            {
+                return _states[_runIndex + 1].GetType() == typeof(AssymetricCompleteCommand);
+            }
+        }
+    }
+                                        
+    
+
     public int RunIndex => _runIndex;
 
     public CommandClip(IEnumerable<Command> states, Command parentCommand)
@@ -53,11 +74,6 @@ public class CommandClip
         catch (IncorrectFormatException e)
         {
             _logger.LogWarning(e, $"Incorrect format of command {firstPartCommand.GetType().Name}: \"{context.Message}\"");
-        }
-        catch (ForceCompleteCommandException e)
-        {
-            _logger.LogWarning($"Force completing command {e.CommandName}");
-            throw;
         }
     }
 

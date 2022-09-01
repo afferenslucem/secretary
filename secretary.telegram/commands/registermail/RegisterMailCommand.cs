@@ -12,6 +12,7 @@ public class RegisterMailCommand: StatedCommand
             new EmptyCommand(),
             new EnterEmailCommand(),
             new EnterCodeCommand(),
+            new AssymetricCompleteCommand(),
         };
     }
 }

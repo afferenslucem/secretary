@@ -10,11 +10,11 @@ public class EnterCodeCommand: Command
 {
     private ILogger<EnterCodeCommand> _logger = LogPoint.GetLogger<EnterCodeCommand>();
 
-    public override async Task Execute()
+    public override Task Execute()
     {
         _ = this.RegisterMail();
-
-        await this.OnComplete();
+        
+        return Task.CompletedTask;
     }
 
     private async Task RegisterMail()

@@ -40,6 +40,7 @@ public class TimeOffCommand: StatedCommand
             new SetEmailsCommand(),
             new CheckEmailsCommand(),
             new SendDocumentCommand(),
+            new AssymetricCompleteCommand(),
         };
     }
 }

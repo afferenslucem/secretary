@@ -52,10 +52,7 @@ public class RegisterMailCommandTests
         
         _context.Message = "/registermail";
         await _command.Execute();
-        await _command.OnComplete();
         
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
-
         _mailClient
             .Setup(target => target.GetAuthenticationCode(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AuthenticationData() { expires_in = 300 } );
@@ -95,14 +92,12 @@ public class RegisterMailCommandTests
         
         _context.Message = "/registermail";
         await _command.Execute();
-        await _command.OnComplete();
         
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
 
         _context.Message = "a.pushkin";
 
         await _command.OnMessage();
-        await _command.OnComplete();
         
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         _client.Verify(target => target.SendMessage(2517, "Некорректный формат почты. Введите почту еще раз"));
@@ -116,9 +111,8 @@ public class RegisterMailCommandTests
         
         _context.Message = "a.pushkin@infinnity.ru";
         
+        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         await _command.OnMessage();
-        await _command.OnComplete();
-        
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
         _userStorage.Verify(target => target.SetUser(It.Is<User>(user => user.Email == "a.pushkin@infinnity.ru")), Times.Once);
         _userStorage.Verify(target => target.UpdateUser(It.Is<User>(user => user.AccessToken == "access" && user.RefreshToken == "refresh")), Times.Once);

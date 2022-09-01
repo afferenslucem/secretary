@@ -130,4 +130,12 @@ public class CommandClipTests
 
         Assert.That(_clip.RunIndex, Is.EqualTo(4));
     }
+
+    [Test]
+    public void ShouldReturnAsymmetricMarker()
+    {
+        var clip = new CommandClip(new[] { _firstState.Object, new AssymetricCompleteCommand() }, _command.Object);
+        
+        Assert.That(clip.IsAsymmetric, Is.True);
+    }
 }
