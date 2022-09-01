@@ -118,6 +118,20 @@ public class CommandClipTests
     }
 
     [Test]
+    public async Task ShouldRerunCommandForZeroCode()
+    {
+        _secondState.Setup(target => target.OnMessage()).ReturnsAsync(0);
+        
+        await _clip.Run(_context);
+        await _clip.Run(_context);
+        await _clip.Run(_context);
+        
+        _secondState.Verify(target => target.OnMessage(), Times.Exactly(2));
+        
+        Assert.That(_context.BackwardRedirect, Is.True);
+    }
+
+    [Test]
     public async Task ShouldIgnoreRunForFinish()
     {
         await _clip.Run(_context);
@@ -132,10 +146,25 @@ public class CommandClipTests
     }
 
     [Test]
-    public void ShouldReturnAsymmetricMarker()
+    public async Task ShouldReturnAsymmetricCompletedMarker()
     {
-        var clip = new CommandClip(new[] { _firstState.Object, new AssymetricCompleteCommand() }, _command.Object);
+        var clip = new CommandClip(new[] { _firstState.Object, _secondState.Object, new AssymetricCompleteCommand() }, _command.Object);
+
+        await clip.Run(_context);
         
-        Assert.That(clip.IsAsymmetric, Is.True);
+        Assert.That(clip.IsAsymmetricCompleted, Is.True);
+        Assert.That(clip.IsCompleted, Is.True);
+    }
+
+    [Test]
+    public async Task ShouldReturnFinishedMarker()
+    {
+        var clip = new CommandClip(new[] { _firstState.Object, _thirdState.Object }, _command.Object);
+
+        await clip.Run(_context);
+        await clip.Run(_context);
+        
+        Assert.That(clip.IsFinishedChain, Is.True);
+        Assert.That(clip.IsCompleted, Is.True);
     }
 }

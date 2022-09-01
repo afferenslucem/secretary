@@ -13,9 +13,7 @@ public class CommandClip
     private readonly Command[] _states;
     private int _runIndex = 0;
 
-    public bool IsFinished => _runIndex == _states.Length;
-
-    public bool IsAsymmetric => _states[LastIndex].GetType() == typeof(AssymetricCompleteCommand);
+    public bool IsFinishedChain => _runIndex == _states.Length;
 
     private int LastIndex => _states.Length - 1;
     
@@ -33,8 +31,8 @@ public class CommandClip
             }
         }
     }
-                                        
-    
+
+    public bool IsCompleted => IsFinishedChain || IsAsymmetricCompleted;
 
     public int RunIndex => _runIndex;
 
@@ -46,7 +44,7 @@ public class CommandClip
 
     public async Task Run(CommandContext context)
     {
-        if (IsFinished) return;
+        if (IsFinishedChain) return;
             
         var firstPartCommand = _states[_runIndex];
             
@@ -64,7 +62,7 @@ public class CommandClip
             
             this.IncrementStep(increment);
 
-            if (IsFinished) return;
+            if (IsFinishedChain) return;
 
             var secondPartCommand = _states[_runIndex];
             var secondPartExecutor = new ChildCommandExecutor(secondPartCommand, context, _parentCommand);
