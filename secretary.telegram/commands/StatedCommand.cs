@@ -28,8 +28,10 @@ public abstract class StatedCommand: Command
             {
                 await OnComplete();
             }
-            
-            await Context.SaveSession(this);
+            else
+            {
+                await Context.SaveSession(this);
+            }
         }
         catch (ForceCompleteCommandException e)
         {
