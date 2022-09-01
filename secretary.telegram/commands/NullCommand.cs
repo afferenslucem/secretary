@@ -9,30 +9,19 @@ public class NullCommand: Command
 {
     private ILogger<NullCommand> _logger = LogPoint.GetLogger<NullCommand>();
     public const string Key = "*";
-    
+
     public override async Task Execute()
     {
-        try
+        var session = await Context.GetSession();
+
+        if (session == null || session.LastCommand == null)
         {
-            var session = await Context.GetSession();
+            await Context.TelegramClient.SendMessage(ChatId, "Извините, я не понял\r\nОтправьте команду");
 
-            if (session == null || session.LastCommand == null)
-            {
-                await Context.TelegramClient.SendMessage(ChatId, "Извините, я не понял\r\nОтправьте команду");
-
-                return;
-            }
-
-            ;
-
-            await new CommandExecutor(session.LastCommand, Context).OnMessage();
-            await new CommandExecutor(session.LastCommand, Context).OnComplete();
+            return;
         }
-        catch (ForceCompleteCommandException e)
-        {
-            await Context.SessionStorage.DeleteSession(ChatId);
-            _logger.LogWarning($"Сommand {e.CommandName} force completed");
-        }
+
+        await new CommandExecutor(session.LastCommand, Context).OnMessage();
     }
 
     public override Task OnComplete()
