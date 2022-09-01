@@ -5,9 +5,10 @@ using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.timeoff;
+using secretary.telegram.sessions;
 using secretary.yandex.mail;
 
-namespace secretary.telegram.tests.commands.subcommands.timeoff;
+namespace secretary.telegram.tests.commands.timeoff;
 
 public class SendDocumentCommandTests
 {
@@ -18,6 +19,7 @@ public class SendDocumentCommandTests
     private Mock<IEmailStorage> _emailStorage = null!;
     private Mock<IUserStorage> _userStorage = null!;
     private Mock<ITimeOffCreator> _timeOffCreator = null!;
+    private Mock<ISessionStorage> _sessionStorage = null!;
     
     
     private TimeOffCommand _parent = null!;
@@ -33,6 +35,7 @@ public class SendDocumentCommandTests
         this._client = new Mock<ITelegramClient>();
         this._mailClient = new Mock<IMailClient>();
         this._timeOffCreator = new Mock<ITimeOffCreator>();
+        this._sessionStorage = new Mock<ISessionStorage>();
 
         this._command = new SendDocumentCommand();
 
@@ -48,6 +51,7 @@ public class SendDocumentCommandTests
             EmailStorage = this._emailStorage.Object,
             UserStorage = this._userStorage.Object,
             MailClient = this._mailClient.Object,
+            SessionStorage = this._sessionStorage.Object,
         };
         
         this._command.Context = _context;
@@ -95,7 +99,7 @@ public class SendDocumentCommandTests
         {
             new SecretaryMailAddress("a.pushkin@infinnity.ru", "Александр Пушкин"),
             new SecretaryMailAddress("s.esenin@infinnity.ru", "Сергей Есенин"),
-            new SecretaryMailAddress("v.mayakovskii@infinnity.ru", null),
+            new SecretaryMailAddress("v.mayakovskii@infinnity.ru", null!),
             new SecretaryMailAddress("user@infinnity.ru", "Пользовалель Пользователев"),
         };
         

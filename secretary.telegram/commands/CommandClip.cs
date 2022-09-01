@@ -13,6 +13,8 @@ public class CommandClip
     private readonly Command[] _states;
     private int _runIndex = 0;
 
+    public bool IsFinished => _runIndex == _states.Length;
+
     public int RunIndex => _runIndex;
 
     public CommandClip(IEnumerable<Command> states, Command parentCommand)
@@ -23,6 +25,8 @@ public class CommandClip
 
     public async Task Run(CommandContext context)
     {
+        if (IsFinished) return;
+            
         var firstPartCommand = _states[_runIndex];
             
         try
@@ -37,9 +41,9 @@ public class CommandClip
                 context.BackwardRedirect = true;
             }
             
-            _runIndex += increment;
+            this.IncrementStep(increment);
 
-            if (_runIndex == this._states.Length) return;
+            if (IsFinished) return;
 
             var secondPartCommand = _states[_runIndex];
             var secondPartExecutor = new ChildCommandExecutor(secondPartCommand, context, _parentCommand);
@@ -48,7 +52,12 @@ public class CommandClip
         }
         catch (IncorrectFormatException e)
         {
-            _logger.LogWarning(e, $"Некорректный формат команды {firstPartCommand.GetType().Name}: \"{context.Message}\"");
+            _logger.LogWarning(e, $"Incorrect format of command {firstPartCommand.GetType().Name}: \"{context.Message}\"");
+        }
+        catch (CancelCommandException e)
+        {
+            _logger.LogWarning($"Cancelling of command {e.CommandName}");
+            throw;
         }
     }
 
@@ -58,5 +67,10 @@ public class CommandClip
         var executor = new ChildCommandExecutor(state, context, _parentCommand);
 
         return executor.Cancel();
+    }
+    
+    private void IncrementStep(int value)
+    {
+        this._runIndex += value;
     }
 }

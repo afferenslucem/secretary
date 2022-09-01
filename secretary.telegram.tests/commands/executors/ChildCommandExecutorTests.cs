@@ -66,4 +66,15 @@ public class ChildCommandExecutorTests
         
         commandMock.Verify(target => target.Cancel(), Times.Once);
     }
+
+    [Test]
+    public async Task ShouldRunOnComplete()
+    {
+        var commandMock = new Mock<Command>();
+        var context = new CommandContext();
+
+        await new CommandExecutor(commandMock.Object, context).OnComplete();
+        
+        commandMock.Verify(target => target.OnComplete(), Times.Once);
+    }
 }

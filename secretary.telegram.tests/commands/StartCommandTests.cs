@@ -1,10 +1,12 @@
 ﻿using Moq;
 using secretary.telegram.commands;
+using secretary.telegram.sessions;
 
 namespace secretary.telegram.tests.commands;
 
 public class StartCommandTests
 {
+    private Mock<ISessionStorage> _sessionStorage = null!;
     private Mock<ITelegramClient> _client = null!;
     
     private StartCommand _command = null!;
@@ -16,11 +18,13 @@ public class StartCommandTests
         this._client = new Mock<ITelegramClient>();
 
         this._command = new StartCommand();
+        this._sessionStorage = new Mock<ISessionStorage>();
         
         this._context = new CommandContext()
         { 
             ChatId = 2517, 
             TelegramClient = this._client.Object, 
+            SessionStorage = this._sessionStorage.Object,
         };
         
         this._command.Context = _context;
@@ -36,5 +40,14 @@ public class StartCommandTests
                                                                "Перед началом работы вам необходимо:\r\n" +
                                                                "/registeruser – зарегистрироваться\r\n" +
                                                                "/registermail – зарегистрировать рабочую почту"));
+    }
+    
+    
+    [Test]
+    public async  Task ShouldDeleteSessionOnComplete()
+    {
+        await _command.OnComplete();
+        
+        _sessionStorage.Verify(target => target.DeleteSession(2517));
     }
 }

@@ -12,7 +12,8 @@ public class SetEmailsCommand : Command
         if (Message.ToLower() != "да" && !Context.BackwardRedirect)
         {
             await this.CancelCommand();
-            return;
+            await this.OnComplete();
+            throw new CancelCommandException("SetEmailsCommand");
         }
 
         var document = await this.Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);

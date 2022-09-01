@@ -6,6 +6,7 @@ using secretary.storage;
 using secretary.telegram.chains;
 using secretary.telegram.commands;
 using secretary.telegram.commands.executors;
+using secretary.telegram.exceptions;
 using secretary.telegram.sessions;
 using secretary.yandex.mail;
 
@@ -68,6 +69,10 @@ public class TelegramBot
             await new CommandExecutor(command, context).Execute();
 
             _logger.LogInformation($"Сommand executed {command.GetType().Name}");
+        }
+        catch (CancelCommandException e)
+        {
+            _logger.LogWarning($"Сommand {e.CommandName} canceled");
         }
         catch (Exception e)
         {

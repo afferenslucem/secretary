@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using secretary.logging;
-using secretary.telegram.commands.executors;
-using secretary.telegram.exceptions;
 
 namespace secretary.telegram.commands;
 
@@ -37,5 +35,13 @@ public abstract class StatedCommand: Command
         await base.Cancel();
         
         await Clip.Cancel(Context);
+    }
+
+    public override async Task OnComplete()
+    {
+        if (Clip.IsFinished)
+        {
+            await base.OnComplete();
+        }
     }
 }

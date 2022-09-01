@@ -64,5 +64,13 @@ public class NullCommandTests
         await this._command.Execute();
         
         lastCommand.Verify(target => target.OnMessage());
+        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
+    }
+    
+    [Test]
+    public async  Task ShouldDeleteSessionOnComplete()
+    {
+        await _command.OnComplete();
+        
     }
 }

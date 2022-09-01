@@ -3,6 +3,8 @@ using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.timeoff;
+using secretary.telegram.exceptions;
+using secretary.telegram.sessions;
 
 namespace secretary.telegram.tests.commands.subcommands.timeoff;
 
@@ -11,6 +13,7 @@ public class SetEmailsCommandTests
     private Mock<ITelegramClient> _client = null!;
     private Mock<IDocumentStorage> _documentStorage = null!;
     private Mock<IEmailStorage> _emailStorage = null!;
+    private Mock<ISessionStorage> _sessionStorage = null!;
     
     private TimeOffCommand _parent = null!;
     private SetEmailsCommand _command = null!;
@@ -22,6 +25,7 @@ public class SetEmailsCommandTests
         this._client = new Mock<ITelegramClient>();
         this._documentStorage = new Mock<IDocumentStorage>();
         this._emailStorage = new Mock<IEmailStorage>();
+        this._sessionStorage = new Mock<ISessionStorage>();
 
         this._command = new SetEmailsCommand();
 
@@ -33,6 +37,7 @@ public class SetEmailsCommandTests
             TelegramClient = this._client.Object, 
             DocumentStorage = this._documentStorage.Object,
             EmailStorage = this._emailStorage.Object,
+            SessionStorage = this._sessionStorage.Object,
         };
         
         this._command.Context = _context;
@@ -41,18 +46,14 @@ public class SetEmailsCommandTests
     
     
     [Test]
-    public async Task ShouldSkipRunCommandForNo()
+    public void ShouldSkipRunCommandForNo()
     {
         _context.Message = "Нет";
+
+        Assert.ThrowsAsync<CancelCommandException>(() =>_command.Execute());
         
-        _documentStorage
-            .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))
-            .ReturnsAsync(new Document());
-
-        await _command.Execute();
-
-        _documentStorage
-            .Verify(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()), Times.Never);
+        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
+        _client.Verify(target => target.SendMessage(2517, "Дальнейшее выполнение команды прервано"));
     }
     
     
@@ -170,15 +171,5 @@ public class SetEmailsCommandTests
         _emailStorage.Verify(target => target.SaveForDocument(0, expectedEmails), Times.Once);
         
         Assert.That(step, Is.EqualTo(1));
-    }
-
-    [Test]
-    public async Task ShouldCancelCommandForNo()
-    {
-        _context.Message = "Нет";
-
-        await _command.Execute();
-        
-        _client.Verify(target => target.SendMessage(2517, "Дальнейшее выполнение команды прервано"));
     }
 }

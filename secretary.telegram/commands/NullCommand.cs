@@ -18,5 +18,11 @@ public class NullCommand: Command
         };
 
         await new CommandExecutor(session.LastCommand, Context).OnMessage();
+        await new CommandExecutor(session.LastCommand, Context).OnComplete();
+    }
+
+    public override Task OnComplete()
+    {
+        return Task.CompletedTask;
     }
 }

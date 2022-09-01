@@ -9,8 +9,6 @@ namespace secretary.telegram.tests.commands;
 
 public class CommandClipTests
 {
-    private ILogger<CommandClipTests> _logger = LogPoint.GetLogger<CommandClipTests>();
-    
     private CommandClip _clip = null!;
 
     private Mock<Command> _firstState = null!; 
@@ -117,5 +115,19 @@ public class CommandClipTests
         await _clip.Run(_context);
         
         Assert.That(_context.BackwardRedirect, Is.True);
+    }
+
+    [Test]
+    public async Task ShouldIgnoreRunForFinish()
+    {
+        await _clip.Run(_context);
+        await _clip.Run(_context);
+        await _clip.Run(_context);
+        
+        Assert.That(_clip.RunIndex, Is.EqualTo(4));
+        
+        await _clip.Run(_context);
+
+        Assert.That(_clip.RunIndex, Is.EqualTo(4));
     }
 }

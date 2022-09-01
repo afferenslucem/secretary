@@ -4,14 +4,16 @@ public class StartCommand: Command
 {
     public const string Key = "/start";
     
-    public override Task Execute()
+    public override async Task Execute()
     {
-        return this.Context.TelegramClient.SendMessage(
+        await this.Context.TelegramClient.SendMessage(
             ChatId, 
             "Добро пожаловать!\r\n" +
             "\r\n" +
             "Перед началом работы вам необходимо:\r\n" +
             "/registeruser – зарегистрироваться\r\n" +
             "/registermail – зарегистрировать рабочую почту");
+
+        await OnComplete();
     }
 }

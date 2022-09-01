@@ -29,6 +29,8 @@ public class SendDocumentCommand : Command
         var message = this.GetMailMessage(user, emails);
 
         await SendMail(message);
+
+        await this.OnComplete();
     }
 
     public SecretaryMailMessage GetMailMessage(User user, IEnumerable<Email> emails)

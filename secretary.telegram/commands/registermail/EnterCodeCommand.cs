@@ -10,11 +10,11 @@ public class EnterCodeCommand: Command
 {
     private ILogger<EnterCodeCommand> _logger = LogPoint.GetLogger<EnterCodeCommand>();
 
-    public override Task Execute()
+    public override async Task Execute()
     {
         _ = this.RegisterMail();
-        
-        return Task.CompletedTask;
+
+        await this.OnComplete();
     }
 
     private async Task RegisterMail()
@@ -25,7 +25,7 @@ public class EnterCodeCommand: Command
 
             await Context.TelegramClient.SendMessage(ChatId,
                 $"Пожалуйста, <strong>УБЕДИТЕСЬ</strong>, что вы авторизуетесь в рабочей почте!\r\n" +
-                $"Введите этот код: <code>{data.user_code}</code> в поле ввода по этой ссылке: {data.verification_url}");
+                $"Введите этот код: <code>{data.user_code}</code> в поле ввода по этой ссылке: {data.verification_url}. Регистрация может занять пару минут.");
 
             var tokenData = await this.AskRegistration(Context.YandexAuthenticator, data, DateTime.Now);
 

@@ -4,6 +4,7 @@ using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.registermail;
+using secretary.telegram.sessions;
 using secretary.yandex.exceptions;
 
 namespace secretary.telegram.tests.commands.registermail;
@@ -13,6 +14,7 @@ public class EnterCodeCommandTests
     private Mock<ITelegramClient> _client = null!;
     private Mock<IUserStorage> _userStorage = null!;
     private Mock<IYandexAuthenticator> _yandexAuthenticator = null!;
+    private Mock<ISessionStorage> _sessionStorage = null!;
     private CommandContext _context = null!;
     private EnterCodeCommand _command = null!;
         
@@ -21,6 +23,7 @@ public class EnterCodeCommandTests
     {
         this._client = new Mock<ITelegramClient>();
         this._userStorage = new Mock<IUserStorage>();
+        this._sessionStorage = new Mock<ISessionStorage>();
         this._yandexAuthenticator = new Mock<IYandexAuthenticator>();
 
         this._context = new CommandContext()
@@ -29,6 +32,7 @@ public class EnterCodeCommandTests
             TelegramClient = this._client.Object, 
             YandexAuthenticator = _yandexAuthenticator.Object, 
             UserStorage = _userStorage.Object,
+            SessionStorage = _sessionStorage.Object,
         };
 
         this._command = new EnterCodeCommand();
@@ -53,7 +57,7 @@ public class EnterCodeCommandTests
         await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, "Пожалуйста, <strong>УБЕДИТЕСЬ</strong>, что вы авторизуетесь в рабочей почте!\r\n" +
-                                                              "Введите этот код: <code>code</code> в поле ввода по этой ссылке: url"));
+                                                              "Введите этот код: <code>code</code> в поле ввода по этой ссылке: url. Регистрация может занять пару минут."));
     }
         
     [Test]
