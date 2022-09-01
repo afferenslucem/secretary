@@ -72,10 +72,27 @@ public class SetEmailsCommand : Command
         }
         else
         {
+            return await ParseAndSaveEmails(document);
+        }
+    }
+
+    private async Task<int> ParseAndSaveEmails(Document document)
+    {
+        try
+        {
             IEnumerable<Email> emails = new EmailParser().ParseMany(Message);
             await Context.EmailStorage.SaveForDocument(document.Id, emails);
 
             return RunNext;
+        }
+        catch (IncorrectEmailException e)
+        {
+            await Context.TelegramClient.SendMessage(ChatId,
+                $"Почтовый адрес <code>{e.IncorrectEmail}</code>" +
+                " имеет некорректный формат.\r\n" +
+                "Поправьте его и отправте список адресов еще раз.");
+
+            return Retry;
         }
     }
 }

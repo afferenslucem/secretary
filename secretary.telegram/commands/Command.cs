@@ -5,6 +5,7 @@ namespace secretary.telegram.commands;
 public abstract class Command
 {
     protected const int RunNext = 1; 
+    protected const int Retry = 0; 
     
     protected readonly CancellationTokenSource CancellationToken;
 
