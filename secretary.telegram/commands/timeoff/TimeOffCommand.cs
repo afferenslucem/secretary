@@ -26,7 +26,7 @@ public class TimeOffCommand: StatedCommand
 {
     public const string Key = "/timeoff";
 
-    public TimeOffCreateModel Data { get; set; } = new TimeOffCreateModel();
+    public TimeOffCreateModel Data { get; set; } = new ();
     
     public override List<Command> ConfigureStates()
     {
@@ -40,6 +40,7 @@ public class TimeOffCommand: StatedCommand
             new SetEmailsCommand(),
             new CheckEmailsCommand(),
             new SendDocumentCommand(),
+            new AssymetricCompleteCommand(),
         };
     }
 }

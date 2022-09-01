@@ -1,11 +1,15 @@
-﻿using secretary.telegram.commands.executors;
+﻿using Microsoft.Extensions.Logging;
+using secretary.logging;
+using secretary.telegram.commands.executors;
+using secretary.telegram.exceptions;
 
 namespace secretary.telegram.commands;
 
 public class NullCommand: Command
 {
+    private ILogger<NullCommand> _logger = LogPoint.GetLogger<NullCommand>();
     public const string Key = "*";
-    
+
     public override async Task Execute()
     {
         var session = await Context.GetSession();
@@ -13,16 +17,10 @@ public class NullCommand: Command
         if (session == null || session.LastCommand == null)
         {
             await Context.TelegramClient.SendMessage(ChatId, "Извините, я не понял\r\nОтправьте команду");
-            
+
             return;
-        };
+        }
 
         await new CommandExecutor(session.LastCommand, Context).OnMessage();
-        await new CommandExecutor(session.LastCommand, Context).OnComplete();
-    }
-
-    public override Task OnComplete()
-    {
-        return Task.CompletedTask;
     }
 }

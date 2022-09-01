@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using secretary.storage.models;
+using secretary.telegram.exceptions;
 
 namespace secretary.telegram.utils;
 
@@ -27,7 +28,7 @@ public class EmailParser
         
         if (!addressMatch.Success)
         {
-            throw new FormatException($"Address \"{message}\" has invalid format");
+            throw new IncorrectEmailException(message, $"Address \"{message}\" has invalid format");
         }
 
         var nameMatch = _nameRegex.Match(message);

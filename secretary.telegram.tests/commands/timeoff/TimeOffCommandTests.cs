@@ -73,7 +73,6 @@ public class TimeOffCommandTests
     {
         _context.Message = "/timeoff";
         await this._command.Execute();
-        await this._command.OnComplete();
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         
         _context.Message = "30.08.2022";
@@ -82,9 +81,7 @@ public class TimeOffCommandTests
         
         _context.Message = "Нужно помыть хомячка";
         await this._command.OnMessage();
-        await this._command.OnComplete();
         Assert.That(_command.Data.Reason, Is.EqualTo("Нужно помыть хомячка"));
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User());
         _context.Message = "Отработаю на следующей неделе";
@@ -100,11 +97,10 @@ public class TimeOffCommandTests
             .ReturnsAsync(new [] { new Email("a.pushkin@infinnity.ru") });
         _context.Message = "Да";
         await this._command.OnMessage();
+        
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
-
         _context.Message = "Повторить";
         await this._command.OnMessage();
-        await this._command.OnComplete();
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
         _mailClient.Verify(target => target.SendMail(It.IsAny<SecretaryMailMessage>()), Times.Once);
     }
@@ -189,5 +185,39 @@ public class TimeOffCommandTests
         await this._command.OnMessage();
         
         _mailClient.Verify(target => target.SendMail(It.IsAny<SecretaryMailMessage>()), Times.Once);
+    }
+    
+    [Test]
+    public async Task ShouldRemoveSessionForNo()
+    {
+        _context.Message = "/timeoff";
+        await this._command.Execute();
+        
+        _context.Message = "30.08.2022";
+        await this._command.OnMessage();
+        Assert.That(_command.Data.Period, Is.EqualTo("30.08.2022"));
+        
+        _context.Message = "Нужно помыть хомячка";
+        await this._command.OnMessage();
+        Assert.That(_command.Data.Reason, Is.EqualTo("Нужно помыть хомячка"));
+
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User());
+        _context.Message = "Отработаю на следующей неделе";
+        await this._command.OnMessage();
+        Assert.That(_command.Data.WorkingOff, Is.EqualTo("Отработаю на следующей неделе"));
+        _client.Verify(target => target.SendDocument(2517, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+
+        _documentStorage
+            .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))
+            .ReturnsAsync(new Document(1, ""));
+        _emailStorage
+            .Setup(target => target.GetForDocument(It.IsAny<long>()))
+            .ReturnsAsync(new [] { new Email("a.pushkin@infinnity.ru") });
+        
+        _context.Message = "Нет";
+        
+        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
+        await this._command.OnMessage();
+        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
     }
 }

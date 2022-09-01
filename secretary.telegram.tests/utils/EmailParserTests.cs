@@ -1,4 +1,5 @@
 ﻿using secretary.storage.models;
+using secretary.telegram.exceptions;
 using secretary.telegram.utils;
 
 namespace secretary.telegram.tests.utils;
@@ -56,7 +57,7 @@ public class EmailParserTests
     [Test]
     public void ShouldThrowErrorForIncorrectEmail()
     {
-        Assert.Throws<FormatException>(
+        Assert.Throws<IncorrectEmailException>(
             () => Parser.Parse("a.pushkin@companyru (Александр Пушкин"),
             "Address \"a.pushkin@companyru (Александр Пушкин\" has invalid format"
         );

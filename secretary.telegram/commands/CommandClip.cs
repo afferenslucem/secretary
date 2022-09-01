@@ -13,7 +13,26 @@ public class CommandClip
     private readonly Command[] _states;
     private int _runIndex = 0;
 
-    public bool IsFinished => _runIndex == _states.Length;
+    public bool IsFinishedChain => _runIndex == _states.Length;
+
+    private int LastIndex => _states.Length - 1;
+    
+    public bool IsAsymmetricCompleted
+    {
+        get
+        {
+            if (_runIndex != LastIndex - 1)
+            {
+                return false;
+            }
+            else
+            {
+                return _states[_runIndex + 1].GetType() == typeof(AssymetricCompleteCommand);
+            }
+        }
+    }
+
+    public bool IsCompleted => IsFinishedChain || IsAsymmetricCompleted;
 
     public int RunIndex => _runIndex;
 
@@ -25,7 +44,7 @@ public class CommandClip
 
     public async Task Run(CommandContext context)
     {
-        if (IsFinished) return;
+        if (IsFinishedChain) return;
             
         var firstPartCommand = _states[_runIndex];
             
@@ -43,7 +62,7 @@ public class CommandClip
             
             this.IncrementStep(increment);
 
-            if (IsFinished) return;
+            if (IsFinishedChain) return;
 
             var secondPartCommand = _states[_runIndex];
             var secondPartExecutor = new ChildCommandExecutor(secondPartCommand, context, _parentCommand);
@@ -53,11 +72,6 @@ public class CommandClip
         catch (IncorrectFormatException e)
         {
             _logger.LogWarning(e, $"Incorrect format of command {firstPartCommand.GetType().Name}: \"{context.Message}\"");
-        }
-        catch (CancelCommandException e)
-        {
-            _logger.LogWarning($"Cancelling of command {e.CommandName}");
-            throw;
         }
     }
 

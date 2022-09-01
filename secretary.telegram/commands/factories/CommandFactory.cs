@@ -1,6 +1,4 @@
-﻿using secretary.telegram.commands.timeoff;
-
-namespace secretary.telegram.commands.factories;
+﻿namespace secretary.telegram.commands.factories;
 
 public class CommandFactory<T>: ICommandFactory
     where T: Command, new()

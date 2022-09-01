@@ -1,8 +1,11 @@
-﻿namespace secretary.telegram.commands;
+﻿using secretary.telegram.exceptions;
+
+namespace secretary.telegram.commands;
 
 public abstract class Command
 {
     protected const int RunNext = 1; 
+    protected const int Retry = 0; 
     
     protected readonly CancellationTokenSource CancellationToken;
 
@@ -38,8 +41,8 @@ public abstract class Command
         return Task.CompletedTask;
     }
 
-    public virtual Task OnComplete()
+    protected void ForceComplete()
     {
-        return this.Context.SessionStorage.DeleteSession(ChatId);
+        throw new ForceCompleteCommandException(this.GetType().Name);
     }
 }

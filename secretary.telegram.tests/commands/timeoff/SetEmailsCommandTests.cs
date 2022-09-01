@@ -50,9 +50,8 @@ public class SetEmailsCommandTests
     {
         _context.Message = "Нет";
 
-        Assert.ThrowsAsync<CancelCommandException>(() =>_command.Execute());
+        Assert.ThrowsAsync<ForceCompleteCommandException>(() =>_command.Execute());
         
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
         _client.Verify(target => target.SendMessage(2517, "Дальнейшее выполнение команды прервано"));
     }
     
@@ -149,7 +148,7 @@ public class SetEmailsCommandTests
     }
     
     [Test]
-    public async Task ShouldParseMails()
+    public async Task ShouldParseEmails()
     {
         _documentStorage
             .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))
@@ -171,5 +170,25 @@ public class SetEmailsCommandTests
         _emailStorage.Verify(target => target.SaveForDocument(0, expectedEmails), Times.Once);
         
         Assert.That(step, Is.EqualTo(1));
+    }
+    
+    [Test]
+    public async Task ShouldReturnIncorrectEmailFormat()
+    {
+        _documentStorage
+            .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))
+            .ReturnsAsync(new Document() { Id = 0 });
+        
+        _context.Message = "a.pushkin@infinnity.ru (Александр Пушкин)\n" +
+                           "s.esenin@infinnityru (Сергей Есенин)\n" +
+                           "v.mayakovskii@infinnity.ru";
+        
+        var step = await this._command.OnMessage();
+
+        _client.Verify(target => target.SendMessage(2517, $"Почтовый адрес <code>s.esenin@infinnityru (Сергей Есенин)</code>" +
+            " имеет некорректный формат.\r\n" +
+            "Поправьте его и отправте список адресов еще раз."));
+        
+        Assert.That(step, Is.EqualTo(0));
     }
 }

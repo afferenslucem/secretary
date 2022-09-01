@@ -1,12 +1,12 @@
 namespace secretary.telegram.exceptions;
 
-public class CancelCommandException: Exception
+public class ForceCompleteCommandException: Exception
 {
     private string _commandName;
 
     public string CommandName => _commandName;
 
-    public CancelCommandException(string commandName)
+    public ForceCompleteCommandException(string commandName)
     {
         _commandName = commandName;
     }

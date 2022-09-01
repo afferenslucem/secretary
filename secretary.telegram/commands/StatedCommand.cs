@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using secretary.logging;
+using secretary.telegram.exceptions;
 
 namespace secretary.telegram.commands;
 
@@ -19,14 +20,28 @@ public abstract class StatedCommand: Command
     
     public override async Task Execute()
     {
-        await Clip.Run(Context);
-        await Context.SaveSession(this);
+        try
+        {
+            await Clip.Run(Context);
+
+            if (Clip.IsCompleted)
+            {
+                await OnComplete();
+            }
+            else
+            {
+                await Context.SaveSession(this);
+            }
+        }
+        catch (ForceCompleteCommandException e)
+        {
+            await this.OnForceComplete(e);
+        }
     }
 
-    public override async Task<int> OnMessage() {
-        await Clip.Run(Context);
-        await Context.SaveSession(this);
-        
+    public override async Task<int> OnMessage()
+    {
+        await this.Execute();
         return RunNext;
     }
 
@@ -37,11 +52,14 @@ public abstract class StatedCommand: Command
         await Clip.Cancel(Context);
     }
 
-    public override async Task OnComplete()
+    private async Task OnComplete()
     {
-        if (Clip.IsFinished)
-        {
-            await base.OnComplete();
-        }
+        await Context.SessionStorage.DeleteSession(ChatId);
+    }
+
+    private async Task OnForceComplete(ForceCompleteCommandException e)
+    {
+        await this.OnComplete();
+        _logger.LogWarning($"Сommand {e.CommandName} force completed");
     }
 }

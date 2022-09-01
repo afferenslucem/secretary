@@ -70,10 +70,6 @@ public class TelegramBot
 
             _logger.LogInformation($"Сommand executed {command.GetType().Name}");
         }
-        catch (CancelCommandException e)
-        {
-            _logger.LogWarning($"Сommand {e.CommandName} canceled");
-        }
         catch (Exception e)
         {
             _logger.LogError(e, $"Сommand execution fault {command.GetType().Name}");

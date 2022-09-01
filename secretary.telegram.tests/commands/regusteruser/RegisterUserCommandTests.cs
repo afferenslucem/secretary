@@ -57,15 +57,9 @@ public class RegisterUserCommandTests
         
         _context.Message = "/registeruser";
         await _command.Execute();
-        await _command.OnComplete();
         
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
-
         _context.Message = "Александр Пушкин";
         await _command.OnMessage();
-        await _command.OnComplete();
-        
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         _userStorage.Verify(target => target.SetUser(It.Is<User>(user => user.Name == "Александр Пушкин")), Times.Once);
 
         _context.Message = "Пушкина Александра Сергеевича";
@@ -75,11 +69,10 @@ public class RegisterUserCommandTests
         _context.Message = "поэт";
         await _command.OnMessage();
         _userStorage.Verify(target => target.UpdateUser(It.Is<User>(user => user.JobTitle == "поэт")), Times.Once);
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         
+        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         _context.Message = "поэта";
         await _command.OnMessage();
-        await _command.OnComplete();
         
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
         _userStorage.Verify(target => target.UpdateUser(It.Is<User>(user => user.JobTitleGenitive == "поэта")), Times.Once);
