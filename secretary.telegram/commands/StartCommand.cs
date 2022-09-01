@@ -13,7 +13,5 @@ public class StartCommand: Command
             "Перед началом работы вам необходимо:\r\n" +
             "/registeruser – зарегистрироваться\r\n" +
             "/registermail – зарегистрировать рабочую почту");
-
-        await OnComplete();
     }
 }

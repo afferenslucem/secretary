@@ -13,4 +13,9 @@ public class CancelCommand: Command
         await Context.SessionStorage.DeleteSession(ChatId);
         await Context.TelegramClient.SendMessage(ChatId, "Дальнейшее выполнение команды прервано");
     }
+
+    public override Task OnComplete()
+    {
+        return Task.CompletedTask;
+    }
 }

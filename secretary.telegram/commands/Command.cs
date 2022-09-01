@@ -1,4 +1,6 @@
-﻿namespace secretary.telegram.commands;
+﻿using secretary.telegram.exceptions;
+
+namespace secretary.telegram.commands;
 
 public abstract class Command
 {
@@ -41,5 +43,10 @@ public abstract class Command
     public virtual Task OnComplete()
     {
         return this.Context.SessionStorage.DeleteSession(ChatId);
+    }
+
+    protected void ForceComplete()
+    {
+        throw new ForceCompleteCommandException(this.GetType().Name);
     }
 }

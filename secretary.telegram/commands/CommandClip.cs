@@ -54,9 +54,9 @@ public class CommandClip
         {
             _logger.LogWarning(e, $"Incorrect format of command {firstPartCommand.GetType().Name}: \"{context.Message}\"");
         }
-        catch (CancelCommandException e)
+        catch (ForceCompleteCommandException e)
         {
-            _logger.LogWarning($"Cancelling of command {e.CommandName}");
+            _logger.LogWarning($"Force completing command {e.CommandName}");
             throw;
         }
     }

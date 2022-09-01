@@ -50,9 +50,8 @@ public class SetEmailsCommandTests
     {
         _context.Message = "Нет";
 
-        Assert.ThrowsAsync<CancelCommandException>(() =>_command.Execute());
+        Assert.ThrowsAsync<ForceCompleteCommandException>(() =>_command.Execute());
         
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
         _client.Verify(target => target.SendMessage(2517, "Дальнейшее выполнение команды прервано"));
     }
     
