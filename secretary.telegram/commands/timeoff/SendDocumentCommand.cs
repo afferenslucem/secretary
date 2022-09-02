@@ -1,4 +1,5 @@
 ﻿using System.Net.Mail;
+using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 using secretary.documents.creators;
@@ -83,6 +84,16 @@ public class SendDocumentCommand : Command
                     "и разрешите отправку по OAuth-токену с сервера imap.\r\n" +
                     "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке"
                     );
+            }
+        }
+        catch (SmtpCommandException e)
+        {
+            if (e.Message.Contains("Sender address rejected: not owned by auth user"))
+            {
+                await Context.TelegramClient.SendMessage(ChatId, 
+                    "Guliki detected!\r\n" +
+                    $"Вы отправляете письмо с токеном не принадлежащим ящику <code>{e.Mailbox.Address}</code>"
+                );
             }
         }
     }

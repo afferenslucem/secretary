@@ -1,4 +1,6 @@
-﻿using MailKit.Security;
+﻿using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
 using Moq;
 using secretary.documents.creators;
 using secretary.storage;
@@ -167,6 +169,29 @@ public class SendDocumentCommandTests
             "Если ящик нужный, то перейдите в <a href=\"https://mail.yandex.ru/#setup/client\">настройки</a> " +
             "и разрешите отправку по OAuth-токену с сервера imap.\r\n" +
             "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке"
-            ));
+        ));
+    }
+
+    [Test]
+    public async Task ShouldProtectNotOwnTokenUsage()
+    {
+        var exception = new SmtpCommandException(
+            SmtpErrorCode.SenderNotAccepted, 
+            SmtpStatusCode.AuthenticationRequired,
+            new MailboxAddress("Username", "a.pushkin@infinnity.ru"),
+            "Sender address rejected: not owned by auth user"
+            );
+        
+        _mailClient.Setup(target => target.SendMail(It.IsAny<SecretaryMailMessage>()))
+            .ThrowsAsync(exception);
+
+        _command.Context = _context;
+        await _command.SendMail(null!);
+        
+        _client.Verify(target => target.SendMessage(
+            2517, 
+            "Guliki detected!\r\n" +
+            "Вы отправляете письмо с токеном не принадлежащим ящику <code>a.pushkin@infinnity.ru</code>"
+        ));
     }
 }
