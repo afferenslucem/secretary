@@ -86,6 +86,8 @@ public class TelegramClient: ITelegramClient
         var buttons = choises.Select(text => new KeyboardButton(text)).ToArray();
         
         var keyboard = new ReplyKeyboardMarkup(buttons);
+
+        keyboard.ResizeKeyboard = true;
         keyboard.OneTimeKeyboard = true;
         
         return this._botClient.SendTextMessageAsync(chatId, message, parseMode: ParseMode.Html, replyMarkup: keyboard, cancellationToken: this._cancellationToken);

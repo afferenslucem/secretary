@@ -63,4 +63,12 @@ public class CommandsListeningChainTests
         
         Assert.IsInstanceOf<RegisterUserCommand>(result);
     }
+
+    [Test]
+    public void ShouldReturnMeCommand()
+    {
+        var result = this.chain.Get(MeCommand.Key);
+        
+        Assert.IsInstanceOf<MeCommand>(result);
+    }
 }

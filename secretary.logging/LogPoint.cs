@@ -14,7 +14,10 @@ public class LogPoint
 
     private static ILoggingBuilder Configure(ILoggingBuilder builder)
     {
-        builder.AddConsole();
+        builder.AddSimpleConsole(options =>
+        {
+            options.TimestampFormat = "[hh:mm:ss] ";
+        });
 
         if (Config.Instance.Environment == "Develop")
         {
