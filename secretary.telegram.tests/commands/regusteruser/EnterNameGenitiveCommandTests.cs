@@ -38,8 +38,8 @@ public class EnterNameGenitiveCommandTests
     {
         await this._command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Введите ваши имя и фамилию в родительном падеже.\r\n" +
-                                                               "Так они будут указаны в отправоляемом документе в графе \"от кого\".\r\n" +
+        this._client.Verify(target => target.SendMessage(2517, "Введите ваши ФИО в родительном падеже.\r\n" +
+                                                               "Так они будут указаны в отправляемом документе в графе \"от кого\".\r\n" +
                                                                @"Например: От <i>Пушкина Александра Сергеевича</i>"));
     }
     
