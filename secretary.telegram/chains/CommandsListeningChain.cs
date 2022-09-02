@@ -8,25 +8,26 @@ namespace secretary.telegram.chains;
 
 public class CommandsListeningChain
 {
-    private CommandsChain commandsChain = new CommandsChain();
+    private readonly CommandsChain _commandsChain = new();
 
     public CommandsListeningChain()
     {
-        this.commandsChain.Add(StartCommand.Key, new CommandFactory<StartCommand>());
-        this.commandsChain.Add(RegisterUserCommand.Key, new CommandFactory<RegisterUserCommand>());
-        this.commandsChain.Add(RegisterMailCommand.Key, new CommandFactory<RegisterMailCommand>());
-        this.commandsChain.Add(TimeOffCommand.Key, new CommandFactory<TimeOffCommand>());
-        this.commandsChain.Add(CancelCommand.Key, new CommandFactory<CancelCommand>());
-        this.commandsChain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
+        this._commandsChain.Add(StartCommand.Key, new CommandFactory<StartCommand>());
+        this._commandsChain.Add(RegisterUserCommand.Key, new CommandFactory<RegisterUserCommand>());
+        this._commandsChain.Add(RegisterMailCommand.Key, new CommandFactory<RegisterMailCommand>());
+        this._commandsChain.Add(TimeOffCommand.Key, new CommandFactory<TimeOffCommand>());
+        this._commandsChain.Add(CancelCommand.Key, new CommandFactory<CancelCommand>());
+        this._commandsChain.Add(MeCommand.Key, new CommandFactory<MeCommand>());
+        this._commandsChain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
     }
 
     private void Add(string key, ICommandFactory commandFactory)
     {
-        this.commandsChain.Add(key, commandFactory);
+        this._commandsChain.Add(key, commandFactory);
     }
 
     public Command? Get(string key)
     {
-        return this.commandsChain.Get(key);
+        return this._commandsChain.Get(key);
     }
 }
