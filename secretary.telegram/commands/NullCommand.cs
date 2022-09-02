@@ -1,13 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using secretary.logging;
 using secretary.telegram.commands.executors;
-using secretary.telegram.exceptions;
 
 namespace secretary.telegram.commands;
 
 public class NullCommand: Command
 {
-    private ILogger<NullCommand> _logger = LogPoint.GetLogger<NullCommand>();
     public const string Key = "*";
 
     public override async Task Execute()

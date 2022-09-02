@@ -55,4 +55,14 @@ public class CancelCommandTests
         
         commandMock.Verify(target => target.Cancel(), Times.Once);
     }
+    
+    [Test]
+    public async Task ShouldCancelEmptySession()
+    {
+        var session = new Session();
+
+        _sessionStorage.Setup(target => target.GetSession(It.IsAny<long>())).ReturnsAsync(session);
+        
+        await this._command.Execute();
+    }
 }

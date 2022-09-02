@@ -1,11 +1,18 @@
-﻿namespace secretary.telegram.commands;
+﻿using Microsoft.Extensions.Logging;
+using secretary.logging;
+
+namespace secretary.telegram.commands;
 
 public class StartCommand: Command
 {
+    private readonly ILogger<StartCommand> _logger = LogPoint.GetLogger<StartCommand>();
+    
     public const string Key = "/start";
     
     public override async Task Execute()
     {
+        _logger.LogInformation($"{ChatId}: Started work");
+
         await this.Context.TelegramClient.SendMessage(
             ChatId, 
             "Добро пожаловать!\r\n" +

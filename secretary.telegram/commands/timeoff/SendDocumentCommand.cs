@@ -1,17 +1,18 @@
-﻿using System.Net.Mail;
-using MailKit.Net.Smtp;
+﻿using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.Extensions.Logging;
 using MimeKit;
 using secretary.documents.creators;
+using secretary.logging;
 using secretary.storage.models;
-using secretary.telegram.exceptions;
-using secretary.telegram.utils;
 using secretary.yandex.mail;
 
 namespace secretary.telegram.commands.timeoff;
 
 public class SendDocumentCommand : Command
 {
+    private readonly ILogger<SendDocumentCommand> _logger = LogPoint.GetLogger<SendDocumentCommand>();
+    
     public ITimeOffCreator MessageCreator;
 
 
@@ -72,6 +73,8 @@ public class SendDocumentCommand : Command
             await Context.MailClient.SendMail(message);
 
             await Context.TelegramClient.SendMessage(ChatId, "Заяление отправлено");
+            
+            _logger.LogInformation($"{ChatId}: sent mail");
         }
         catch (AuthenticationException e)
         {

@@ -1,9 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Moq;
-using secretary.logging;
+﻿using Moq;
 using secretary.telegram.commands;
 using secretary.telegram.exceptions;
-using secretary.telegram.sessions;
 
 namespace secretary.telegram.tests.commands;
 

@@ -33,6 +33,7 @@ public class EnterCodeCommand: Command
             {
                 await this.SetTokens(tokenData);
                 await Context.TelegramClient.SendMessage(ChatId, "Ура, вы успешно зарегистрировали почту");
+                _logger.LogInformation($"{ChatId}: handled tokens");
             }
         }
         catch (YandexAuthenticationException e)

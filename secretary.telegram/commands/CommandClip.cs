@@ -67,6 +67,7 @@ public class CommandClip
             var secondPartCommand = _states[_runIndex];
             var secondPartExecutor = new ChildCommandExecutor(secondPartCommand, context, _parentCommand);
 
+            _logger.LogInformation($"{context.ChatId}: Start execute command {secondPartCommand.GetType().Name}");
             await secondPartExecutor.Execute();
         }
         catch (IncorrectFormatException e)

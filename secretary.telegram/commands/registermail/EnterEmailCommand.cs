@@ -1,4 +1,6 @@
 ﻿using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
+using secretary.logging;
 using secretary.storage.models;
 using secretary.telegram.exceptions;
 
@@ -6,8 +8,11 @@ namespace secretary.telegram.commands.registermail;
 
 public class EnterEmailCommand : Command
 {
+    private readonly ILogger<EnterEmailCommand> _logger = LogPoint.GetLogger<EnterEmailCommand>();
     public override Task Execute()
     {
+        _logger.LogInformation($"{ChatId}: started register mail");
+        
         return Context.TelegramClient.SendMessage(ChatId, "Введите вашу почту, с которой вы отправляете заявления.\r\n" +
                                                           @"Например: <i>a.pushkin@infinnity.ru</i>");
     }

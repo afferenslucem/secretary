@@ -1,7 +1,4 @@
-﻿using secretary.documents.creators;
-using secretary.telegram.exceptions;
-
-namespace secretary.telegram.commands.timeoff;
+﻿namespace secretary.telegram.commands.timeoff;
 
 public class CheckEmailsCommand : Command
 {

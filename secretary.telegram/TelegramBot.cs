@@ -6,7 +6,6 @@ using secretary.storage;
 using secretary.telegram.chains;
 using secretary.telegram.commands;
 using secretary.telegram.commands.executors;
-using secretary.telegram.exceptions;
 using secretary.telegram.sessions;
 using secretary.yandex.mail;
 
@@ -52,7 +51,7 @@ public class TelegramBot
         
         try
         {
-            _logger.LogInformation($"Start execute command {command.GetType().Name}");
+            LogCommand(command, $"{message.ChatId}: execute command {command.GetType().Name}");
 
             var context = new CommandContext(
                 message.ChatId,
@@ -67,12 +66,10 @@ public class TelegramBot
             );
 
             await new CommandExecutor(command, context).Execute();
-
-            _logger.LogInformation($"Сommand executed {command.GetType().Name}");
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Сommand execution fault {command.GetType().Name}");
+            _logger.LogError(e, $"{message.ChatId}: Сommand execution fault {command.GetType().Name}");
         }
     }
     
@@ -85,5 +82,12 @@ public class TelegramBot
     public void Cancel()
     {
         this._cancellationTokenSource.Cancel();
+    }
+
+    public void LogCommand(Command command, string message)
+    {
+        if (command.GetType() == typeof(NullCommand)) return;
+        
+        _logger.LogInformation(message);
     }
 }
