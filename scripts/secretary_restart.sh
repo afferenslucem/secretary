@@ -3,6 +3,5 @@
 execPath=&
 
 pushd $execPath
-docker-compose pull bot
-docker-compose up -d --force-recreate bot
+docker-compose pull bot && docker-compose up -d --force-recreate bot
 popd
