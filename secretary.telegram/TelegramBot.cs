@@ -13,6 +13,8 @@ namespace secretary.telegram;
 
 public class TelegramBot
 {
+    public const string Version = "v0.1.0";
+    
     private readonly ILogger<TelegramBot> _logger = LogPoint.GetLogger<TelegramBot>();
     
     private readonly CommandsListeningChain _chain;
@@ -22,11 +24,12 @@ public class TelegramBot
     private readonly Database _database;
 
     private readonly IYandexAuthenticator _yandexAuthenticator;
+
     private readonly IMailClient _mailClient;
 
     private readonly ITelegramClient _telegramClient;
 
-    private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+    private CancellationTokenSource _cancellationTokenSource = new();
 
     public TelegramBot(string telegramToken, MailConfig mailConfig, Database database)
     {

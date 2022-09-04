@@ -18,6 +18,7 @@ public class CommandsListeningChain
         this._commandsChain.Add(TimeOffCommand.Key, new CommandFactory<TimeOffCommand>());
         this._commandsChain.Add(CancelCommand.Key, new CommandFactory<CancelCommand>());
         this._commandsChain.Add(MeCommand.Key, new CommandFactory<MeCommand>());
+        this._commandsChain.Add(VersionCommand.Key, new CommandFactory<VersionCommand>());
         this._commandsChain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
     }
 

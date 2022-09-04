@@ -71,4 +71,12 @@ public class CommandsListeningChainTests
         
         Assert.IsInstanceOf<MeCommand>(result);
     }
+
+    [Test]
+    public void ShouldReturnVersionCommand()
+    {
+        var result = this.chain.Get(VersionCommand.Key);
+        
+        Assert.IsInstanceOf<VersionCommand>(result);
+    }
 }
