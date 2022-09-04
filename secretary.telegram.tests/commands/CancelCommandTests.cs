@@ -29,6 +29,12 @@ public class CancelCommandTests
 
         this._command.Context = _context;
     }
+
+    [Test]
+    public void ShouldHaveCorrectKey()
+    {
+        Assert.That(CancelCommand.Key, Is.EqualTo("/cancel"));
+    }
     
     [Test]
     public async Task ShouldBreakCommand()

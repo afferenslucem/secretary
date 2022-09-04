@@ -46,6 +46,12 @@ public class RegisterMailCommandTests
     }
     
     [Test]
+    public void ShouldHaveCorrectKey()
+    {
+        Assert.That(RegisterMailCommand.Key, Is.EqualTo("/registermail"));
+    }
+    
+    [Test]
     public async Task ShouldRunFully()
     {
         _userStorage.Setup(target => target.GetUser(2517)).ReturnsAsync(() => new User());

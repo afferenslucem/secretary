@@ -32,6 +32,12 @@ public class MeCommandTests
     }
 
     [Test]
+    public void ShouldHaveCorrectKey()
+    {
+        Assert.That(MeCommand.Key, Is.EqualTo("/me"));
+    }
+
+    [Test]
     public void ShouldCreate()
     {
         Assert.Pass();

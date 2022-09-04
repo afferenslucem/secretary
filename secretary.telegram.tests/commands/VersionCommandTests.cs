@@ -28,6 +28,12 @@ public class VersionCommandTests
     }
 
     [Test]
+    public void ShouldHaveCorrectKey()
+    {
+        Assert.That(VersionCommand.Key, Is.EqualTo("/version"));
+    }
+
+    [Test]
     public async Task ShouldSendVersion()
     {
         await this._command.Execute();

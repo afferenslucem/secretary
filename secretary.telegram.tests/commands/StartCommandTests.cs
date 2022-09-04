@@ -31,6 +31,12 @@ public class StartCommandTests
     }
 
     [Test]
+    public void ShouldHaveCorrectKey()
+    {
+        Assert.That(StartCommand.Key, Is.EqualTo("/start"));
+    }
+
+    [Test]
     public async Task ShouldSendExampleMessage()
     {
         await this._command.Execute();

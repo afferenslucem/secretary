@@ -39,6 +39,12 @@ public class RegisterUserCommandTests
     {
         Assert.Pass();
     }
+
+    [Test]
+    public void ShouldHaveCorrectKey()
+    {
+        Assert.That(RegisterUserCommand.Key, Is.EqualTo("/registeruser"));
+    }
         
     [Test]
     public async Task ShouldSaveSessionOnExecute()

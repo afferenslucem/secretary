@@ -29,6 +29,12 @@ public class NullCommandTests
         
         this._command.Context = _context;
     }
+
+    [Test]
+    public void ShouldHaveCorrectKey()
+    {
+        Assert.That(NullCommand.Key, Is.EqualTo("*"));
+    }
     
     [Test]
     public async Task ShouldReturnSorryForEmptySession()

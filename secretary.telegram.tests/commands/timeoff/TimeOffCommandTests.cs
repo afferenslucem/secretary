@@ -59,6 +59,12 @@ public class TimeOffCommandTests
     {
         Assert.Pass();
     }
+
+    [Test]
+    public void ShouldHaveCorrectKey()
+    {
+        Assert.That(TimeOffCommand.Key, Is.EqualTo("/timeoff"));
+    }
     
     [Test]
     public async Task ShouldSaveSessionOnExecute()
