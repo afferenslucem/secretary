@@ -52,7 +52,7 @@ public abstract class StatedCommand: Command
         await Clip.Cancel(Context);
     }
 
-    private async Task OnComplete()
+    protected async Task OnComplete()
     {
         await Context.SessionStorage.DeleteSession(ChatId);
     }

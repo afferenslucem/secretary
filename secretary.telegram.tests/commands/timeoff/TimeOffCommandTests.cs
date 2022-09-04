@@ -49,6 +49,8 @@ public class TimeOffCommandTests
         
         this._command.Context = _context;
         
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { JobTitleGenitive = "", AccessToken = ""});
+        
         DocumentTemplatesStorage.Initialize(Config.Instance.TemplatesPath);
     }
     
@@ -66,6 +68,53 @@ public class TimeOffCommandTests
         await this._command.Execute();
         
         this._sessionStorage.Verify(target => target.SaveSession(2517, It.Is<Session>(session => session.ChaitId == 2517 && session.LastCommand == _command)));
+    }
+
+    [Test]
+    public async Task ShouldBreakExecutionForNonRegisteredUser()
+    {
+        _context.Message = "/timeoff";
+
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync((User?)null);
+        
+        await this._command.Execute();
+        
+        _client.Verify(target => target.SendMessage(2517, "Вы – незарегистрированный пользователь.\r\n\r\n" +
+                                                          "Выполните команды:\r\n" +
+                                                          "/registeruser\r\n" +
+                                                          "/registermail"));
+        
+        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
+    }
+
+    [Test]
+    public async Task ShouldBreakExecutionForUserWithoutMail()
+    {
+        _context.Message = "/timeoff";
+
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { JobTitleGenitive = ""});
+        
+        await this._command.Execute();
+        
+        _client.Verify(target => target.SendMessage(2517, "У вас не зарегистрирована почта.\r\n" +
+                                                          "Выполните команду: /registermail"));
+        
+        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
+    }
+
+    [Test]
+    public async Task ShouldBreakExecutionForUserWithoutInfo()
+    {
+        _context.Message = "/timeoff";
+
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { AccessToken = ""});
+        
+        await this._command.Execute();
+        
+        _client.Verify(target => target.SendMessage(2517, "У вас не заданы данные о пользователе.\r\n" +
+                                                          "Выполните команду /registeruser"));
+        
+        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
     }
     
     [Test]

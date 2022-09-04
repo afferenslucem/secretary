@@ -1,12 +1,16 @@
 ﻿using Moq;
+using secretary.storage;
+using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.timeoff;
+using secretary.telegram.exceptions;
 
 namespace secretary.telegram.tests.commands.subcommands.timeoff;
 
 public class EnterPeriodCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
+    private Mock<IUserStorage> _userStorage = null!;
     
     private TimeOffCommand _parent = null!;
     private EnterPeriodCommand _command = null!;
@@ -16,6 +20,7 @@ public class EnterPeriodCommandTests
     public void Setup()
     {
         this._client = new Mock<ITelegramClient>();
+        this._userStorage = new Mock<IUserStorage>();
 
         this._command = new EnterPeriodCommand();
 
@@ -25,10 +30,14 @@ public class EnterPeriodCommandTests
         { 
             ChatId = 2517, 
             TelegramClient = this._client.Object, 
+            UserStorage = _userStorage.Object,
         };
         
         this._command.Context = _context;
         this._command.ParentCommand = _parent;
+
+        this._userStorage.Setup(target => target.GetUser(It.IsAny<long>()))
+            .ReturnsAsync(new User() { JobTitleGenitive = "", AccessToken = "" });
     }
     
     [Test]
@@ -53,5 +62,29 @@ public class EnterPeriodCommandTests
         await this._command.OnMessage();
         
         Assert.That(_context.Message, Is.EqualTo(_parent.Data.Period));
+    }
+    
+    [Test]
+    public void ShouldThrowExceptionForUnregisteredUser()
+    {
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync((User?)null);
+
+        Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
+    }
+    
+    [Test]
+    public void ShouldThrowExceptionForUnregisteredMail()
+    {
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { JobTitleGenitive = "" });
+
+        Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
+    }
+    
+    [Test]
+    public void ShouldThrowExceptionForUnregisteredPersonalInfo()
+    {
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { AccessToken = "" });
+
+        Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
     }
 }

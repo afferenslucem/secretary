@@ -1,4 +1,8 @@
-﻿using secretary.documents.creators;
+﻿using Microsoft.Extensions.Logging;
+using secretary.documents.creators;
+using secretary.logging;
+using secretary.telegram.commands.exceptionHandlers;
+using secretary.telegram.exceptions;
 
 namespace secretary.telegram.commands.timeoff;
 
@@ -23,6 +27,8 @@ public class TimeOffCreateModel
 
 public class TimeOffCommand: StatedCommand
 {
+    private ILogger<TimeOffCreateModel> _logger = LogPoint.GetLogger<TimeOffCreateModel>();
+    
     public const string Key = "/timeoff";
 
     public TimeOffCreateModel Data { get; set; } = new ();
@@ -41,5 +47,25 @@ public class TimeOffCommand: StatedCommand
             new SendDocumentCommand(),
             new AssymetricCompleteCommand(),
         };
+    }
+
+    public override async Task Execute()
+    {
+        try
+        {
+            await base.Execute();
+        }
+        catch (NonCompleteUserException e)
+        {
+            await HandleUserException(e);
+            await OnComplete();
+            
+            this._logger.LogError(e, $"Command was completed by exception");
+        }
+    }
+
+    private async Task HandleUserException(NonCompleteUserException e)
+    {
+        await new NonCompleteUserExceptionHandlerVisitor().Handle(e, ChatId, Context.TelegramClient);
     }
 }
