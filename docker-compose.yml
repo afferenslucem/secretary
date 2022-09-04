@@ -1,10 +1,20 @@
 version: "3"
 services:
+  redis: 
+    image: redis:7-bullseye
+
+    ports:
+      - 6379:6379
+
   bot:
     build: 
       context: .
       dockerfile: dockerfile
+    
     volumes:
       - "./config.prod.json:/app/config.json"
       - "./data:/data"
       - "./templates:/templates"
+
+    depends_on:
+      - redis

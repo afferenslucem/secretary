@@ -1,31 +1,30 @@
-﻿namespace secretary.telegram.sessions;
+﻿using secretary.cache;
+
+namespace secretary.telegram.sessions;
 
 public class SessionStorage: ISessionStorage
 {
-    private readonly Dictionary<long, Session> sessions = new();
+    private readonly ICacheService _cacheService;
 
-    public Task<Session?> GetSession(long chatId)
+    public SessionStorage()
     {
-        Session? result;
-
-        return Task.Run(() => sessions.TryGetValue(chatId, out result) ? result : null);
+        _cacheService = new RedisCacheService("localhost:6379");
     }
 
-    public Task SaveSession(long chatId, Session session)
+    public async Task<Session?> GetSession(long chatId)
     {
-        this.sessions[chatId] = session;
-        
-        return Task.CompletedTask;
+        var result = await _cacheService.GetEntity<Session>(chatId);
+
+        return result;
     }
 
-    public Task DeleteSession(long chatId)
+    public async Task SaveSession(long chatId, Session session)
     {
-        return Task.Run(() =>
-        {
-            if (sessions.ContainsKey(chatId))
-            {
-                sessions.Remove(chatId);
-            }
-        });
+        await _cacheService.SaveEntity<Session>(chatId, session);
+    }
+
+    public async Task DeleteSession(long chatId)
+    {
+        await _cacheService.DeleteEntity<Session>(chatId);
     }
 }
