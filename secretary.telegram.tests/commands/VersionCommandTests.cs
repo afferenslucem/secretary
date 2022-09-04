@@ -38,6 +38,6 @@ public class VersionCommandTests
     {
         await this._command.Execute();
 
-        this._client.Verify(target => target.SendMessage(2517, "v0.1.0"));
+        this._client.Verify(target => target.SendMessage(2517, "v0.2.0"));
     }
 }
