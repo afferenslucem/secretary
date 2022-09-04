@@ -3,6 +3,7 @@ using secretary.cache;
 using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
+using secretary.telegram.commands.caches;
 using secretary.telegram.commands.registermail;
 using secretary.telegram.exceptions;
 
@@ -57,7 +58,7 @@ public class EnterEmailCommandTests
         
         await this._command.OnMessage();
         
-        this._cacheService.Verify(target => target.SaveEntity(2517,  new RegisterMailData("a.pushkin@infinnity.ru"), It.IsAny<short>()));
+        this._cacheService.Verify(target => target.SaveEntity(2517,  new RegisterMailCache("a.pushkin@infinnity.ru"), It.IsAny<short>()));
     }
         
     [Test]

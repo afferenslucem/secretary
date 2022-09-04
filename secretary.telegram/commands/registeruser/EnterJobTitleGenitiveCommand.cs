@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using secretary.logging;
+using secretary.storage.models;
+using secretary.telegram.commands.caches;
 using secretary.telegram.exceptions;
 
 namespace secretary.telegram.commands.registeruser;
@@ -16,18 +18,30 @@ public class EnterJobTitleGenitiveCommand : Command
 
     public override async Task<int> OnMessage()
     {
-        var user = await Context.UserStorage.GetUser(ChatId);
+        try
+        {
+            var cache = await Context.CacheService.GetEntity<RegisterUserCache>(ChatId);
+            if (cache == null) throw new InternalException();
 
-        if (user == null) throw new InternalException();
-        
-        user.JobTitleGenitive = Message;
+            var user = await Context.UserStorage.GetUser(ChatId);
+            user = user ?? new User() { ChatId = ChatId };
 
-        await Context.UserStorage.UpdateUser(user);
+            user.Name = cache.Name;
+            user.NameGenitive = cache.NameGenitive;
+            user.JobTitle = cache.JobTitle;
+            user.JobTitleGenitive = Message;
 
-        await Context.TelegramClient.SendMessage(ChatId, "Ваш пользователь успешно сохранен");
-        
-        _logger.LogInformation($"{ChatId}: registered user {user.Name}");
+            await Context.UserStorage.SetUser(user);
 
-        return RunNext;
+            await Context.TelegramClient.SendMessage(ChatId, "Ваш пользователь успешно сохранен");
+
+            _logger.LogInformation($"{ChatId}: registered user {user.Name}");
+
+            return RunNext;
+        }
+        finally
+        {
+            await Context.CacheService.DeleteEntity<RegisterUserCache>(ChatId);
+        }
     }
 }

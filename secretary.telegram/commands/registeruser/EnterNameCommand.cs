@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using secretary.logging;
 using secretary.storage.models;
+using secretary.telegram.commands.caches;
 
 namespace secretary.telegram.commands.registeruser;
 
@@ -19,16 +20,10 @@ public class EnterNameCommand : Command
 
     public override async Task<int> OnMessage()
     {
-        var user = await Context.UserStorage.GetUser(ChatId);
+        var cache = new RegisterUserCache();
+        cache.Name = Message;
 
-        user = user ?? new User()
-        {
-            ChatId = ChatId,
-        };
-
-        user.Name = Message;
-
-        await Context.UserStorage.SetUser(user);
+        await Context.CacheService.SaveEntity(ChatId, cache);
         
         return RunNext;
     }

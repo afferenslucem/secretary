@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using secretary.logging;
 using secretary.storage.models;
+using secretary.telegram.commands.caches;
 using secretary.telegram.exceptions;
 
 namespace secretary.telegram.commands.registermail;
@@ -19,9 +20,9 @@ public class EnterEmailCommand : Command
 
     public override async Task<int> OnMessage()
     {
-        var data = new RegisterMailData(Message);
+        var cache = new RegisterMailCache(Message);
 
-        await Context.CacheService.SaveEntity(ChatId, data);
+        await Context.CacheService.SaveEntity(ChatId, cache);
         
         return RunNext;
     }

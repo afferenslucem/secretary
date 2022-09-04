@@ -2,6 +2,7 @@
 using secretary.logging;
 using secretary.mail.Authentication;
 using secretary.storage.models;
+using secretary.telegram.commands.caches;
 using secretary.telegram.exceptions;
 using secretary.yandex.exceptions;
 
@@ -43,6 +44,10 @@ public class EnterCodeCommand: Command
                 "При запросе токена для авторизации произошла ошибка:(\r\n" +
                 "Попробуйте через пару минут, если не сработает, то обратитесь по вот этому адресу @hrodveetnir");
         }
+        finally
+        {
+            await Context.CacheService.DeleteEntity<RegisterMailCache>(ChatId);
+        }
     }
 
     private async Task<TokenData?> AskRegistration(IYandexAuthenticator client, AuthenticationData data,
@@ -65,12 +70,13 @@ public class EnterCodeCommand: Command
 
     private async Task SetTokens(TokenData data)
     {
-        var registerEmailData = await Context.CacheService.GetEntity<RegisterMailData>(ChatId);
+        var cache = await Context.CacheService.GetEntity<RegisterMailCache>(ChatId);
+        if (cache == null) throw new InternalException();
+        
         var user = await Context.UserStorage.GetUser(ChatId);
-
         user = user ?? new User() { ChatId = ChatId };
 
-        user.Email = registerEmailData!.Email;
+        user.Email = cache.Email;
         user.AccessToken = data.access_token;
         user.RefreshToken = data.refresh_token;
 

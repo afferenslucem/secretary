@@ -1,15 +1,15 @@
-﻿namespace secretary.telegram.commands.registermail;
+﻿namespace secretary.telegram.commands.caches;
 
-public class RegisterMailData: IEquatable<RegisterMailData>
+public class RegisterMailCache: IEquatable<RegisterMailCache>
 {
     public string Email;
 
-    public RegisterMailData(string email)
+    public RegisterMailCache(string email)
     {
         Email = email;
     }
 
-    public bool Equals(RegisterMailData? other)
+    public bool Equals(RegisterMailCache? other)
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
@@ -21,7 +21,7 @@ public class RegisterMailData: IEquatable<RegisterMailData>
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != this.GetType()) return false;
-        return Equals((RegisterMailData)obj);
+        return Equals((RegisterMailCache)obj);
     }
 
     public override int GetHashCode()

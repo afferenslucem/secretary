@@ -1,4 +1,5 @@
-﻿using secretary.telegram.exceptions;
+﻿using secretary.telegram.commands.caches;
+using secretary.telegram.exceptions;
 
 namespace secretary.telegram.commands.registeruser;
 
@@ -13,13 +14,12 @@ public class EnterNameGenitiveCommand : Command
 
     public override async Task<int> OnMessage()
     {
-        var user = await Context.UserStorage.GetUser(ChatId);
-
-        if (user == null) throw new InternalException();
+        var cache = await Context.CacheService.GetEntity<RegisterUserCache>(ChatId);
+        if (cache == null) throw new InternalException();
         
-        user.NameGenitive = Message;
+        cache.NameGenitive = Message;
 
-        await Context.UserStorage.UpdateUser(user);
+        await Context.CacheService.SaveEntity(ChatId, cache);
         
         return RunNext;
     }

@@ -1,7 +1,9 @@
 ﻿using Moq;
+using secretary.cache;
 using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
+using secretary.telegram.commands.caches;
 using secretary.telegram.commands.registeruser;
 
 namespace secretary.telegram.tests.commands.regusteruser;
@@ -9,7 +11,7 @@ namespace secretary.telegram.tests.commands.regusteruser;
 public class EnterNameGenitiveCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
-    private Mock<IUserStorage> _userStorage = null!;
+    private Mock<ICacheService> _cacheService = null!;
     
     private EnterNameGenitiveCommand _command = null!;
     private CommandContext _context = null!;
@@ -21,13 +23,13 @@ public class EnterNameGenitiveCommandTests
 
         this._command = new EnterNameGenitiveCommand();
         
-        this._userStorage = new Mock<IUserStorage>();
+        this._cacheService = new Mock<ICacheService>();
 
         this._context = new CommandContext()
         { 
             ChatId = 2517, 
             TelegramClient = this._client.Object, 
-            UserStorage = this._userStorage.Object,
+            CacheService = this._cacheService.Object,
         };
         
         this._command.Context = _context;
@@ -44,22 +46,31 @@ public class EnterNameGenitiveCommandTests
     }
     
     [Test]
-    public async Task ShouldSetNameGenitive()
+    public async Task ShouldSetNameGenitiveToCache()
     {
-        var oldUser = new User
+        var oldCache = new RegisterUserCache
         {
-            ChatId = 2517,
             Name = "Александр Пушкин",
         };
         
-        _userStorage.Setup(obj => obj.GetUser(It.IsAny<long>())).ReturnsAsync(oldUser);
+        _cacheService.Setup(obj => obj.GetEntity<RegisterUserCache>(It.IsAny<long>())).ReturnsAsync(oldCache);
 
         _context.Message = "Пушкина Александра Сергеевича";
         
         await this._command.OnMessage();
         
-        this._userStorage.Verify(target => target.UpdateUser(
-            It.Is<User>(user => user.ChatId == 2517 && user.NameGenitive == "Пушкина Александра Сергеевича" && user.Name == "Александр Пушкин")
-        ));
+        
+
+        this._cacheService.Verify(target => target.SaveEntity(
+                2517,
+                new RegisterUserCache()
+                {
+                    Name = "Александр Пушкин",
+                    NameGenitive = "Пушкина Александра Сергеевича"
+                },
+                It.IsAny<short>()
+            ),
+            Times.Once
+        );
     }
 }

@@ -4,6 +4,7 @@ using secretary.mail.Authentication;
 using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
+using secretary.telegram.commands.caches;
 using secretary.telegram.commands.registermail;
 using secretary.telegram.sessions;
 using secretary.yandex.exceptions;
@@ -99,8 +100,8 @@ public class EnterCodeCommandTests
 
         _userStorage.Setup(obj => obj.GetUser(It.IsAny<long>())).ReturnsAsync(oldUser);
 
-        _cacheService.Setup(target => target.GetEntity<RegisterMailData>(It.IsAny<long>()))
-            .ReturnsAsync(new RegisterMailData("a.pushkin@infinnity.ru"));
+        _cacheService.Setup(target => target.GetEntity<RegisterMailCache>(It.IsAny<long>()))
+            .ReturnsAsync(new RegisterMailCache("a.pushkin@infinnity.ru"));
         
         _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TokenData() { access_token = "token"});
@@ -132,8 +133,8 @@ public class EnterCodeCommandTests
         };
         _userStorage.Setup(obj => obj.GetUser(It.IsAny<long>())).ReturnsAsync(oldUser);
         
-        _cacheService.Setup(target => target.GetEntity<RegisterMailData>(It.IsAny<long>()))
-            .ReturnsAsync(new RegisterMailData("a.pushkin@infinnity.ru"));
+        _cacheService.Setup(target => target.GetEntity<RegisterMailCache>(It.IsAny<long>()))
+            .ReturnsAsync(new RegisterMailCache("a.pushkin@infinnity.ru"));
         
         await this._command.Execute();
         
@@ -144,6 +145,8 @@ public class EnterCodeCommandTests
                     && user.RefreshToken == "refresh_token"
                     && user.Email == "a.pushkin@infinnity.ru"
         )));
+        
+        this._cacheService.Verify(target => target.DeleteEntity<RegisterMailCache>(2517), Times.Once);
     }
     
         
@@ -165,8 +168,8 @@ public class EnterCodeCommandTests
         User? oldUser = null;
         _userStorage.Setup(obj => obj.GetUser(It.IsAny<long>())).ReturnsAsync(oldUser);
         
-        _cacheService.Setup(target => target.GetEntity<RegisterMailData>(It.IsAny<long>()))
-            .ReturnsAsync(new RegisterMailData("a.pushkin@infinnity.ru"));
+        _cacheService.Setup(target => target.GetEntity<RegisterMailCache>(It.IsAny<long>()))
+            .ReturnsAsync(new RegisterMailCache("a.pushkin@infinnity.ru"));
         
         await this._command.Execute();
         
