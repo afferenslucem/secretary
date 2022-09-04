@@ -2,10 +2,12 @@
 using MailKit.Security;
 using MimeKit;
 using Moq;
+using secretary.cache;
 using secretary.documents.creators;
 using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
+using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
 using secretary.telegram.sessions;
 using secretary.yandex.mail;
@@ -16,6 +18,7 @@ public class SendDocumentCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
     private Mock<IMailClient> _mailClient = null!;
+    private Mock<ICacheService> _cacheService = null!;
     
     private Mock<IDocumentStorage> _documentStorage = null!;
     private Mock<IEmailStorage> _emailStorage = null!;
@@ -24,7 +27,6 @@ public class SendDocumentCommandTests
     private Mock<ISessionStorage> _sessionStorage = null!;
     
     
-    private TimeOffCommand _parent = null!;
     private SendDocumentCommand _command = null!;
     private CommandContext _context = null!;
 
@@ -33,6 +35,7 @@ public class SendDocumentCommandTests
     {
         this._documentStorage = new Mock<IDocumentStorage>();
         this._emailStorage = new Mock<IEmailStorage>();
+        this._cacheService = new Mock<ICacheService>();
         this._userStorage = new Mock<IUserStorage>();
         this._client = new Mock<ITelegramClient>();
         this._mailClient = new Mock<IMailClient>();
@@ -43,8 +46,6 @@ public class SendDocumentCommandTests
 
         this._command.MessageCreator = this._timeOffCreator.Object;
         
-        this._parent = new TimeOffCommand();
-
         this._context = new CommandContext()
         { 
             ChatId = 2517, 
@@ -54,10 +55,10 @@ public class SendDocumentCommandTests
             UserStorage = this._userStorage.Object,
             MailClient = this._mailClient.Object,
             SessionStorage = this._sessionStorage.Object,
+            CacheService = this._cacheService.Object,
         };
         
         this._command.Context = _context;
-        this._command.ParentCommand = _parent;
     }
 
     [Test]
@@ -91,9 +92,13 @@ public class SendDocumentCommandTests
         
         _timeOffCreator.Setup(target => target.Create(It.IsAny<TimeOffData>())).Returns("html");
 
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(new TimeOffCache()
+        {
+            Period = "28.08.2022",
+            FilePath = "timeoff.docx"
+        });
+
         _context.Message = "Повторить";
-        _parent.Data.FilePath = "timeoff.docx";
-        _parent.Data.Period = "28.08.2022";
 
         await this._command.Execute();
 
@@ -151,6 +156,8 @@ public class SendDocumentCommandTests
             ));
         
         _client.Verify(target => target.SendMessage(2517, "Заяление отправлено"));
+        
+        _cacheService.Verify(target => target.DeleteEntity<TimeOffCache>(2517));
     }
 
     [Test]
@@ -170,6 +177,8 @@ public class SendDocumentCommandTests
             "и разрешите отправку по OAuth-токену с сервера imap.\r\n" +
             "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке"
         ));
+        
+        _cacheService.Verify(target => target.DeleteEntity<TimeOffCache>(2517));
     }
 
     [Test]
@@ -193,5 +202,7 @@ public class SendDocumentCommandTests
             "Guliki detected!\r\n" +
             "Вы отправляете письмо с токеном не принадлежащим ящику <code>a.pushkin@infinnity.ru</code>"
         ));
+        
+        _cacheService.Verify(target => target.DeleteEntity<TimeOffCache>(2517));
     }
 }

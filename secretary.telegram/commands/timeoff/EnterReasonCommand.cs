@@ -1,4 +1,7 @@
-﻿namespace secretary.telegram.commands.timeoff;
+﻿using secretary.telegram.commands.caches;
+using secretary.telegram.exceptions;
+
+namespace secretary.telegram.commands.timeoff;
 
 public class EnterReasonCommand : Command
 {
@@ -10,14 +13,18 @@ public class EnterReasonCommand : Command
             new [] {"Пропустить"});
     }
 
-    public override Task<int> OnMessage()
+    public override async Task<int> OnMessage()
     {
-        if (Message == "Пропустить") return Task.FromResult(RunNext);
+        if (Message == "Пропустить") return RunNext;
+
+        var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
+
+        if (cache == null) throw new InternalException();
         
-        var parent = this.ParentCommand as TimeOffCommand;
+        cache.Reason = Message;
+
+        await Context.CacheService.SaveEntity(ChatId, cache);
         
-        parent!.Data.Reason = Message;
-        
-        return Task.FromResult(RunNext);
+        return RunNext;
     }
 }

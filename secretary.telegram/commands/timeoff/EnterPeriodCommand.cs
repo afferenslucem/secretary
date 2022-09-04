@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using secretary.logging;
+using secretary.telegram.commands.caches;
 using secretary.telegram.commands.validation;
 
 namespace secretary.telegram.commands.timeoff;
@@ -21,13 +22,15 @@ public class EnterPeriodCommand : Command
                                                           "Лучше соблюдать форматы даты и всемени, потому что со временем я хочу еще сделать создание события в календаре яндекса:)");
     }
     
-    public override Task<int> OnMessage()
+    public override async Task<int> OnMessage()
     {
-        var parent = this.ParentCommand as TimeOffCommand;
+        var cache = new TimeOffCache();
+
+        cache.Period = Message;
+
+        await Context.CacheService.SaveEntity(ChatId, cache);
         
-        parent!.Data.Period = Message;
-        
-        return Task.FromResult(RunNext);
+        return RunNext;
     }
 
     private async Task ValidateUser()

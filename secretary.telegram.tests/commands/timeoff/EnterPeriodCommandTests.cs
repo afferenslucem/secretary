@@ -1,7 +1,9 @@
 ﻿using Moq;
+using secretary.cache;
 using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
+using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
 using secretary.telegram.exceptions;
 
@@ -11,8 +13,8 @@ public class EnterPeriodCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
     private Mock<IUserStorage> _userStorage = null!;
+    private Mock<ICacheService> _cacheService = null!;
     
-    private TimeOffCommand _parent = null!;
     private EnterPeriodCommand _command = null!;
     private CommandContext _context = null!;
         
@@ -21,20 +23,19 @@ public class EnterPeriodCommandTests
     {
         this._client = new Mock<ITelegramClient>();
         this._userStorage = new Mock<IUserStorage>();
+        this._cacheService = new Mock<ICacheService>();
 
         this._command = new EnterPeriodCommand();
-
-        this._parent = new TimeOffCommand();
 
         this._context = new CommandContext()
         { 
             ChatId = 2517, 
             TelegramClient = this._client.Object, 
             UserStorage = _userStorage.Object,
+            CacheService = _cacheService.Object,
         };
         
         this._command.Context = _context;
-        this._command.ParentCommand = _parent;
 
         this._userStorage.Setup(target => target.GetUser(It.IsAny<long>()))
             .ReturnsAsync(new User() { JobTitleGenitive = "", AccessToken = "" });
@@ -55,13 +56,13 @@ public class EnterPeriodCommandTests
     }
     
     [Test]
-    public async Task ShouldSetPeriodToCommand()
+    public async Task ShouldSetPeriodToCache()
     {
         _context.Message = "16.08.2022 c 13:00 до 17:00";
       
         await this._command.OnMessage();
         
-        Assert.That(_context.Message, Is.EqualTo(_parent.Data.Period));
+        _cacheService.Verify(target => target.SaveEntity(2517, new TimeOffCache() { Period = "16.08.2022 c 13:00 до 17:00"}, It.IsAny<short>()), Times.Once);
     }
     
     [Test]

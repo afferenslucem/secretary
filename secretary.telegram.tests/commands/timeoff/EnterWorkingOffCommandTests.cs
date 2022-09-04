@@ -1,5 +1,7 @@
 ﻿using Moq;
+using secretary.cache;
 using secretary.telegram.commands;
+using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
 
 namespace secretary.telegram.tests.commands.subcommands.timeoff;
@@ -7,8 +9,8 @@ namespace secretary.telegram.tests.commands.subcommands.timeoff;
 public class EnterWorkingOffCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
+    private Mock<ICacheService> _cacheService = null!;
     
-    private TimeOffCommand _parent = null!;
     private EnterWorkingOffCommand _command = null!;
     private CommandContext _context = null!;
         
@@ -16,19 +18,18 @@ public class EnterWorkingOffCommandTests
     public void Setup()
     {
         this._client = new Mock<ITelegramClient>();
+        this._cacheService = new Mock<ICacheService>();
 
         this._command = new EnterWorkingOffCommand();
-
-        this._parent = new TimeOffCommand();
 
         this._context = new CommandContext()
         { 
             ChatId = 2517, 
             TelegramClient = this._client.Object, 
+            CacheService = _cacheService.Object,
         };
         
         this._command.Context = _context;
-        this._command.ParentCommand = _parent;
     }
     
     [Test]
@@ -49,11 +50,30 @@ public class EnterWorkingOffCommandTests
     [Test]
     public async Task ShouldSetWorkingOffToCommand()
     {
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(2517)).ReturnsAsync(
+            new TimeOffCache()
+            {
+                Period = "05.09.2022", 
+                Reason = "Поеду заниматься ремонтом",
+            }
+        );
+        
         _context.Message = "Отгул обязуюсь отработать";
         
         await this._command.OnMessage();
         
-        Assert.That(_context.Message, Is.EqualTo(this._parent.Data.WorkingOff));
+        _cacheService.Verify(
+            target => target.SaveEntity(
+                2517, 
+                new TimeOffCache()
+                {
+                    Period = "05.09.2022", 
+                    Reason = "Поеду заниматься ремонтом",
+                    WorkingOff = "Отгул обязуюсь отработать",
+                }, 
+                It.IsAny<short>()), 
+            Times.Once
+        );
     }
     
     [Test]
@@ -63,6 +83,6 @@ public class EnterWorkingOffCommandTests
         
         await this._command.OnMessage();
         
-        Assert.IsNull(this._parent.Data.WorkingOff);
+        _cacheService.Verify(target => target.SaveEntity(2517, It.IsAny<TimeOffCache>(), It.IsAny<short>()), Times.Never);
     }
 }

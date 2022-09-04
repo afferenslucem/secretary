@@ -1,9 +1,11 @@
 ﻿using Moq;
+using secretary.cache;
 using secretary.configuration;
 using secretary.documents;
 using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
+using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
 using secretary.telegram.sessions;
 using secretary.yandex.mail;
@@ -18,7 +20,8 @@ public class TimeOffCommandTests
     private Mock<IDocumentStorage> _documentStorage = null!;
     private Mock<IEmailStorage> _emailStorage = null!;
     private Mock<IMailClient> _mailClient = null!;
-    
+    private Mock<ICacheService> _cacheService = null!;
+
     private TimeOffCommand _command = null!;
     private CommandContext _context = null!;
         
@@ -33,6 +36,7 @@ public class TimeOffCommandTests
         this._documentStorage = new Mock<IDocumentStorage>();
         this._emailStorage = new Mock<IEmailStorage>();
         this._mailClient = new Mock<IMailClient>();
+        this._cacheService = new Mock<ICacheService>();
 
         this._command = new TimeOffCommand();
         
@@ -45,6 +49,7 @@ public class TimeOffCommandTests
                 DocumentStorage = _documentStorage.Object,
                 EmailStorage = _emailStorage.Object,
                 MailClient = _mailClient.Object,
+                CacheService = _cacheService.Object,
             };
         
         this._command.Context = _context;
@@ -126,22 +131,22 @@ public class TimeOffCommandTests
     [Test]
     public async Task ShouldExecuteSkipCheckEmailsForRepeat()
     {
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>()))
+            .ReturnsAsync(new TimeOffCache());
+        
         _context.Message = "/timeoff";
         await this._command.Execute();
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         
         _context.Message = "30.08.2022";
         await this._command.OnMessage();
-        Assert.That(_command.Data.Period, Is.EqualTo("30.08.2022"));
         
         _context.Message = "Нужно помыть хомячка";
         await this._command.OnMessage();
-        Assert.That(_command.Data.Reason, Is.EqualTo("Нужно помыть хомячка"));
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User());
         _context.Message = "Отработаю на следующей неделе";
         await this._command.OnMessage();
-        Assert.That(_command.Data.WorkingOff, Is.EqualTo("Отработаю на следующей неделе"));
         _client.Verify(target => target.SendDocument(2517, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
         _documentStorage
@@ -163,21 +168,21 @@ public class TimeOffCommandTests
     [Test]
     public async Task ShouldExecuteShowCheckEmailsForNewEmail()
     {
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>()))
+            .ReturnsAsync(new TimeOffCache());
+
         _context.Message = "/timeoff";
         await this._command.Execute();
         
         _context.Message = "30.08.2022";
         await this._command.OnMessage();
-        Assert.That(_command.Data.Period, Is.EqualTo("30.08.2022"));
         
         _context.Message = "Нужно помыть хомячка";
         await this._command.OnMessage();
-        Assert.That(_command.Data.Reason, Is.EqualTo("Нужно помыть хомячка"));
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User());
         _context.Message = "Отработаю на следующей неделе";
         await this._command.OnMessage();
-        Assert.That(_command.Data.WorkingOff, Is.EqualTo("Отработаю на следующей неделе"));
         _client.Verify(target => target.SendDocument(2517, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
         _documentStorage
@@ -201,21 +206,21 @@ public class TimeOffCommandTests
     [Test]
     public async Task ShouldExecuteReturnToEmailEnter()
     {
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>()))
+            .ReturnsAsync(new TimeOffCache());
+        
         _context.Message = "/timeoff";
         await this._command.Execute();
         
         _context.Message = "30.08.2022";
         await this._command.OnMessage();
-        Assert.That(_command.Data.Period, Is.EqualTo("30.08.2022"));
         
         _context.Message = "Нужно помыть хомячка";
         await this._command.OnMessage();
-        Assert.That(_command.Data.Reason, Is.EqualTo("Нужно помыть хомячка"));
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User());
         _context.Message = "Отработаю на следующей неделе";
         await this._command.OnMessage();
-        Assert.That(_command.Data.WorkingOff, Is.EqualTo("Отработаю на следующей неделе"));
         _client.Verify(target => target.SendDocument(2517, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
         _documentStorage
@@ -232,7 +237,7 @@ public class TimeOffCommandTests
 
         _context.Message = "не верно";
         await this._command.OnMessage();
-
+        
         _context.Message = "a.pushkin@infinnity.ru";
         await this._command.OnMessage();
 
@@ -245,21 +250,21 @@ public class TimeOffCommandTests
     [Test]
     public async Task ShouldRemoveSessionForNo()
     {
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>()))
+            .ReturnsAsync(new TimeOffCache());
+        
         _context.Message = "/timeoff";
         await this._command.Execute();
         
         _context.Message = "30.08.2022";
         await this._command.OnMessage();
-        Assert.That(_command.Data.Period, Is.EqualTo("30.08.2022"));
         
         _context.Message = "Нужно помыть хомячка";
         await this._command.OnMessage();
-        Assert.That(_command.Data.Reason, Is.EqualTo("Нужно помыть хомячка"));
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User());
         _context.Message = "Отработаю на следующей неделе";
         await this._command.OnMessage();
-        Assert.That(_command.Data.WorkingOff, Is.EqualTo("Отработаю на следующей неделе"));
         _client.Verify(target => target.SendDocument(2517, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
         _documentStorage

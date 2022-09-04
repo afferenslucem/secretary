@@ -1,7 +1,9 @@
 ﻿using Moq;
+using secretary.cache;
 using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
+using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
 using secretary.telegram.exceptions;
 using secretary.telegram.sessions;
@@ -11,6 +13,7 @@ namespace secretary.telegram.tests.commands.subcommands.timeoff;
 public class SetEmailsCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
+    private Mock<ICacheService> _cacheService = null!;
     private Mock<IDocumentStorage> _documentStorage = null!;
     private Mock<IEmailStorage> _emailStorage = null!;
     private Mock<ISessionStorage> _sessionStorage = null!;
@@ -23,6 +26,7 @@ public class SetEmailsCommandTests
     public void Setup()
     {
         this._client = new Mock<ITelegramClient>();
+        this._cacheService = new Mock<ICacheService>();
         this._documentStorage = new Mock<IDocumentStorage>();
         this._emailStorage = new Mock<IEmailStorage>();
         this._sessionStorage = new Mock<ISessionStorage>();
@@ -33,11 +37,12 @@ public class SetEmailsCommandTests
 
         this._context = new CommandContext()
         { 
-            ChatId = 2517, 
-            TelegramClient = this._client.Object, 
             DocumentStorage = this._documentStorage.Object,
-            EmailStorage = this._emailStorage.Object,
             SessionStorage = this._sessionStorage.Object,
+            EmailStorage = this._emailStorage.Object,
+            CacheService = this._cacheService.Object,
+            TelegramClient = this._client.Object, 
+            ChatId = 2517, 
         };
         
         this._command.Context = _context;
@@ -150,9 +155,8 @@ public class SetEmailsCommandTests
     [Test]
     public async Task ShouldParseEmails()
     {
-        _documentStorage
-            .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))
-            .ReturnsAsync(new Document() { Id = 0 });
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>()))
+            .ReturnsAsync(new TimeOffCache() { Period = "04.09.2022" });
         
         _context.Message = "a.pushkin@infinnity.ru (Александр Пушкин)\n" +
                            "s.esenin@infinnity.ru (Сергей Есенин)\n" +
@@ -167,7 +171,11 @@ public class SetEmailsCommandTests
             new Email() { Address = "v.mayakovskii@infinnity.ru" },
         };
         
-        _emailStorage.Verify(target => target.SaveForDocument(0, expectedEmails), Times.Once);
+        _cacheService.Verify(target => target.SaveEntity(2517, new TimeOffCache()
+        {
+            Period = "04.09.2022",
+            Emails = expectedEmails,
+        }, It.IsAny<short>()), Times.Once);
         
         Assert.That(step, Is.EqualTo(1));
     }
@@ -175,9 +183,8 @@ public class SetEmailsCommandTests
     [Test]
     public async Task ShouldReturnIncorrectEmailFormat()
     {
-        _documentStorage
-            .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))
-            .ReturnsAsync(new Document() { Id = 0 });
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>()))
+            .ReturnsAsync(new TimeOffCache() { Period = "04.09.2022" });
         
         _context.Message = "a.pushkin@infinnity.ru (Александр Пушкин)\n" +
                            "s.esenin@infinnityru (Сергей Есенин)\n" +

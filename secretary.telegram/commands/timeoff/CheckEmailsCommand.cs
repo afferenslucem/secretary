@@ -1,13 +1,16 @@
-﻿namespace secretary.telegram.commands.timeoff;
+﻿using secretary.telegram.commands.caches;
+using secretary.telegram.exceptions;
+
+namespace secretary.telegram.commands.timeoff;
 
 public class CheckEmailsCommand : Command
 {
     public override async Task Execute()
     {
-        var document = await this.Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);
-        var emails = await this.Context.EmailStorage.GetForDocument(document.Id);
+        var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
+        if (cache?.Emails == null) throw new InternalException();
         
-        var emailsPrints = emails
+        var emailsPrints = cache.Emails
             .Select(item => item.DisplayName != null ? $"{item.Address} ({item.DisplayName})" : item.Address);
 
         var emailTable = string.Join("\r\n", emailsPrints);
@@ -22,15 +25,21 @@ public class CheckEmailsCommand : Command
         await Context.TelegramClient.SendMessageWithKeyBoard(ChatId, message, new [] { "Верно", "Нет, нужно поправить" });
     }
 
-    public override Task<int> OnMessage()
+    public override async Task<int> OnMessage()
     {
         if (Message.ToLower() == "верно")
         {
-            return Task.FromResult<int>(RunNext);
+            var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
+            if (cache?.Emails == null) throw new InternalException();
+
+            var document = await Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);
+            await Context.EmailStorage.SaveForDocument(document.Id, cache.Emails);
+            
+            return RunNext;
         }
         else
         {
-            return Task.FromResult<int>(-1);
+            return -1;
         }
     }
 }

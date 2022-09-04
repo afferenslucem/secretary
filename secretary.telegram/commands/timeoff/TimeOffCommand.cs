@@ -11,8 +11,6 @@ public class TimeOffCommand: StatedCommand
     private ILogger<TimeOffCache> _logger = LogPoint.GetLogger<TimeOffCache>();
     
     public const string Key = "/timeoff";
-
-    public TimeOffCache Data { get; set; } = new ();
     
     public override List<Command> ConfigureStates()
     {

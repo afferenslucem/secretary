@@ -27,7 +27,7 @@ public class DocumentStorage: Storage, IDocumentStorage
         await connection.OpenAsync();
 
         var document = await connection.QueryFirstOrDefaultAsync<Document>(
-            @"select Id, ChatId, DocumentName from Documents where ChatId = @chatId and DocumentName = documentName",
+            @"select Id, ChatId, DocumentName from Documents where ChatId = @chatId and DocumentName = @documentName",
             new { chatId, documentName }
         );
 

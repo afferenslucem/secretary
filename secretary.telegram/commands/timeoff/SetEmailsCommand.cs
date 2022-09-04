@@ -1,4 +1,5 @@
 ﻿using secretary.storage.models;
+using secretary.telegram.commands.caches;
 using secretary.telegram.exceptions;
 using secretary.telegram.utils;
 
@@ -63,24 +64,25 @@ public class SetEmailsCommand : Command
 
     public override async Task<int> OnMessage()
     {
-        var document = await Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);
-
         if (Message == "Повторить")
         {
             return 2;
         }
         else
         {
-            return await ParseAndSaveEmails(document);
+            return await ParseAndSaveEmails();
         }
     }
 
-    private async Task<int> ParseAndSaveEmails(Document document)
+    private async Task<int> ParseAndSaveEmails()
     {
         try
         {
-            IEnumerable<Email> emails = new EmailParser().ParseMany(Message);
-            await Context.EmailStorage.SaveForDocument(document.Id, emails);
+            var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
+            if (cache == null) throw new InternalException();
+            
+            cache.Emails = new EmailParser().ParseMany(Message);
+            await Context.CacheService.SaveEntity(ChatId, cache);
 
             return RunNext;
         }

@@ -1,5 +1,7 @@
 ﻿using Moq;
+using secretary.cache;
 using secretary.telegram.commands;
+using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
 
 namespace secretary.telegram.tests.commands.subcommands.timeoff;
@@ -7,8 +9,8 @@ namespace secretary.telegram.tests.commands.subcommands.timeoff;
 public class EnterReasonCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
+    private Mock<ICacheService> _cacheService = null!;
     
-    private TimeOffCommand _parent = null!;
     private EnterReasonCommand _command = null!;
     private CommandContext _context = null!;
         
@@ -16,19 +18,18 @@ public class EnterReasonCommandTests
     public void Setup()
     {
         this._client = new Mock<ITelegramClient>();
+        this._cacheService = new Mock<ICacheService>();
 
         this._command = new EnterReasonCommand();
-
-        this._parent = new TimeOffCommand();
 
         this._context = new CommandContext()
         { 
             ChatId = 2517, 
-            TelegramClient = this._client.Object, 
+            TelegramClient = _client.Object, 
+            CacheService = _cacheService.Object,
         };
         
         this._command.Context = _context;
-        this._command.ParentCommand = _parent;
     }
     
     [Test]
@@ -47,11 +48,18 @@ public class EnterReasonCommandTests
     [Test]
     public async Task ShouldSetReasonToCommand()
     {
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(2517)).ReturnsAsync(new TimeOffCache() { Period = "05.09.2022" });
+        
         _context.Message = "Поеду заниматься ремонтом";
 
         await this._command.OnMessage();
         
-        Assert.That(_context.Message, Is.EqualTo(this._parent.Data.Reason));
+        _cacheService.Verify(target => target.SaveEntity(2517, 
+            new TimeOffCache()
+            {
+                Period = "05.09.2022", 
+                Reason = "Поеду заниматься ремонтом"
+            }, It.IsAny<short>()), Times.Once);
     }
     
     
@@ -62,6 +70,6 @@ public class EnterReasonCommandTests
         
         await this._command.OnMessage();
         
-        Assert.IsNull(_parent.Data.Reason);
+        _cacheService.Verify(target => target.SaveEntity(2517, It.IsAny<TimeOffCache>(), It.IsAny<short>()), Times.Never);
     }
 }
