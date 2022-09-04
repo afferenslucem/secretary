@@ -1,8 +1,9 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using secretary.logging;
 using StackExchange.Redis;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace secretary.cache;
 
@@ -25,7 +26,11 @@ public class RedisCacheService: ICacheService
         {
             var db = _connectionMultiplexer.GetDatabase();
 
-            var json = JsonSerializer.Serialize(value);
+            var json = JsonConvert.SerializeObject(value, new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.All,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
 
             await db.StringSetAsync(new RedisKey($"{typeof(T)}:{key}"), json, TimeSpan.FromSeconds(lifetimeSec));
         }
@@ -50,7 +55,11 @@ public class RedisCacheService: ICacheService
 
             var json = redisValue.ToString();
             
-            return JsonSerializer.Deserialize<T>(json);
+            return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.All,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
         }
         catch (Exception e)
         {

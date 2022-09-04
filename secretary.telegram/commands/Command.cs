@@ -1,4 +1,5 @@
-﻿using secretary.telegram.exceptions;
+﻿using Newtonsoft.Json;
+using secretary.telegram.exceptions;
 
 namespace secretary.telegram.commands;
 
@@ -9,6 +10,7 @@ public abstract class Command
     
     protected readonly CancellationTokenSource CancellationToken;
 
+    [JsonIgnore]
     public CommandContext Context { get; set; } = null!;
 
     protected long ChatId => Context.ChatId;

@@ -50,10 +50,7 @@ public class CancelCommandTests
     {
         var commandMock = new Mock<Command>();
 
-        var session = new Session()
-        {
-            LastCommand = commandMock.Object,
-        };
+        var session = new Session(2517, commandMock.Object);
 
         _sessionStorage.Setup(target => target.GetSession(It.IsAny<long>())).ReturnsAsync(session);
         
@@ -65,7 +62,7 @@ public class CancelCommandTests
     [Test]
     public async Task ShouldCancelEmptySession()
     {
-        var session = new Session();
+        var session = new Session(2517, null!);
 
         _sessionStorage.Setup(target => target.GetSession(It.IsAny<long>())).ReturnsAsync(session);
         

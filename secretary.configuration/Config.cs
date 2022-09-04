@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+﻿using Newtonsoft.Json;
 
 namespace secretary.configuration;
 
@@ -19,7 +19,7 @@ public class Config
     {
         var data = File.ReadAllText("config.json");
 
-        var config = JsonSerializer.Deserialize<Config>(data);
+        var config = JsonConvert.DeserializeObject<Config>(data);
 
         Instance = config ?? throw new JsonException("Wrong config format");
     }

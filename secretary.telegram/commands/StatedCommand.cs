@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using secretary.logging;
 using secretary.telegram.exceptions;
 
@@ -8,6 +9,7 @@ public abstract class StatedCommand: Command
 {
     private ILogger<StatedCommand> _logger = LogPoint.GetLogger<StatedCommand>();
 
+    [JsonProperty]
     protected CommandClip Clip;
 
     protected StatedCommand() : base()

@@ -49,23 +49,13 @@ public class NullCommandTests
     }
     
     [Test]
-    public async Task ShouldReturnSorryForLastCommand()
-    {
-        _sessionStorage.Setup(target => target.GetSession(It.IsAny<long>())).ReturnsAsync(new Session());
-        
-        await this._command.Execute();
-        
-        this._client.Verify(target => target.SendMessage(2517, "Извините, я не понял\r\nОтправьте команду"));
-    }
-    
-    [Test]
     public async Task ShouldRunLastCommand()
     {
         var lastCommand = new Mock<Command>();
         
         _sessionStorage
             .Setup(target => target.GetSession(It.IsAny<long>()))
-            .ReturnsAsync(new Session() { LastCommand = lastCommand.Object});
+            .ReturnsAsync(new Session(2517, lastCommand.Object));
         
         await this._command.Execute();
         

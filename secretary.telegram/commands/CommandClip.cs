@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using secretary.logging;
 using secretary.telegram.commands.executors;
 using secretary.telegram.exceptions;
@@ -9,8 +10,13 @@ public class CommandClip
 {
     private readonly ILogger<CommandClip> _logger = LogPoint.GetLogger<CommandClip>();
 
+    [JsonProperty]
     private readonly Command _parentCommand;
+    
+    [JsonProperty]
     private readonly Command[] _states;
+    
+    [JsonProperty]
     private int _runIndex = 0;
 
     public bool IsFinishedChain => _runIndex == _states.Length;

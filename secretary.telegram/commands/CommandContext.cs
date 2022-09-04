@@ -65,17 +65,13 @@ public class CommandContext
         return this.SessionStorage.GetSession(this.ChatId);
     }
 
-    public Task SaveSession(Command command)
+    public async Task SaveSession(Command command)
     {
         if (this.SessionStorage == null)
         {
             throw new NullReferenceException("Session storage is null");
         }
-        
-        return this.SessionStorage.SaveSession(ChatId, new Session()
-        {
-            ChatId = ChatId,
-            LastCommand = command
-        });
+
+        await this.SessionStorage.SaveSession(ChatId, new Session(ChatId, command));
     }
 }
