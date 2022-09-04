@@ -92,7 +92,7 @@ public class CheckEmailsCommandTests
 
         var result = await _command.OnMessage();
         
-        _emailStorage.Verify(target => target.SaveForDocument(1, expectedEmails));
+        _emailStorage.Verify(target => target.SaveForDocument(0, expectedEmails));
         
         Assert.That(result, Is.EqualTo(1));
     }
