@@ -1,37 +1,18 @@
 ﻿using Microsoft.Extensions.Logging;
-using secretary.documents.creators;
 using secretary.logging;
+using secretary.telegram.commands.caches;
 using secretary.telegram.commands.exceptionHandlers;
 using secretary.telegram.exceptions;
 
 namespace secretary.telegram.commands.timeoff;
 
-public class TimeOffCreateModel 
-{
-    public string? Period { get; set; }
-    public string? Reason { get; set; }
-    public string? WorkingOff { get; set; }
-    
-    public string? FilePath { get; set; }
-
-    public TimeOffData ToDocumentData()
-    {
-        return new TimeOffData()
-        {
-            Period = this.Period,
-            Reason = this.Reason,
-            WorkingOff = this.WorkingOff,
-        };
-    }
-}
-
 public class TimeOffCommand: StatedCommand
 {
-    private ILogger<TimeOffCreateModel> _logger = LogPoint.GetLogger<TimeOffCreateModel>();
+    private ILogger<TimeOffCache> _logger = LogPoint.GetLogger<TimeOffCache>();
     
     public const string Key = "/timeoff";
 
-    public TimeOffCreateModel Data { get; set; } = new ();
+    public TimeOffCache Data { get; set; } = new ();
     
     public override List<Command> ConfigureStates()
     {
