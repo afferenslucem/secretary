@@ -1,4 +1,5 @@
 ﻿using Moq;
+using secretary.cache;
 using secretary.mail.Authentication;
 using secretary.storage;
 using secretary.storage.models;
@@ -15,6 +16,7 @@ public class EnterCodeCommandTests
     private Mock<IUserStorage> _userStorage = null!;
     private Mock<IYandexAuthenticator> _yandexAuthenticator = null!;
     private Mock<ISessionStorage> _sessionStorage = null!;
+    private Mock<ICacheService> _cacheService = null!;
     private CommandContext _context = null!;
     private EnterCodeCommand _command = null!;
         
@@ -25,6 +27,7 @@ public class EnterCodeCommandTests
         this._userStorage = new Mock<IUserStorage>();
         this._sessionStorage = new Mock<ISessionStorage>();
         this._yandexAuthenticator = new Mock<IYandexAuthenticator>();
+        this._cacheService = new Mock<ICacheService>();
 
         this._context = new CommandContext()
         {
@@ -33,6 +36,7 @@ public class EnterCodeCommandTests
             YandexAuthenticator = _yandexAuthenticator.Object, 
             UserStorage = _userStorage.Object,
             SessionStorage = _sessionStorage.Object,
+            CacheService = _cacheService.Object,
         };
 
         this._command = new EnterCodeCommand();
@@ -94,6 +98,9 @@ public class EnterCodeCommandTests
         };
 
         _userStorage.Setup(obj => obj.GetUser(It.IsAny<long>())).ReturnsAsync(oldUser);
+
+        _cacheService.Setup(target => target.GetEntity<RegisterMailData>(It.IsAny<long>()))
+            .ReturnsAsync(new RegisterMailData("a.pushkin@infinnity.ru"));
         
         _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TokenData() { access_token = "token"});
@@ -103,9 +110,8 @@ public class EnterCodeCommandTests
         this._client.Verify(target => target.SendMessage(2517, "Ура, вы успешно зарегистрировали почту"));
     }
     
-        
     [Test]
-    public async Task ShouldUpdateTokens()
+    public async Task ShouldUpdateUser()
     {
         _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TokenData() { access_token = "access_token", refresh_token = "refresh_token", expires_in = 500 });
@@ -126,10 +132,49 @@ public class EnterCodeCommandTests
         };
         _userStorage.Setup(obj => obj.GetUser(It.IsAny<long>())).ReturnsAsync(oldUser);
         
+        _cacheService.Setup(target => target.GetEntity<RegisterMailData>(It.IsAny<long>()))
+            .ReturnsAsync(new RegisterMailData("a.pushkin@infinnity.ru"));
+        
         await this._command.Execute();
         
-        _userStorage.Verify(target => target.UpdateUser(It.Is<User>(
-            user => user.ChatId == 2517 && user.Name == "Александр Пушкин" && user.AccessToken == "access_token" && user.RefreshToken == "refresh_token"
+        _userStorage.Verify(target => target.SetUser(It.Is<User>(
+            user => user.ChatId == 2517 
+                    && user.Name == "Александр Пушкин" 
+                    && user.AccessToken == "access_token" 
+                    && user.RefreshToken == "refresh_token"
+                    && user.Email == "a.pushkin@infinnity.ru"
+        )));
+    }
+    
+        
+    [Test]
+    public async Task ShouldInsertUser()
+    {
+        _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new TokenData() { access_token = "access_token", refresh_token = "refresh_token", expires_in = 500 });
+        
+        _yandexAuthenticator.Setup(target => target.GetAuthenticationCode(It.IsAny<CancellationToken>())).ReturnsAsync(
+            new AuthenticationData()
+            {
+                user_code = "code",
+                verification_url = "url",
+                expires_in = 300,
+            }
+        );
+        
+        User? oldUser = null;
+        _userStorage.Setup(obj => obj.GetUser(It.IsAny<long>())).ReturnsAsync(oldUser);
+        
+        _cacheService.Setup(target => target.GetEntity<RegisterMailData>(It.IsAny<long>()))
+            .ReturnsAsync(new RegisterMailData("a.pushkin@infinnity.ru"));
+        
+        await this._command.Execute();
+        
+        _userStorage.Verify(target => target.SetUser(It.Is<User>(
+            user => user.ChatId == 2517 
+                    && user.AccessToken == "access_token" 
+                    && user.RefreshToken == "refresh_token"
+                    && user.Email == "a.pushkin@infinnity.ru"
         )));
     }
     

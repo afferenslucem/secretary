@@ -16,7 +16,7 @@ namespace secretary.console
             
             database.InitDb();
 
-            var bot = new TelegramBot(Config.Instance.TelegramApiKey, Config.Instance.MailConfig, database);
+            var bot = new TelegramBot(Config.Instance, database);
 
             await bot.Listen();
         }

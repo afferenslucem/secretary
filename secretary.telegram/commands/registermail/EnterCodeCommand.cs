@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using secretary.logging;
 using secretary.mail.Authentication;
+using secretary.storage.models;
 using secretary.telegram.exceptions;
 using secretary.yandex.exceptions;
 
@@ -64,13 +65,15 @@ public class EnterCodeCommand: Command
 
     private async Task SetTokens(TokenData data)
     {
+        var registerEmailData = await Context.CacheService.GetEntity<RegisterMailData>(ChatId);
         var user = await Context.UserStorage.GetUser(ChatId);
 
-        if (user == null) throw new InternalException();
-        
+        user = user ?? new User() { ChatId = ChatId };
+
+        user.Email = registerEmailData!.Email;
         user.AccessToken = data.access_token;
         user.RefreshToken = data.refresh_token;
 
-        await Context.UserStorage.UpdateUser(user);
+        await Context.UserStorage.SetUser(user);
     }
 }

@@ -19,16 +19,9 @@ public class EnterEmailCommand : Command
 
     public override async Task<int> OnMessage()
     {
-        var user = await Context.UserStorage.GetUser(ChatId);
+        var data = new RegisterMailData(Message);
 
-        user = user ?? new User()
-        {
-            ChatId = ChatId,
-        };
-
-        user.Email = Message;
-
-        await Context.UserStorage.SetUser(user);
+        await Context.CacheService.SaveEntity(ChatId, data);
         
         return RunNext;
     }

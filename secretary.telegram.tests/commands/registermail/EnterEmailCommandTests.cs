@@ -1,4 +1,5 @@
 ﻿using Moq;
+using secretary.cache;
 using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
@@ -10,7 +11,8 @@ namespace secretary.telegram.tests.commands.registermail;
 public class EnterEmailCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
-    private Mock<IUserStorage> _userStorage= null!;
+    private Mock<IUserStorage> _userStorage = null!;
+    private Mock<ICacheService> _cacheService = null!;
     private CommandContext _context= null!;
     private EnterEmailCommand _command= null!;
         
@@ -19,12 +21,14 @@ public class EnterEmailCommandTests
     {
         this._client = new Mock<ITelegramClient>();
         this._userStorage = new Mock<IUserStorage>();
+        this._cacheService = new Mock<ICacheService>();
 
         this._context = new CommandContext()
         {
             ChatId = 2517, 
             TelegramClient = this._client.Object, 
             UserStorage = _userStorage.Object,
+            CacheService = _cacheService.Object,
         };
 
         this._command = new EnterEmailCommand();
@@ -47,37 +51,13 @@ public class EnterEmailCommandTests
     }
     
     [Test]
-    public async Task ShouldSetEmail()
+    public async Task ShouldSetCacheDataEmail()
     {
-        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync((User?)null);
-
         _context.Message = "a.pushkin@infinnity.ru";
         
         await this._command.OnMessage();
         
-        this._userStorage.Verify(target => target.SetUser(
-            It.Is<User>(user => user.ChatId == 2517 && user.Email == "a.pushkin@infinnity.ru")
-        ));
-    }
-        
-    [Test]
-    public async Task ShouldUpdateEmail()
-    {
-        var oldUser = new User
-        {
-            ChatId = 2517,
-            Name = "Александр Пушкин",
-        };
-        
-        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(oldUser);
-
-        _context.Message = "a.pushkin@infinnity.ru";
-        
-        await this._command.OnMessage();
-        
-        this._userStorage.Verify(target => target.SetUser(
-            It.Is<User>(user => user.ChatId == 2517 && user.Name == "Александр Пушкин" && user.Email == "a.pushkin@infinnity.ru")
-        ));
+        this._cacheService.Verify(target => target.SaveEntity(2517,  new RegisterMailData("a.pushkin@infinnity.ru"), It.IsAny<short>()));
     }
         
     [Test]

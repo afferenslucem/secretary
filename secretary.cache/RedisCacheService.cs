@@ -20,7 +20,7 @@ public class RedisCacheService: ICacheService
         _logger.LogInformation("Created RedisCacheService");
     }
 
-    public async Task SaveEntity<T>(long key, T value, short lifetimeSec = 900) where T : class
+    public async Task SaveEntity<T>(long key, T value, short lifetimeSec = 600) where T : class
     {
         try
         {
