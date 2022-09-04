@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using secretary.cache;
 using secretary.configuration;
 using secretary.logging;
 using secretary.mail.Authentication;
@@ -24,6 +25,8 @@ public class TelegramBot
     private readonly Database _database;
 
     private readonly IYandexAuthenticator _yandexAuthenticator;
+    
+    private readonly ICacheService _cacheService;
 
     private readonly IMailClient _mailClient;
 
@@ -31,19 +34,21 @@ public class TelegramBot
 
     private CancellationTokenSource _cancellationTokenSource = new();
 
-    public TelegramBot(string telegramToken, MailConfig mailConfig, Database database)
+    public TelegramBot(Config config, Database database)
     {
         _database = database;
 
-        _sessionStorage = new SessionStorage();
+        _cacheService = new RedisCacheService(config.RedisHost);
 
-        _yandexAuthenticator = new YandexAuthenticator(mailConfig);
+        _sessionStorage = new SessionStorage(_cacheService);
+
+        _yandexAuthenticator = new YandexAuthenticator(config.MailConfig);
 
         _chain = new CommandsListeningChain();
 
         _mailClient = new MailClient();
 
-        _telegramClient = new TelegramClient(telegramToken, _cancellationTokenSource.Token);
+        _telegramClient = new TelegramClient(config.TelegramApiKey, _cancellationTokenSource.Token);
 
         _telegramClient.OnMessage += this.WorkWithMessage;
     }
@@ -65,6 +70,7 @@ public class TelegramBot
                 _database.EmailStorage,
                 _yandexAuthenticator,
                 _mailClient,
+                _cacheService,
                 message.Text
             );
 

@@ -6,5 +6,6 @@
     "ClientSecret": ""
   },
   "DbPath": "",
-  "TemplatesPath": ""
+  "TemplatesPath": "",
+  "RedisHost": ""
 }

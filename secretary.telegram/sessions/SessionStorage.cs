@@ -6,9 +6,9 @@ public class SessionStorage: ISessionStorage
 {
     private readonly ICacheService _cacheService;
 
-    public SessionStorage()
+    public SessionStorage(ICacheService cacheService)
     {
-        _cacheService = new RedisCacheService("localhost:6379");
+        _cacheService = cacheService;
     }
 
     public async Task<Session?> GetSession(long chatId)

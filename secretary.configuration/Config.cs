@@ -13,6 +13,8 @@ public class Config
     
     public string TemplatesPath { get; set; } = null!;
 
+    public string RedisHost { get; set; } = null!;
+
     public static Config Instance { get; set; }
 
     static Config()

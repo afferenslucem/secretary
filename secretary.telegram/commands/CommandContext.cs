@@ -1,4 +1,5 @@
-﻿using secretary.mail.Authentication;
+﻿using secretary.cache;
+using secretary.mail.Authentication;
 using secretary.storage;
 using secretary.telegram.sessions;
 using secretary.yandex.mail;
@@ -23,6 +24,8 @@ public class CommandContext
 
     public IMailClient MailClient = null!;
 
+    public ICacheService CacheService = null!;
+
     public string Message = null!;
 
     public bool BackwardRedirect = false;
@@ -36,6 +39,7 @@ public class CommandContext
         IEmailStorage emailStorage,
         IYandexAuthenticator yandexAuthenticator, 
         IMailClient mailClient, 
+        ICacheService cacheService,
         string message)
     {
         ChatId = chatId;
@@ -46,6 +50,7 @@ public class CommandContext
         EmailStorage = emailStorage;
         YandexAuthenticator = yandexAuthenticator;
         MailClient = mailClient;
+        CacheService = cacheService;
         Message = message;
     }
     
