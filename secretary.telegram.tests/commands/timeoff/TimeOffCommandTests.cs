@@ -73,7 +73,7 @@ public class TimeOffCommandTests
 
         await this._command.Execute();
         
-        this._sessionStorage.Verify(target => target.SaveSession(2517, It.Is<Session>(session => session.ChaitId == 2517 && session.LastCommand == _command)));
+        this._sessionStorage.Verify(target => target.SaveSession(2517, It.Is<Session>(session => session.ChatId == 2517 && session.LastCommand == _command)));
     }
 
     [Test]

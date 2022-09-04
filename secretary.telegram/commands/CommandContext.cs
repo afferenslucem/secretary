@@ -74,7 +74,7 @@ public class CommandContext
         
         return this.SessionStorage.SaveSession(ChatId, new Session()
         {
-            ChaitId = ChatId,
+            ChatId = ChatId,
             LastCommand = command
         });
     }

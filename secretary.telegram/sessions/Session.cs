@@ -4,6 +4,6 @@ namespace secretary.telegram.sessions;
 
 public class Session
 {
-    public long ChaitId { get; set; }
+    public long ChatId { get; set; }
     public Command? LastCommand { get; set; }
 }
