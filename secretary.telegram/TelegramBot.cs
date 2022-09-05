@@ -14,7 +14,7 @@ namespace secretary.telegram;
 
 public class TelegramBot
 {
-    public const string Version = "v0.2.0";
+    public const string Version = "v0.3.0";
     
     private readonly ILogger<TelegramBot> _logger = LogPoint.GetLogger<TelegramBot>();
     
