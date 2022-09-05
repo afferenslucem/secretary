@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using HtmlAgilityPack;
+using secretary.documents.utils;
 
 namespace secretary.documents.templates.html
 {
@@ -44,6 +45,8 @@ namespace secretary.documents.templates.html
             var period = Doc.GetElementbyId("time-off_period");
 
             var body = period.ParentNode;
+
+            value = new InsertStringFormatter().Format(value);
                 
             var replaced = period.OuterHtml.Replace(Placeholders.TimeOffPeriod, value);
 
@@ -64,6 +67,8 @@ namespace secretary.documents.templates.html
             }
             else
             {
+                value = new InsertStringFormatter().Format(value);
+                
                 var replaced = reason.OuterHtml.Replace(Placeholders.Reason, value);
 
                 var newNode = HtmlNode.CreateNode(replaced);
@@ -84,6 +89,8 @@ namespace secretary.documents.templates.html
             }
             else
             {
+                value = new InsertStringFormatter().Format(value);
+                
                 var replaced = reason.OuterHtml.Replace(Placeholders.WorkingOff, value);
 
                 var newNode = HtmlNode.CreateNode(replaced);

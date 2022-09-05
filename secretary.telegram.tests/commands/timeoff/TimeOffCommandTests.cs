@@ -131,8 +131,13 @@ public class TimeOffCommandTests
     [Test]
     public async Task ShouldExecuteSkipCheckEmailsForRepeat()
     {
-        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>()))
-            .ReturnsAsync(new TimeOffCache());
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(new TimeOffCache()
+        {
+            Period = "05.09.2022",
+            WorkingOff = "Отаботаю",
+            Reason = "Ну надо",
+        });
+
         
         _context.Message = "/timeoff";
         await this._command.Execute();
@@ -168,8 +173,12 @@ public class TimeOffCommandTests
     [Test]
     public async Task ShouldExecuteShowCheckEmailsForNewEmail()
     {
-        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>()))
-            .ReturnsAsync(new TimeOffCache());
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(new TimeOffCache()
+        {
+            Period = "05.09.2022",
+            WorkingOff = "Отаботаю",
+            Reason = "Ну надо",
+        });
 
         _context.Message = "/timeoff";
         await this._command.Execute();
@@ -206,8 +215,13 @@ public class TimeOffCommandTests
     [Test]
     public async Task ShouldExecuteReturnToEmailEnter()
     {
-        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>()))
-            .ReturnsAsync(new TimeOffCache());
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(new TimeOffCache()
+        {
+            Period = "05.09.2022",
+            WorkingOff = "Отаботаю",
+            Reason = "Ну надо",
+        });
+
         
         _context.Message = "/timeoff";
         await this._command.Execute();
@@ -250,8 +264,13 @@ public class TimeOffCommandTests
     [Test]
     public async Task ShouldRemoveSessionForNo()
     {
-        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>()))
-            .ReturnsAsync(new TimeOffCache());
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(new TimeOffCache()
+        {
+            Period = "05.09.2022",
+            WorkingOff = "Отаботаю",
+            Reason = "Ну надо",
+        });
+
         
         _context.Message = "/timeoff";
         await this._command.Execute();

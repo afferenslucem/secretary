@@ -1,4 +1,5 @@
 ﻿using System;
+using secretary.documents.utils;
 using Xceed.Words.NET;
 
 namespace secretary.documents.templates.docx
@@ -24,6 +25,7 @@ namespace secretary.documents.templates.docx
 
         public void SetTimeOffPeriod(string value)
         {
+            value = new InsertStringFormatter().Format(value);
             this.document.Paragraphs[6].ReplaceText(Placeholders.TimeOffPeriod, value);
         }
 
@@ -36,6 +38,7 @@ namespace secretary.documents.templates.docx
             }
             else
             {
+                value = new InsertStringFormatter().Format(value);
                 this.document.Paragraphs[7].ReplaceText(Placeholders.Reason, value);
             }
         }
@@ -49,6 +52,7 @@ namespace secretary.documents.templates.docx
             }
             else
             {
+                value = new InsertStringFormatter().Format(value);
                 this.document.Paragraphs[8].ReplaceText(Placeholders.WorkingOff, value);
             }
         }

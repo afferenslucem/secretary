@@ -44,7 +44,7 @@ namespace secretary.documents.tests.templates.docx
         }
 
         [Test]
-        public void ShouldSetTimeOffDate()
+        public void ShouldSetTimeOffDateWithExtraPoint()
         {
             using var adapter = new TimeOffDocumentAdapter(this.Document);
             
@@ -54,11 +54,31 @@ namespace secretary.documents.tests.templates.docx
         }
 
         [Test]
-        public void ShouldSetReason()
+        public void ShouldSetTimeOffDateWithoutExtraPoint()
+        {
+            using var adapter = new TimeOffDocumentAdapter(this.Document);
+            
+            adapter.SetTimeOffPeriod("10.08.2022 с 9:00 до 13:00.");
+            
+            Assert.That(Document.Paragraphs[6].Text, Is.EqualTo("Прошу предоставить отгул 10.08.2022 с 9:00 до 13:00."));
+        }
+
+        [Test]
+        public void ShouldSetReasonWithExtraPoint()
         {
             using var adapter = new TimeOffDocumentAdapter(this.Document);
             
             adapter.SetReason("необходимо починить машину");
+            
+            Assert.That(Document.Paragraphs[7].Text, Is.EqualTo("Причина: необходимо починить машину."));
+        }
+
+        [Test]
+        public void ShouldSetReasonWithoutExtraPoint()
+        {
+            using var adapter = new TimeOffDocumentAdapter(this.Document);
+            
+            adapter.SetReason("необходимо починить машину.");
             
             Assert.That(Document.Paragraphs[7].Text, Is.EqualTo("Причина: необходимо починить машину."));
         }
@@ -74,11 +94,21 @@ namespace secretary.documents.tests.templates.docx
         }
 
         [Test]
-        public void ShouldSetWorkingOff()
+        public void ShouldSetWorkingOffWithExtraPoint()
         {
             using var adapter = new TimeOffDocumentAdapter(this.Document);
             
             adapter.SetWorkingOff("Пропущенное время обязуюсь отработать");
+            
+            Assert.That(Document.Paragraphs[8].Text, Is.EqualTo("Пропущенное время обязуюсь отработать."));
+        }
+
+        [Test]
+        public void ShouldSetWorkingOffWithoutExtraPoint()
+        {
+            using var adapter = new TimeOffDocumentAdapter(this.Document);
+            
+            adapter.SetWorkingOff("Пропущенное время обязуюсь отработать.");
             
             Assert.That(Document.Paragraphs[8].Text, Is.EqualTo("Пропущенное время обязуюсь отработать."));
         }
