@@ -96,6 +96,18 @@ namespace secretary.documents.tests.templates.html
         }
 
         [Test]
+        public void ShouldSetReasonWithoutRedundantWhitespaces()
+        {
+            var adapter = new TimeOffMessageAdapter(this.Document);
+            
+            adapter.SetReason("Нужно   съездить на  восстание.");
+
+            var node = this.Document.GetElementbyId("time-off_reason");
+            
+            Assert.That(node.InnerHtml, Is.EqualTo("<br>Причина: Нужно съездить на восстание."));
+        }
+
+        [Test]
         public void ShouldDeleteReasonIfSetNull()
         {
             var adapter = new TimeOffMessageAdapter(this.Document);
@@ -125,6 +137,18 @@ namespace secretary.documents.tests.templates.html
             var adapter = new TimeOffMessageAdapter(this.Document);
             
             adapter.SetWorkingOff("Отработаю в ссылке.");
+
+            var node = this.Document.GetElementbyId("time-off_working-off");
+            
+            Assert.That(node.InnerHtml, Is.EqualTo("<br>Отработаю в ссылке."));
+        }
+
+        [Test]
+        public void ShouldSetWorkingOffWithUppercase()
+        {
+            var adapter = new TimeOffMessageAdapter(Document);
+            
+            adapter.SetWorkingOff("отработаю в ссылке.");
 
             var node = this.Document.GetElementbyId("time-off_working-off");
             

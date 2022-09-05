@@ -52,7 +52,7 @@ namespace secretary.documents.templates.docx
             }
             else
             {
-                value = new InsertStringFormatter().Format(value);
+                value = new InsertStringFormatter().Format(value, firstLetter: FirstLetter.Upper);
                 this.document.Paragraphs[8].ReplaceText(Placeholders.WorkingOff, value);
             }
         }

@@ -114,6 +114,26 @@ namespace secretary.documents.tests.templates.docx
         }
 
         [Test]
+        public void ShouldSetWorkingOffWithUppercase()
+        {
+            using var adapter = new TimeOffDocumentAdapter(this.Document);
+            
+            adapter.SetWorkingOff("пропущенное время обязуюсь отработать.");
+            
+            Assert.That(Document.Paragraphs[8].Text, Is.EqualTo("Пропущенное время обязуюсь отработать."));
+        }
+
+        [Test]
+        public void ShouldSetWorkingOffWithoutRedundantWhitespaces()
+        {
+            using var adapter = new TimeOffDocumentAdapter(this.Document);
+            
+            adapter.SetWorkingOff("Пропущенное  время   обязуюсь  отработать.");
+            
+            Assert.That(Document.Paragraphs[8].Text, Is.EqualTo("Пропущенное время обязуюсь отработать."));
+        }
+
+        [Test]
         public void ShouldDeleteWorkingOffIfSetNull()
         {
             using var adapter = new TimeOffDocumentAdapter(this.Document);

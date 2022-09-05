@@ -89,7 +89,7 @@ namespace secretary.documents.templates.html
             }
             else
             {
-                value = new InsertStringFormatter().Format(value);
+                value = new InsertStringFormatter().Format(value, firstLetter: FirstLetter.Upper);
                 
                 var replaced = reason.OuterHtml.Replace(Placeholders.WorkingOff, value);
 
