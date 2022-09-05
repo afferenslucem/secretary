@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using secretary.documents.templates.docx;
+using secretary.documents.utils;
 
 namespace secretary.documents.creators;
 
@@ -19,18 +20,9 @@ public class TimeOffDocumentCreator: ITimeOffCreator
         adapter.SetWorkingOff(data.WorkingOff);
         adapter.SetSendingDay(DateTime.Now.ToString("dd.MM.yyyy"));
 
-        var tempFile = this.CreateTempFile();
+        var tempFile = new FileManager().CreateTempFile();
 
         adapter.SaveAs(tempFile);
-
-        return tempFile;
-    }
-
-    private string CreateTempFile()
-    {
-        var tempFile = Path.GetTempFileName();
-        File.Move(tempFile, tempFile.Replace(".tmp", ".docx"));
-        tempFile = tempFile.Replace(".tmp", ".docx");
 
         return tempFile;
     }

@@ -37,6 +37,8 @@ public class SendDocumentCommand : Command
         var message = this.GetMailMessage(user!, emails, cache);
 
         await SendMail(message);
+        
+        DeleteDocument(cache.FilePath!);
     }
 
     public SecretaryMailMessage GetMailMessage(User user, IEnumerable<Email> emails, TimeOffCache cache)
@@ -106,6 +108,18 @@ public class SendDocumentCommand : Command
         finally
         {
             await Context.CacheService.DeleteEntity<TimeOffCache>(ChatId);
+        }
+    }
+
+    private void DeleteDocument(string filename)
+    {
+        try
+        {
+            File.Delete(filename);
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, $"Could not delete file {filename}");
         }
     }
 }
