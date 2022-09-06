@@ -14,8 +14,6 @@ public abstract class Command
 
     protected string Message => Context.Message;
 
-    public Command? ParentCommand { get; set; } = null!;
-
     protected Command()
     {
         CancellationToken = new CancellationTokenSource();
