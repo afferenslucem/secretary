@@ -37,7 +37,7 @@ public class EnterJobTitleGenitiveCommand : Command
 
             _logger.LogInformation($"{ChatId}: registered user {user.Name}");
 
-            return RunNext;
+            return ExecuteDirection.RunNext;
         }
         finally
         {

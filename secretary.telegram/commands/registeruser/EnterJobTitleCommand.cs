@@ -21,6 +21,6 @@ public class EnterJobTitleCommand : Command
 
         await Context.CacheService.SaveEntity(ChatId, cache);
         
-        return RunNext;
+        return ExecuteDirection.RunNext;
     }
 }

@@ -44,7 +44,7 @@ public abstract class StatedCommand: Command
     public override async Task<int> OnMessage()
     {
         await this.Execute();
-        return RunNext;
+        return ExecuteDirection.RunNext;
     }
 
     public override async Task Cancel()

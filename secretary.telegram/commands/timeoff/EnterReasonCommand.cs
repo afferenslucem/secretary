@@ -15,7 +15,7 @@ public class EnterReasonCommand : Command
 
     public override async Task<int> OnMessage()
     {
-        if (Message == "Пропустить") return RunNext;
+        if (Message == "Пропустить") return ExecuteDirection.RunNext;
 
         var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
 
@@ -25,6 +25,6 @@ public class EnterReasonCommand : Command
 
         await Context.CacheService.SaveEntity(ChatId, cache);
         
-        return RunNext;
+        return ExecuteDirection.RunNext;
     }
 }

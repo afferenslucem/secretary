@@ -17,7 +17,7 @@ public class EnterWorkingOffCommand : Command
     
     public override async Task<int> OnMessage()
     {
-        if (Message == "Пропустить") return RunNext;
+        if (Message == "Пропустить") return ExecuteDirection.RunNext;
 
         var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
 
@@ -27,6 +27,6 @@ public class EnterWorkingOffCommand : Command
 
         await Context.CacheService.SaveEntity(ChatId, cache);
         
-        return RunNext;
+        return ExecuteDirection.RunNext;
     }
 }

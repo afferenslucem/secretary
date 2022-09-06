@@ -24,7 +24,7 @@ public class EnterEmailCommand : Command
 
         await Context.CacheService.SaveEntity(ChatId, cache);
         
-        return RunNext;
+        return ExecuteDirection.RunNext;
     }
 
     public override async Task ValidateMessage()

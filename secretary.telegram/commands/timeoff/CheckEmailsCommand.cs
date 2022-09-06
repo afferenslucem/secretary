@@ -35,11 +35,11 @@ public class CheckEmailsCommand : Command
             var document = await Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);
             await Context.EmailStorage.SaveForDocument(document.Id, cache.Emails);
             
-            return RunNext;
+            return ExecuteDirection.RunNext;
         }
         else
         {
-            return -1;
+            return ExecuteDirection.GoBack;
         }
     }
 }

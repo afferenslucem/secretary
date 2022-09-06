@@ -84,7 +84,7 @@ public class SetEmailsCommand : Command
             cache.Emails = new EmailParser().ParseMany(Message);
             await Context.CacheService.SaveEntity(ChatId, cache);
 
-            return RunNext;
+            return ExecuteDirection.RunNext;
         }
         catch (IncorrectEmailException e)
         {
@@ -93,7 +93,7 @@ public class SetEmailsCommand : Command
                 " имеет некорректный формат.\r\n" +
                 "Поправьте его и отправте список адресов еще раз.");
 
-            return Retry;
+            return ExecuteDirection.Retry;
         }
     }
 }

@@ -30,7 +30,7 @@ public class EnterPeriodCommand : Command
 
         await Context.CacheService.SaveEntity(ChatId, cache);
         
-        return RunNext;
+        return ExecuteDirection.RunNext;
     }
 
     private async Task ValidateUser()

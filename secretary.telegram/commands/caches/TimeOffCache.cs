@@ -34,7 +34,7 @@ public class TimeOffCache: IEquatable<TimeOffCache>
         return Period == other.Period 
                && Reason == other.Reason 
                && WorkingOff == other.WorkingOff 
-               && (Emails == other.Emails || Emails.SequenceEqual(other.Emails))
+               && (Emails == other.Emails || Emails!.SequenceEqual(other.Emails!))
                && FilePath == other.FilePath;
     }
 
