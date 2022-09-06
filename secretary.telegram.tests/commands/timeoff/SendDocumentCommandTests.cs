@@ -133,7 +133,7 @@ public class SendDocumentCommandTests
         
         _mailClient
             .Verify(target => target.SendMail(
-                    It.Is<SecretaryMailMessage>(data => data.Theme == "[Отгул 28.08.2022]")
+                    It.Is<SecretaryMailMessage>(data => data.Theme == "Пользовалель Пользователев [Отгул 28.08.2022]")
                 )
             );
         

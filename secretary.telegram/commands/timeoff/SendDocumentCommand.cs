@@ -65,7 +65,7 @@ public class SendDocumentCommand : Command
             },
             Sender = new SecretaryMailAddress(user.Email!, user.Name!),
             Receivers = receivers,
-            Theme = $"[Отгул {data.PeriodYear}]",
+            Theme = $"{user.Name} [Отгул {data.PeriodYear}]",
             HtmlBody = MessageCreator.Create(data)
         };
 
