@@ -31,8 +31,7 @@ public class CommandClipTests
         _fourthState.Setup(target => target.OnMessage()).ReturnsAsync(1);
         
         _clip = new(
-            new List<Command>() {_firstState.Object, _secondState.Object, _thirdState.Object, _fourthState.Object},
-            _command.Object
+            new List<Command>() {_firstState.Object, _secondState.Object, _thirdState.Object, _fourthState.Object}
             );
     }
 
@@ -145,7 +144,7 @@ public class CommandClipTests
     [Test]
     public async Task ShouldReturnAsymmetricCompletedMarker()
     {
-        var clip = new CommandClip(new[] { _firstState.Object, _secondState.Object, new AssymetricCompleteCommand() }, _command.Object);
+        var clip = new CommandClip(new[] { _firstState.Object, _secondState.Object, new AssymetricCompleteCommand() });
 
         await clip.Run(_context);
         
@@ -156,7 +155,7 @@ public class CommandClipTests
     [Test]
     public async Task ShouldReturnFinishedMarker()
     {
-        var clip = new CommandClip(new[] { _firstState.Object, _thirdState.Object }, _command.Object);
+        var clip = new CommandClip(new[] { _firstState.Object, _thirdState.Object });
 
         await clip.Run(_context);
         await clip.Run(_context);

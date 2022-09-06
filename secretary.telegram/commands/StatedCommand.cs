@@ -12,10 +12,10 @@ public abstract class StatedCommand: Command
     [JsonProperty]
     protected CommandClip Clip;
 
-    protected StatedCommand() : base()
+    protected StatedCommand()
     {
         var states = this.ConfigureStates();
-        this.Clip = new CommandClip(states, this);
+        this.Clip = new CommandClip(states);
     }
     
     public abstract List<Command> ConfigureStates();

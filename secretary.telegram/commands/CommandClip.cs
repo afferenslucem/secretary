@@ -9,9 +9,6 @@ namespace secretary.telegram.commands;
 public class CommandClip
 {
     private readonly ILogger<CommandClip> _logger = LogPoint.GetLogger<CommandClip>();
-
-    [JsonProperty]
-    private readonly Command _parentCommand;
     
     [JsonProperty]
     private readonly Command[] _states;
@@ -42,9 +39,8 @@ public class CommandClip
 
     public int RunIndex => _runIndex;
 
-    public CommandClip(IEnumerable<Command> states, Command parentCommand)
+    public CommandClip(IEnumerable<Command> states)
     {
-        _parentCommand = parentCommand;
         _states = states.ToArray();
     }
 
