@@ -56,7 +56,7 @@ public class CommandClip
             
         try
         {
-            var firstPartExecutor = new ChildCommandExecutor(firstPartCommand, context, _parentCommand);
+            var firstPartExecutor = new CommandExecutor(firstPartCommand, context);
 
             await firstPartExecutor.ValidateMessage();
             var increment = await firstPartExecutor.OnMessage();
@@ -71,7 +71,7 @@ public class CommandClip
             if (IsFinishedChain) return;
 
             var secondPartCommand = _states[_runIndex];
-            var secondPartExecutor = new ChildCommandExecutor(secondPartCommand, context, _parentCommand);
+            var secondPartExecutor = new CommandExecutor(secondPartCommand, context);
 
             _logger.LogInformation($"{context.ChatId}: Start execute command {secondPartCommand.GetType().Name}");
             await secondPartExecutor.Execute();
@@ -85,7 +85,7 @@ public class CommandClip
     public Task Cancel(CommandContext context)
     {
         var state = _states[_runIndex];
-        var executor = new ChildCommandExecutor(state, context, _parentCommand);
+        var executor = new CommandExecutor(state, context);
 
         return executor.Cancel();
     }

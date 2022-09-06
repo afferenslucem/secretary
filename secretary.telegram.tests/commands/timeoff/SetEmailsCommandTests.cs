@@ -46,7 +46,6 @@ public class SetEmailsCommandTests
         };
         
         this._command.Context = _context;
-        this._command.ParentCommand = _parent;
     }
     
     
