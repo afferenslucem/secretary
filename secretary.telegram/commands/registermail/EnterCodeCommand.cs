@@ -40,6 +40,8 @@ public class EnterCodeCommand: Command
         }
         catch (YandexAuthenticationException e)
         {
+            _logger.LogError(e, "Could not get auth info from server");
+            
             await this.Context.TelegramClient.SendMessage(ChatId,
                 "При запросе токена для авторизации произошла ошибка:(\r\n" +
                 "Попробуйте через пару минут, если не сработает, то обратитесь по вот этому адресу @hrodveetnir");
