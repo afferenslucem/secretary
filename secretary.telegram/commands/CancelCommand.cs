@@ -11,11 +11,11 @@ public class CancelCommand: Command
     
     public override async Task Execute()
     {
-        var session = await Context.GetSession();
+        var session = await SessionStorage.GetSession();
         
         session?.LastCommand?.Cancel();
         
-        await Context.SessionStorage.DeleteSession(ChatId);
+        await SessionStorage.DeleteSession();
         await TelegramClient.SendMessage("Дальнейшее выполнение команды прервано");
 
         var commandTypeName = session?.LastCommand?.GetType()?.Name ?? "null";

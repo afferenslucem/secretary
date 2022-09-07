@@ -8,7 +8,7 @@ public class NullCommand: Command
 
     public override async Task Execute()
     {
-        var session = await Context.GetSession();
+        var session = await SessionStorage.GetSession();
 
         if (session == null)
         {

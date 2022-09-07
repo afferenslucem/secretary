@@ -11,7 +11,8 @@ public abstract class Command
     [JsonIgnore]
     public CommandContext Context { get; set; } = null!;
 
-    public TelegramClientWrapper TelegramClient => new (Context.TelegramClient, Context.ChatId);
+    protected TelegramClientWrapper TelegramClient => new (Context.TelegramClient, Context.ChatId);
+    protected SessionStorageWrapper SessionStorage => new (Context.SessionStorage, Context.ChatId);
 
     protected long ChatId => Context.ChatId;
 
@@ -48,6 +49,6 @@ public abstract class Command
     
     public virtual async Task OnComplete()
     {
-        await Context.SessionStorage.DeleteSession(ChatId);
+        await SessionStorage.DeleteSession();
     }
 }

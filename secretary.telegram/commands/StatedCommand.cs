@@ -27,7 +27,7 @@ public abstract class StatedCommand: Command
             await Clip.Run(Context);
             if (!Clip.IsCompleted)
             {
-                await Context.SaveSession(this);
+                await SessionStorage.SaveSession(this);
             }
         }
         catch (ForceCompleteCommandException e)

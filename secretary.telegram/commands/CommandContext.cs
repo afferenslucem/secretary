@@ -59,14 +59,4 @@ public class CommandContext
      * @deprecated
      */
     public CommandContext() { }
-
-    public Task<Session?> GetSession()
-    {
-        return this.SessionStorage.GetSession(this.ChatId);
-    }
-
-    public async Task SaveSession(Command command)
-    {
-        await this.SessionStorage.SaveSession(ChatId, new Session(ChatId, command));
-    }
 }
