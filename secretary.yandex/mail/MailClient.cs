@@ -40,7 +40,7 @@ public class MailClient: IMailClient
             multipart.Add(attachment);
         }
         
-        var message = new MimeMessage(
+        using var message = new MimeMessage(
             new [] { new MailboxAddress(messageConfig.Sender.DisplayName, messageConfig.Sender.Address) },
             receivers,
             messageConfig.Theme,

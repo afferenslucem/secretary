@@ -197,9 +197,13 @@ public class SendDocumentCommandTests
         _command.Context = _context;
         await _command.SendMail(null!);
         
+        _client.Verify(target => target.SendSticker(
+            2517, 
+            Stickers.Guliki
+        ));
+        
         _client.Verify(target => target.SendMessage(
             2517, 
-            "Guliki detected!\r\n" +
             "Вы отправляете письмо с токеном не принадлежащим ящику <code>a.pushkin@infinnity.ru</code>"
         ));
         

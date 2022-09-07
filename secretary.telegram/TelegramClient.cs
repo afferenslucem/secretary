@@ -101,4 +101,9 @@ public class TelegramClient: ITelegramClient
             chatId: chatId,
             document: new InputOnlineFile(content: fileStream, fileName: fileName), cancellationToken: this._cancellationToken);
     }
+
+    public async Task SendSticker(long chatId, string stickerId)
+    {
+        await this._botClient.SendStickerAsync(chatId, new InputOnlineFile(stickerId));
+    }
 }

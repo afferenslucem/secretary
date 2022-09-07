@@ -99,8 +99,9 @@ public class SendDocumentCommand : Command
         {
             if (e.Message.Contains("Sender address rejected: not owned by auth user"))
             {
+                await Context.TelegramClient.SendSticker(ChatId, Stickers.Guliki);
+                
                 await Context.TelegramClient.SendMessage(ChatId,
-                    "Guliki detected!\r\n" +
                     $"Вы отправляете письмо с токеном не принадлежащим ящику <code>{e.Mailbox.Address}</code>"
                 );
             }
