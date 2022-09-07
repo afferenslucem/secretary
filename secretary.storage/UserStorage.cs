@@ -38,7 +38,7 @@ public class UserStorage: Storage, IUserStorage
         }
     }
 
-    public async Task InsertUser(User user)
+    private async Task InsertUser(User user)
     {
         using var connection = this.GetConnection();
 
@@ -51,7 +51,7 @@ public class UserStorage: Storage, IUserStorage
             user);
     }
 
-    public async Task UpdateUser(User user)
+    private async Task UpdateUser(User user)
     {
         using var connection = this.GetConnection();
 

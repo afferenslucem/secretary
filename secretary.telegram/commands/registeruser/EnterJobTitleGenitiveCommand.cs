@@ -23,7 +23,7 @@ public class EnterJobTitleGenitiveCommand : Command
             var cache = await Context.CacheService.GetEntity<RegisterUserCache>(ChatId);
             if (cache == null) throw new InternalException();
 
-            var user = await Context.UserStorage.GetUser(ChatId);
+            var user = await UserStorage.GetUser();
             user = user ?? new User() { ChatId = ChatId };
 
             user.Name = cache.Name;
@@ -31,7 +31,7 @@ public class EnterJobTitleGenitiveCommand : Command
             user.JobTitle = cache.JobTitle;
             user.JobTitleGenitive = Message;
 
-            await Context.UserStorage.SetUser(user);
+            await UserStorage.SetUser(user);
 
             await TelegramClient.SendMessage("Ваш пользователь успешно сохранен");
 

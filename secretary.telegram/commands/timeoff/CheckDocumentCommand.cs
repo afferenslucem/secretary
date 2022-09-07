@@ -15,7 +15,7 @@ public class CheckDocumentCommand : Command
     
     public override async Task Execute()
     {
-        var user = (await Context.UserStorage.GetUser(ChatId))!;
+        var user = (await UserStorage.GetUser())!;
         var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
 
         if (cache == null) throw new InternalException();

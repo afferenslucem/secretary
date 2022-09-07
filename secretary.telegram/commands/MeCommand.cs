@@ -14,7 +14,7 @@ public class MeCommand: Command
     {
         _logger.LogInformation($"{ChatId}: Asked user info");
 
-        var user = await Context.UserStorage.GetUser(ChatId);
+        var user = await UserStorage.GetUser();
 
         if (user == null)
         {

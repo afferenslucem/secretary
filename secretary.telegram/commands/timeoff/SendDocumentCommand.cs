@@ -30,7 +30,7 @@ public class SendDocumentCommand : Command
         if (cache == null) throw new InternalException();
         
         var document = await Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);
-        var user = await Context.UserStorage.GetUser(ChatId);
+        var user = await UserStorage.GetUser();
 
         IEnumerable<Email> emails = await this.Context.EmailStorage.GetForDocument(document.Id);
 

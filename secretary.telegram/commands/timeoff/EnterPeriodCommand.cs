@@ -35,7 +35,7 @@ public class EnterPeriodCommand : Command
 
     private async Task ValidateUser()
     {
-        var user = await Context.UserStorage.GetUser(ChatId);
+        var user = await UserStorage.GetUser();
         
         new UserValidationVisitor().Validate(user);
     }

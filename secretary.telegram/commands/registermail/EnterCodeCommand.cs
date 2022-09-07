@@ -75,13 +75,13 @@ public class EnterCodeCommand: Command
         var cache = await Context.CacheService.GetEntity<RegisterMailCache>(ChatId);
         if (cache == null) throw new InternalException();
         
-        var user = await Context.UserStorage.GetUser(ChatId);
+        var user = await UserStorage.GetUser();
         user = user ?? new User() { ChatId = ChatId };
 
         user.Email = cache.Email;
         user.AccessToken = data.access_token;
         user.RefreshToken = data.refresh_token;
 
-        await Context.UserStorage.SetUser(user);
+        await UserStorage.SetUser(user);
     }
 }
