@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using secretary.telegram.exceptions;
+using secretary.telegram.wrappers;
 
 namespace secretary.telegram.commands;
 
@@ -9,6 +10,8 @@ public abstract class Command
 
     [JsonIgnore]
     public CommandContext Context { get; set; } = null!;
+
+    public TelegramClientWrapper TelegramClient => new (Context.TelegramClient, Context.ChatId);
 
     protected long ChatId => Context.ChatId;
 

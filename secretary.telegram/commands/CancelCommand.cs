@@ -16,7 +16,7 @@ public class CancelCommand: Command
         session?.LastCommand?.Cancel();
         
         await Context.SessionStorage.DeleteSession(ChatId);
-        await Context.TelegramClient.SendMessage(ChatId, "Дальнейшее выполнение команды прервано");
+        await TelegramClient.SendMessage("Дальнейшее выполнение команды прервано");
 
         var commandTypeName = session?.LastCommand?.GetType()?.Name ?? "null";
         

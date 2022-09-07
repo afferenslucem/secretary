@@ -25,8 +25,8 @@ public class EnterCodeCommand: Command
         {
             var data = await Context.YandexAuthenticator.GetAuthenticationCode(CancellationToken.Token);
 
-            await Context.TelegramClient.SendMessage(ChatId,
-                $"Пожалуйста, <strong>УБЕДИТЕСЬ</strong>, что вы авторизуетесь в рабочей почте!\r\n" +
+            await TelegramClient.SendMessage(
+                "Пожалуйста, <strong>УБЕДИТЕСЬ</strong>, что вы авторизуетесь в рабочей почте!\r\n" +
                 $"Введите этот код: <code>{data.user_code}</code> в поле ввода по этой ссылке: {data.verification_url}. Регистрация может занять пару минут.");
 
             var tokenData = await this.AskRegistration(Context.YandexAuthenticator, data, DateTime.Now);
@@ -34,7 +34,7 @@ public class EnterCodeCommand: Command
             if (tokenData != null)
             {
                 await this.SetTokens(tokenData);
-                await Context.TelegramClient.SendMessage(ChatId, "Ура, вы успешно зарегистрировали почту");
+                await TelegramClient.SendMessage("Ура, вы успешно зарегистрировали почту");
                 _logger.LogInformation($"{ChatId}: handled tokens");
             }
         }
@@ -42,7 +42,7 @@ public class EnterCodeCommand: Command
         {
             _logger.LogError(e, "Could not get auth info from server");
             
-            await this.Context.TelegramClient.SendMessage(ChatId,
+            await this.TelegramClient.SendMessage(
                 "При запросе токена для авторизации произошла ошибка:(\r\n" +
                 "Попробуйте через пару минут, если не сработает, то обратитесь по вот этому адресу @hrodveetnir");
         }

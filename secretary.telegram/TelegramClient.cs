@@ -81,9 +81,9 @@ public class TelegramClient: ITelegramClient
         return this._botClient.SendTextMessageAsync(chatId, message, cancellationToken: this._cancellationToken, parseMode: ParseMode.Html, replyMarkup: new ReplyKeyboardRemove());
     }
 
-    public Task SendMessageWithKeyBoard(long chatId, string message, string[] choises)
+    public Task SendMessageWithKeyBoard(long chatId, string message, string[] choices)
     {
-        var buttons = choises.Select(text => new KeyboardButton(text)).ToArray();
+        var buttons = choices.Select(text => new KeyboardButton(text)).ToArray();
         
         var keyboard = new ReplyKeyboardMarkup(buttons);
 

@@ -11,9 +11,9 @@ public class EnterJobTitleGenitiveCommand : Command
     private readonly ILogger<EnterJobTitleGenitiveCommand> _logger = LogPoint.GetLogger<EnterJobTitleGenitiveCommand>();
     public override Task Execute()
     {
-        return Context.TelegramClient.SendMessage(ChatId, "Введите вашу должность в родительном падеже.\r\n" +
-                                                          "Так она будут указана в графе \"от кого\".\r\n" +
-                                                          @"Например: От <i>поэта</i> Пушкина Александра Сергеевича");
+        return TelegramClient.SendMessage("Введите вашу должность в родительном падеже.\r\n" +
+                                          "Так она будут указана в графе \"от кого\".\r\n" +
+                                          @"Например: От <i>поэта</i> Пушкина Александра Сергеевича");
     }
 
     public override async Task<int> OnMessage()
@@ -33,7 +33,7 @@ public class EnterJobTitleGenitiveCommand : Command
 
             await Context.UserStorage.SetUser(user);
 
-            await Context.TelegramClient.SendMessage(ChatId, "Ваш пользователь успешно сохранен");
+            await TelegramClient.SendMessage("Ваш пользователь успешно сохранен");
 
             _logger.LogInformation($"{ChatId}: registered user {user.Name}");
 

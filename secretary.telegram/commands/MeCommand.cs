@@ -39,33 +39,33 @@ public class MeCommand: Command
 
     private Task ReturnUnregisteredUser()
     {
-        return Context.TelegramClient.SendMessage(ChatId, "Вы незарегистрированный пользователь\r\n\r\n" +
-                                                          "Для корректной работы вам необходимо выполнить следующие команды:\r\n" +
-                                                          "/registeruser\r\n" +
-                                                          "/registermail");
+        return TelegramClient.SendMessage("Вы незарегистрированный пользователь\r\n\r\n" +
+                                          "Для корректной работы вам необходимо выполнить следующие команды:\r\n" +
+                                          "/registeruser\r\n" +
+                                          "/registermail");
     }
 
     private Task ReturnUnregisteredMail(User user)
     {
         var userInfo = GetUserInfo(user);
         
-        return Context.TelegramClient.SendMessage(ChatId, $"{userInfo}\r\n\r\n" +
-                                                          "У вас нет токена для почты. Выполните команду /registermail");
+        return TelegramClient.SendMessage($"{userInfo}\r\n\r\n" +
+                                           "У вас нет токена для почты. Выполните команду /registermail");
     }
 
     private Task ReturnUnregisteredName(User user)
     {
         var userInfo = GetUserInfo(user);
         
-        return Context.TelegramClient.SendMessage(ChatId, $"{userInfo}\r\n\r\n" +
-                                                          "У вас не заданы данные о пользователе. Выполните команду /registeruser");
+        return TelegramClient.SendMessage($"{userInfo}\r\n\r\n" +
+                                           "У вас не заданы данные о пользователе. Выполните команду /registeruser");
     }
 
     private Task ReturnUserInfo(User user)
     {
         var userInfo = GetUserInfo(user);
         
-        return Context.TelegramClient.SendMessage(ChatId, userInfo);
+        return TelegramClient.SendMessage(userInfo);
     }
 
     private string GetUserInfo(User user)

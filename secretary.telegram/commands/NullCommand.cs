@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using secretary.logging;
-using secretary.telegram.commands.executors;
+﻿using secretary.telegram.commands.executors;
 
 namespace secretary.telegram.commands;
 
@@ -14,7 +12,7 @@ public class NullCommand: Command
 
         if (session == null)
         {
-            await Context.TelegramClient.SendMessage(ChatId, "Извините, я не понял\r\nОтправьте команду");
+            await TelegramClient.SendMessage("Извините, я не понял\r\nОтправьте команду");
 
             return;
         }

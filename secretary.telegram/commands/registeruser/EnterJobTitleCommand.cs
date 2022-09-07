@@ -7,9 +7,9 @@ public class EnterJobTitleCommand : Command
 {
     public override Task Execute()
     {
-        return Context.TelegramClient.SendMessage(ChatId, "Введите вашу должность в именительном падеже.\r\n" +
-                                                          "Так она будут указана в подписи письма.\r\n" +
-                                                          @"Например: С уважением, <i>поэт</i> Александр Пушкин");
+        return TelegramClient.SendMessage("Введите вашу должность в именительном падеже.\r\n" +
+                                          "Так она будут указана в подписи письма.\r\n" +
+                                          @"Например: С уважением, <i>поэт</i> Александр Пушкин");
     }
 
     public override async Task<int> OnMessage()

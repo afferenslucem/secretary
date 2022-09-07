@@ -62,21 +62,11 @@ public class CommandContext
 
     public Task<Session?> GetSession()
     {
-        if (this.SessionStorage == null)
-        {
-            throw new NullReferenceException("Session storage is null");
-        }
-        
         return this.SessionStorage.GetSession(this.ChatId);
     }
 
     public async Task SaveSession(Command command)
     {
-        if (this.SessionStorage == null)
-        {
-            throw new NullReferenceException("Session storage is null");
-        }
-
         await this.SessionStorage.SaveSession(ChatId, new Session(ChatId, command));
     }
 }

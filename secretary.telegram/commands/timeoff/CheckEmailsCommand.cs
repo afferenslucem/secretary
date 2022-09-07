@@ -22,7 +22,7 @@ public class CheckEmailsCommand : Command
                       "\r\n" +
                       "Все верно?";
         
-        await Context.TelegramClient.SendMessageWithKeyBoard(ChatId, message, new [] { "Верно", "Нет, нужно поправить" });
+        await TelegramClient.SendMessageWithKeyBoard(message, new [] { "Верно", "Нет, нужно поправить" });
     }
 
     public override async Task<int> OnMessage()

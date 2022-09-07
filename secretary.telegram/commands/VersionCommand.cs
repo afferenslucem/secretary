@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using secretary.logging;
-using secretary.storage.models;
 
 namespace secretary.telegram.commands;
 
@@ -14,6 +13,6 @@ public class VersionCommand: Command
     {
         _logger.LogInformation($"{ChatId}: Asked version");
         
-        return Context.TelegramClient.SendMessage(ChatId, TelegramBot.Version);
+        return TelegramClient.SendMessage(TelegramBot.Version);
     }
 }

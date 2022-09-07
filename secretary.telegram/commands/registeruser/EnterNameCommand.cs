@@ -13,9 +13,9 @@ public class EnterNameCommand : Command
     {
         _logger.LogInformation($"{ChatId}: Started register user");
         
-        return Context.TelegramClient.SendMessage(ChatId, "Введите ваши имя и фамилию в именительном падеже.\r\n" +
-                                                          "Так они будут указаны в почтовом ящике, с которого будет отправляться письмо.\r\n" +
-                                                          @"Например: <i>Александр Пушкин</i>");
+        return TelegramClient.SendMessage("Введите ваши имя и фамилию в именительном падеже.\r\n" +
+                                          "Так они будут указаны в почтовом ящике, с которого будет отправляться письмо.\r\n" +
+                                          @"Например: <i>Александр Пушкин</i>");
     }
 
     public override async Task<int> OnMessage()

@@ -32,8 +32,8 @@ public class CheckDocumentCommand : Command
         var fileName = string.Join('-', fileNameParts).Replace(' ', '-');
 
         await Context.CacheService.SaveEntity(ChatId, cache);
-        await Context.TelegramClient.SendMessage(ChatId, "Проверьте документ");
-        await Context.TelegramClient.SendDocument(ChatId, path, fileName);
-        await Context.TelegramClient.SendMessageWithKeyBoard(ChatId, "Отправить заявление?", new [] {"Да", "Нет"});
+        await TelegramClient.SendMessage("Проверьте документ");
+        await TelegramClient.SendDocument(path, fileName);
+        await TelegramClient.SendMessageWithKeyBoard("Отправить заявление?", new [] {"Да", "Нет"});
     }
 }

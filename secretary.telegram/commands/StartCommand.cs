@@ -13,8 +13,7 @@ public class StartCommand: Command
     {
         _logger.LogInformation($"{ChatId}: Started work");
 
-        await this.Context.TelegramClient.SendMessage(
-            ChatId, 
+        await TelegramClient.SendMessage(
             "Добро пожаловать!\r\n" +
             "\r\n" +
             "Перед началом работы вам необходимо:\r\n" +

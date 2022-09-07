@@ -30,12 +30,12 @@ public class SetEmailsCommand : Command
 
     public Task CancelCommand()
     {
-        return Context.TelegramClient.SendMessage(ChatId, "Дальнейшее выполнение команды прервано");
+        return TelegramClient.SendMessage("Дальнейшее выполнение команды прервано");
     }
 
     public Task SendAskEmails()
     {
-        return Context.TelegramClient.SendMessage(ChatId, 
+        return TelegramClient.SendMessage( 
             "Отправьте список адресов для рассылки в формате:\r\n" +
             "<code>" +
             "a.pushkin@infinnity.ru (Александр Пушкин)\r\n" +
@@ -59,7 +59,7 @@ public class SetEmailsCommand : Command
                       "\r\n" +
                       "Повторить?";
         
-        return Context.TelegramClient.SendMessageWithKeyBoard(ChatId, message, new [] { "Повторить" });
+        return TelegramClient.SendMessageWithKeyBoard(message, new [] { "Повторить" });
     }
 
     public override async Task<int> OnMessage()
@@ -88,9 +88,7 @@ public class SetEmailsCommand : Command
         }
         catch (IncorrectEmailException e)
         {
-            await Context.TelegramClient.SendMessage(ChatId,
-                $"Почтовый адрес <code>{e.IncorrectEmail}</code>" +
-                " имеет некорректный формат.\r\n" +
+            await TelegramClient.SendMessage($"Почтовый адрес <code>{e.IncorrectEmail}</code> имеет некорректный формат.\r\n" +
                 "Поправьте его и отправте список адресов еще раз.");
 
             return ExecuteDirection.Retry;

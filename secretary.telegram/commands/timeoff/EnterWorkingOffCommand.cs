@@ -7,7 +7,7 @@ public class EnterWorkingOffCommand : Command
 {
     public override Task Execute()
     {
-        return Context.TelegramClient.SendMessageWithKeyBoard(ChatId, 
+        return TelegramClient.SendMessageWithKeyBoard( 
             "Введите данные об отработке в свободном формате.\r\n" +
             "Например: <i>Отгул обязуюсь отработать</i>\r\n" +
             "Или: Отгул <i>без отработки</i>\r\n\r\n" +

@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using secretary.logging;
-using secretary.storage.models;
 using secretary.telegram.commands.caches;
 using secretary.telegram.exceptions;
 
@@ -14,8 +13,8 @@ public class EnterEmailCommand : Command
     {
         _logger.LogInformation($"{ChatId}: started register mail");
         
-        return Context.TelegramClient.SendMessage(ChatId, "Введите вашу почту, с которой вы отправляете заявления.\r\n" +
-                                                          @"Например: <i>a.pushkin@infinnity.ru</i>");
+        return TelegramClient.SendMessage("Введите вашу почту, с которой вы отправляете заявления.\r\n" +
+                                          @"Например: <i>a.pushkin@infinnity.ru</i>");
     }
 
     public override async Task<int> OnMessage()
@@ -32,7 +31,7 @@ public class EnterEmailCommand : Command
         var emailRegex = new Regex(@"^[\w_\-\.]+@([\w\-_]+\.)+[\w-]{2,4}");
         if (!emailRegex.IsMatch(Message))
         {
-            await this.Context.TelegramClient.SendMessage(ChatId, "Некорректный формат почты. Введите почту еще раз");
+            await TelegramClient.SendMessage("Некорректный формат почты. Введите почту еще раз");
             throw new IncorrectFormatException();
         }
 
@@ -40,9 +39,9 @@ public class EnterEmailCommand : Command
 
         if (!domainAllowed)
         {
-            await this.Context.TelegramClient.SendMessage(ChatId, "Некорректный домен почты.\r\n" +
-                                                                  "Бот доступен только для сотрудников Infinnity Solutions.\r\n" +
-                                                                  "Введите вашу рабочую почту");
+            await TelegramClient.SendMessage("Некорректный домен почты.\r\n" +
+                                             "Бот доступен только для сотрудников Infinnity Solutions.\r\n" +
+                                             "Введите вашу рабочую почту");
             throw new IncorrectFormatException();
         }
     }

@@ -7,7 +7,7 @@ public class EnterReasonCommand : Command
 {
     public override Task Execute()
     {
-        return Context.TelegramClient.SendMessageWithKeyBoard(ChatId, 
+        return TelegramClient.SendMessageWithKeyBoard( 
             "Введите причину отгула, это опционально, если вы нажмете \"Пропустить\", то этой графы не будет в заявлении.\r\n" +
             @"А если укажете, то это будет строка вида <code>Причина: {{причина}}</code>",
             new [] {"Пропустить"});
