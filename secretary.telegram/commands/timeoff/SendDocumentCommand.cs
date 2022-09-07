@@ -32,7 +32,7 @@ public class SendDocumentCommand : Command
         var document = await DocumentStorage.GetOrCreateDocument(TimeOffCommand.Key);
         var user = await UserStorage.GetUser();
 
-        IEnumerable<Email> emails = await this.Context.EmailStorage.GetForDocument(document.Id);
+        IEnumerable<Email> emails = await EmailStorage.GetForDocument(document.Id);
 
         var message = this.GetMailMessage(user!, emails, cache);
 

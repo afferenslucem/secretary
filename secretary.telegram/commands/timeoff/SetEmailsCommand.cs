@@ -16,7 +16,7 @@ public class SetEmailsCommand : Command
         }
 
         var document = await DocumentStorage.GetOrCreateDocument(TimeOffCommand.Key);
-        var emails = await Context.EmailStorage.GetForDocument(document.Id);
+        var emails = await EmailStorage.GetForDocument(document.Id);
 
         if (emails.Count() > 0)
         {

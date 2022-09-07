@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using secretary.storage;
 using secretary.telegram.exceptions;
 using secretary.telegram.wrappers;
 
@@ -15,6 +16,8 @@ public abstract class Command
     protected SessionStorageWrapper SessionStorage => new (Context.SessionStorage, Context.ChatId);
     protected UserStorageWrapper UserStorage => new (Context.UserStorage, Context.ChatId);
     protected DocumentStorageWrapper DocumentStorage => new (Context.DocumentStorage, Context.ChatId);
+
+    protected IEmailStorage EmailStorage => Context.EmailStorage;
 
     protected long ChatId => Context.ChatId;
 

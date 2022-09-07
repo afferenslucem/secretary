@@ -33,7 +33,7 @@ public class CheckEmailsCommand : Command
             if (cache?.Emails == null) throw new InternalException();
 
             var document = await DocumentStorage.GetOrCreateDocument(TimeOffCommand.Key);
-            await Context.EmailStorage.SaveForDocument(document.Id, cache.Emails);
+            await EmailStorage.SaveForDocument(document.Id, cache.Emails);
             
             return ExecuteDirection.RunNext;
         }
