@@ -7,6 +7,7 @@ namespace secretary.telegram.tests.commands;
 public class VersionCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
+    private Mock<ISessionStorage> _sessionStorage = null!;
 
     private VersionCommand _command = null!;
     private CommandContext _context = null!;
@@ -17,11 +18,13 @@ public class VersionCommandTests
         this._client = new Mock<ITelegramClient>();
 
         this._command = new VersionCommand();
+        this._sessionStorage = new Mock<ISessionStorage>();
 
         this._context = new CommandContext()
         {
             ChatId = 2517,
             TelegramClient = this._client.Object,
+            SessionStorage = this._sessionStorage.Object,
         };
 
         this._command.Context = _context;
@@ -39,5 +42,13 @@ public class VersionCommandTests
         await this._command.Execute();
 
         this._client.Verify(target => target.SendMessage(2517, "v0.4.0"));
+    }
+
+    [Test]
+    public async Task ShouldDeleteSession()
+    {
+        await _command.OnComplete();
+        
+        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
     }
 }

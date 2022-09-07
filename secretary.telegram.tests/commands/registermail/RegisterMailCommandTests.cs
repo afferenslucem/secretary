@@ -79,6 +79,7 @@ public class RegisterMailCommandTests
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         
         await _command.OnMessage();
+        await _command.OnComplete();
         
         _userStorage.Verify(target => target.SetUser(It.Is<User>(user => user.Name == "Александр Пушкин" 
                                                                          && user.Email == "a.pushkin@infinnity.ru" 
@@ -134,6 +135,7 @@ public class RegisterMailCommandTests
         
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         await _command.OnMessage();
+        await _command.OnComplete();
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
         _userStorage.Verify(target => target.SetUser(It.Is<User>(user => user.Email == "a.pushkin@infinnity.ru" 
                                                                          && user.AccessToken == "access" 

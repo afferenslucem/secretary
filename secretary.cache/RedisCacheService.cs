@@ -43,7 +43,8 @@ public class RedisCacheService: ICacheService
 
     public async Task<T?> GetEntity<T>(long key) where T : class
     {
-        try {
+        try 
+        {
             var db = _connectionMultiplexer.GetDatabase();
 
             var redisValue = await db.StringGetAsync(new RedisKey($"{typeof(T)}:{key}"));
@@ -70,7 +71,8 @@ public class RedisCacheService: ICacheService
 
     public async Task DeleteEntity<T>(long key) where T : class
     {
-        try {
+        try 
+        {
             var db = _connectionMultiplexer.GetDatabase();
 
             await db.KeyDeleteAsync(new RedisKey($"{typeof(T)}:{key}"));

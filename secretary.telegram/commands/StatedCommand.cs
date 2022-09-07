@@ -25,12 +25,7 @@ public abstract class StatedCommand: Command
         try
         {
             await Clip.Run(Context);
-
-            if (Clip.IsCompleted)
-            {
-                await OnComplete();
-            }
-            else
+            if (!Clip.IsCompleted)
             {
                 await Context.SaveSession(this);
             }
@@ -54,14 +49,17 @@ public abstract class StatedCommand: Command
         await Clip.Cancel(Context);
     }
 
-    protected async Task OnComplete()
+    public override async Task OnComplete()
     {
-        await Context.SessionStorage.DeleteSession(ChatId);
+        if (Clip.IsCompleted)
+        {
+            await base.OnComplete();
+        }
     }
 
-    private async Task OnForceComplete(ForceCompleteCommandException e)
+    protected async Task OnForceComplete(ForceCompleteCommandException e)
     {
-        await this.OnComplete();
+        await base.OnComplete();
         _logger.LogWarning($"Сommand {e.CommandName} force completed");
     }
 }

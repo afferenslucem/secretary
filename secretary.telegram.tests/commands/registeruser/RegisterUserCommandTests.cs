@@ -92,6 +92,7 @@ public class RegisterUserCommandTests
         _context.Message = "поэта";
         
         await _command.OnMessage();
+        await _command.OnComplete();
         
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
         _userStorage.Verify(target => target.SetUser(It.Is<User>(user => user.JobTitleGenitive == "поэта")), Times.Once);

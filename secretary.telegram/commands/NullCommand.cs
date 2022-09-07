@@ -12,7 +12,7 @@ public class NullCommand: Command
     {
         var session = await Context.GetSession();
 
-        if (session == null || session.LastCommand == null)
+        if (session == null)
         {
             await Context.TelegramClient.SendMessage(ChatId, "Извините, я не понял\r\nОтправьте команду");
 
@@ -20,5 +20,11 @@ public class NullCommand: Command
         }
 
         await new CommandExecutor(session.LastCommand, Context).OnMessage();
+        await new CommandExecutor(session.LastCommand, Context).OnComplete();
+    }
+
+    public override Task OnComplete()
+    {
+        return Task.CompletedTask;
     }
 }

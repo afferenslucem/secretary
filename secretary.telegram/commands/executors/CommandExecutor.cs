@@ -30,4 +30,9 @@ public class CommandExecutor
     {
         return Command.Cancel();
     }
+    
+    public Task OnComplete()
+    {
+        return Command.OnComplete();
+    }
 }

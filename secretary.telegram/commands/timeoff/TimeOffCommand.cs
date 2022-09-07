@@ -37,9 +37,9 @@ public class TimeOffCommand: StatedCommand
         catch (NonCompleteUserException e)
         {
             await HandleUserException(e);
-            await OnComplete();
-            
             this._logger.LogError(e, $"Command was completed by exception");
+
+            throw;
         }
     }
 

@@ -7,6 +7,7 @@ using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
+using secretary.telegram.exceptions;
 using secretary.telegram.sessions;
 using secretary.yandex.mail;
 
@@ -82,50 +83,45 @@ public class TimeOffCommandTests
     }
 
     [Test]
-    public async Task ShouldBreakExecutionForNonRegisteredUser()
+    public void ShouldBreakExecutionForNonRegisteredUser()
     {
         _context.Message = "/timeoff";
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync((User?)null);
         
-        await this._command.Execute();
+        Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
         
         _client.Verify(target => target.SendMessage(2517, "Вы – незарегистрированный пользователь.\r\n\r\n" +
                                                           "Выполните команды:\r\n" +
                                                           "/registeruser\r\n" +
                                                           "/registermail"));
-        
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
     }
 
     [Test]
-    public async Task ShouldBreakExecutionForUserWithoutMail()
+    public void ShouldBreakExecutionForUserWithoutMail()
     {
         _context.Message = "/timeoff";
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { JobTitleGenitive = ""});
         
-        await this._command.Execute();
+        Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
         
         _client.Verify(target => target.SendMessage(2517, "У вас не зарегистрирована почта.\r\n" +
                                                           "Выполните команду: /registermail"));
-        
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
     }
 
     [Test]
-    public async Task ShouldBreakExecutionForUserWithoutInfo()
+    public void ShouldBreakExecutionForUserWithoutInfo()
     {
         _context.Message = "/timeoff";
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { AccessToken = ""});
         
-        await this._command.Execute();
+        Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
         
-        _client.Verify(target => target.SendMessage(2517, "У вас не заданы данные о пользователе.\r\n" +
-                                                          "Выполните команду /registeruser"));
-        
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
+        _client.Verify(target => target.SendMessage(2517, 
+            "У вас не заданы данные о пользователе.\r\n" +
+            "Выполните команду /registeruser"));
     }
     
     [Test]
@@ -162,10 +158,12 @@ public class TimeOffCommandTests
             .ReturnsAsync(new [] { new Email("a.pushkin@infinnity.ru") });
         _context.Message = "Да";
         await this._command.OnMessage();
+        await _command.OnComplete();
         
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         _context.Message = "Повторить";
         await this._command.OnMessage();
+        await _command.OnComplete();
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
         _mailClient.Verify(target => target.SendMail(It.IsAny<SecretaryMailMessage>()), Times.Once);
     }

@@ -2,6 +2,7 @@
 using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
+using secretary.telegram.sessions;
 
 namespace secretary.telegram.tests.commands;
 
@@ -9,6 +10,7 @@ public class MeCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
     private Mock<IUserStorage> _userStorage = null!;
+    private Mock<ISessionStorage> _sessionStorage = null!;
 
     private MeCommand _command = null!;
     private CommandContext _context = null!;
@@ -18,6 +20,7 @@ public class MeCommandTests
     {
         this._client = new Mock<ITelegramClient>();
         this._userStorage = new Mock<IUserStorage>();
+        this._sessionStorage = new Mock<ISessionStorage>();
 
         this._command = new MeCommand();
 
@@ -26,6 +29,7 @@ public class MeCommandTests
             ChatId = 2517,
             TelegramClient = this._client.Object,
             UserStorage = _userStorage.Object,
+            SessionStorage = _sessionStorage.Object,
         };
 
         this._command.Context = _context;
@@ -122,5 +126,13 @@ public class MeCommandTests
             "<strong>Должность:</strong> поэт\r\n" +
             "<strong>Должность в Р.П.:</strong> поэта\r\n" +
             "<strong>Почта:</strong> a.pushkin@infinnity.ru"));
+    }
+
+    [Test]
+    public async Task ShouldDeleteSession()
+    {
+        await _command.OnComplete();
+        
+        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
     }
 }

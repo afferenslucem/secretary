@@ -60,6 +60,27 @@ public class NullCommandTests
         await this._command.Execute();
         
         lastCommand.Verify(target => target.OnMessage());
+    }
+    
+    [Test]
+    public async Task ShouldRunLastCommandComplete()
+    {
+        var lastCommand = new Mock<Command>();
+        
+        _sessionStorage
+            .Setup(target => target.GetSession(It.IsAny<long>()))
+            .ReturnsAsync(new Session(2517, lastCommand.Object));
+        
+        await this._command.Execute();
+        
+        lastCommand.Verify(target => target.OnComplete(), Times.Once);
+    }
+
+    [Test]
+    public async Task ShouldNotDeleteSession()
+    {
+        await _command.OnComplete();
+        
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
     }
 }

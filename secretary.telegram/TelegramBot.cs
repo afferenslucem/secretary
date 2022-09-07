@@ -75,10 +75,12 @@ public class TelegramBot
             );
 
             await new CommandExecutor(command, context).Execute();
+            await new CommandExecutor(command, context).OnComplete();
         }
         catch (Exception e)
         {
             _logger.LogError(e, $"{message.ChatId}: Сommand execution fault {command.GetType().Name}");
+            await _sessionStorage.DeleteSession(message.ChatId);
         }
     }
     

@@ -68,4 +68,12 @@ public class CancelCommandTests
         
         await this._command.Execute();
     }
+
+    [Test]
+    public async Task ShouldNotDeleteSession()
+    {
+        await _command.OnComplete();
+        
+        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
+    }
 }

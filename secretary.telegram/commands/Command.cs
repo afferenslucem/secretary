@@ -42,4 +42,9 @@ public abstract class Command
     {
         throw new ForceCompleteCommandException(this.GetType().Name);
     }
+    
+    public virtual async Task OnComplete()
+    {
+        await Context.SessionStorage.DeleteSession(ChatId);
+    }
 }

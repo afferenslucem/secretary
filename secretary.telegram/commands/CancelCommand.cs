@@ -22,4 +22,9 @@ public class CancelCommand: Command
         
         _logger.LogInformation($"{ChatId}: Cancelled command {commandTypeName}");
     }
+
+    public override Task OnComplete()
+    {
+        return Task.CompletedTask;
+    }
 }

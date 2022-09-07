@@ -47,4 +47,12 @@ public class StartCommandTests
                                                                "/registeruser – зарегистрироваться\r\n" +
                                                                "/registermail – зарегистрировать рабочую почту"));
     }
+
+    [Test]
+    public async Task ShouldDeleteSession()
+    {
+        await _command.OnComplete();
+        
+        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
+    }
 }
