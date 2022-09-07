@@ -15,8 +15,8 @@ public class SetEmailsCommand : Command
             this.ForceComplete();
         }
 
-        var document = await this.Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);
-        var emails = await this.Context.EmailStorage.GetForDocument(document.Id);
+        var document = await DocumentStorage.GetOrCreateDocument(TimeOffCommand.Key);
+        var emails = await Context.EmailStorage.GetForDocument(document.Id);
 
         if (emails.Count() > 0)
         {

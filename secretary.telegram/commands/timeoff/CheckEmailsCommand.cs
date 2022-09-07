@@ -32,7 +32,7 @@ public class CheckEmailsCommand : Command
             var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
             if (cache?.Emails == null) throw new InternalException();
 
-            var document = await Context.DocumentStorage.GetOrCreateDocument(ChatId, TimeOffCommand.Key);
+            var document = await DocumentStorage.GetOrCreateDocument(TimeOffCommand.Key);
             await Context.EmailStorage.SaveForDocument(document.Id, cache.Emails);
             
             return ExecuteDirection.RunNext;

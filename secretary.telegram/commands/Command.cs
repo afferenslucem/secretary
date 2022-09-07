@@ -14,6 +14,7 @@ public abstract class Command
     protected TelegramClientWrapper TelegramClient => new (Context.TelegramClient, Context.ChatId);
     protected SessionStorageWrapper SessionStorage => new (Context.SessionStorage, Context.ChatId);
     protected UserStorageWrapper UserStorage => new (Context.UserStorage, Context.ChatId);
+    protected DocumentStorageWrapper DocumentStorage => new (Context.DocumentStorage, Context.ChatId);
 
     protected long ChatId => Context.ChatId;
 
