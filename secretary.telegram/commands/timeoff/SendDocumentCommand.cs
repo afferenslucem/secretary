@@ -76,7 +76,7 @@ public class SendDocumentCommand : Command
     {
         try
         {
-            await Context.MailClient.SendMail(message);
+            await MailClient.SendMail(message);
 
             await TelegramClient.SendMessage("Заяление отправлено");
 
