@@ -23,13 +23,13 @@ public class EnterCodeCommand: Command
     {
         try
         {
-            var data = await Context.YandexAuthenticator.GetAuthenticationCode(CancellationToken.Token);
+            var data = await YandexAuthenticator.GetAuthenticationCode(CancellationToken.Token);
 
             await TelegramClient.SendMessage(
                 "Пожалуйста, <strong>УБЕДИТЕСЬ</strong>, что вы авторизуетесь в рабочей почте!\r\n" +
                 $"Введите этот код: <code>{data.user_code}</code> в поле ввода по этой ссылке: {data.verification_url}. Регистрация может занять пару минут.");
 
-            var tokenData = await this.AskRegistration(Context.YandexAuthenticator, data, DateTime.Now);
+            var tokenData = await this.AskRegistration(YandexAuthenticator, data, DateTime.Now);
 
             if (tokenData != null)
             {

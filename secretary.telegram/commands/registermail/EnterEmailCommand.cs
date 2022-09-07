@@ -35,7 +35,7 @@ public class EnterEmailCommand : Command
             throw new IncorrectFormatException();
         }
 
-        var domainAllowed = Context.YandexAuthenticator.IsUserDomainAllowed(Message);
+        var domainAllowed = YandexAuthenticator.IsUserDomainAllowed(Message);
 
         if (!domainAllowed)
         {

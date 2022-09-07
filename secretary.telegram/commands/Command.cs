@@ -2,6 +2,7 @@
 using secretary.storage;
 using secretary.telegram.exceptions;
 using secretary.telegram.wrappers;
+using secretary.yandex.authentication;
 
 namespace secretary.telegram.commands;
 
@@ -16,8 +17,8 @@ public abstract class Command
     protected SessionStorageWrapper SessionStorage => new (Context.SessionStorage, Context.ChatId);
     protected UserStorageWrapper UserStorage => new (Context.UserStorage, Context.ChatId);
     protected DocumentStorageWrapper DocumentStorage => new (Context.DocumentStorage, Context.ChatId);
-
     protected IEmailStorage EmailStorage => Context.EmailStorage;
+    protected IYandexAuthenticator YandexAuthenticator => Context.YandexAuthenticator;
 
     protected long ChatId => Context.ChatId;
 
