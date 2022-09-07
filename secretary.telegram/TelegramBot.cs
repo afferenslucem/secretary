@@ -2,7 +2,7 @@
 using secretary.cache;
 using secretary.configuration;
 using secretary.logging;
-using secretary.mail.Authentication;
+using secretary.yandex.authentication;
 using secretary.storage;
 using secretary.telegram.chains;
 using secretary.telegram.commands;
@@ -14,7 +14,7 @@ namespace secretary.telegram;
 
 public class TelegramBot
 {
-    public const string Version = "v0.3.2";
+    public const string Version = "v0.4.0";
     
     private readonly ILogger<TelegramBot> _logger = LogPoint.GetLogger<TelegramBot>();
     

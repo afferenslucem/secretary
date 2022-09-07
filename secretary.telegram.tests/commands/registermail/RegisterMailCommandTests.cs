@@ -1,6 +1,6 @@
 ﻿using Moq;
 using secretary.cache;
-using secretary.mail.Authentication;
+using secretary.yandex.authentication;
 using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
@@ -59,6 +59,7 @@ public class RegisterMailCommandTests
     [Test]
     public async Task ShouldRunFully()
     {
+        _yandexAuthenticator.Setup(target => target.IsUserDomainAllowed(It.IsAny<string>())).Returns(true);
         _userStorage.Setup(target => target.GetUser(2517)).ReturnsAsync(() => new User() {Name = "Александр Пушкин"} );
         
         _context.Message = "/registermail";
@@ -104,6 +105,7 @@ public class RegisterMailCommandTests
     [Test]
     public async Task ShouldPassExecutionAfterIncorrectMail()
     {
+        _yandexAuthenticator.Setup(target => target.IsUserDomainAllowed(It.IsAny<string>())).Returns(true);
         _userStorage.Setup(target => target.GetUser(2517)).ReturnsAsync(() => new User());
         
         _context.Message = "/registermail";

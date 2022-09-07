@@ -4,7 +4,7 @@ using secretary.configuration;
 using secretary.logging;
 using secretary.yandex.exceptions;
 
-namespace secretary.mail.Authentication;
+namespace secretary.yandex.authentication;
 
 public class YandexAuthenticator: IYandexAuthenticator
 {
@@ -95,5 +95,10 @@ public class YandexAuthenticator: IYandexAuthenticator
             _logger.LogError(e, "Ошибка при получении токена");
             throw new YandexAuthenticationException("Could not get token", e);
         }
+    }
+
+    public bool IsUserDomainAllowed(string email)
+    {
+        return _mailConfig.AllowedSenderDomains.Any(domain => email.EndsWith($"@{domain}"));
     }
 }

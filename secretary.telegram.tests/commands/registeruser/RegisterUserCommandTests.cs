@@ -7,7 +7,7 @@ using secretary.telegram.commands.caches;
 using secretary.telegram.commands.registeruser;
 using secretary.telegram.sessions;
 
-namespace secretary.telegram.tests.commands.regusteruser;
+namespace secretary.telegram.tests.commands.registeruser;
 
 public class RegisterUserCommandTests
 {

@@ -2,7 +2,8 @@
     "TelegramApiKey": "",
     "MailConfig": {
       "ClientId": "",
-      "ClientSecret": ""
+      "ClientSecret": "",
+      "AllowedSenderDomains": ["infinnity.ru"]
     },
     "DbPath": "",
     "TemplatesPath": "../../../../templates"

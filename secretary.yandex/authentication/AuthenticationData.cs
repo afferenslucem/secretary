@@ -1,4 +1,4 @@
-﻿namespace secretary.mail.Authentication;
+﻿namespace secretary.yandex.authentication;
 
 public class AuthenticationData
 {

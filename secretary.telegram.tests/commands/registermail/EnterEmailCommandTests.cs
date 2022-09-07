@@ -6,6 +6,7 @@ using secretary.telegram.commands;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.registermail;
 using secretary.telegram.exceptions;
+using secretary.yandex.authentication;
 
 namespace secretary.telegram.tests.commands.registermail;
 
@@ -14,6 +15,7 @@ public class EnterEmailCommandTests
     private Mock<ITelegramClient> _client = null!;
     private Mock<IUserStorage> _userStorage = null!;
     private Mock<ICacheService> _cacheService = null!;
+    private Mock<IYandexAuthenticator> _yandexAuthenticator = null!;
     private CommandContext _context= null!;
     private EnterEmailCommand _command= null!;
         
@@ -22,6 +24,7 @@ public class EnterEmailCommandTests
     {
         this._client = new Mock<ITelegramClient>();
         this._userStorage = new Mock<IUserStorage>();
+        this._yandexAuthenticator = new Mock<IYandexAuthenticator>();
         this._cacheService = new Mock<ICacheService>();
 
         this._context = new CommandContext()
@@ -30,6 +33,7 @@ public class EnterEmailCommandTests
             TelegramClient = this._client.Object, 
             UserStorage = _userStorage.Object,
             CacheService = _cacheService.Object,
+            YandexAuthenticator = _yandexAuthenticator.Object
         };
 
         this._command = new EnterEmailCommand();
@@ -70,5 +74,22 @@ public class EnterEmailCommandTests
         
         Assert.ThrowsAsync<IncorrectFormatException>(async () => await this._command.ValidateMessage());
         _client.Verify(target => target.SendMessage(2517, "Некорректный формат почты. Введите почту еще раз"));
+    }
+        
+    [Test]
+    public void ShouldThrowErrorForIncorrectDomain()
+    {
+        _yandexAuthenticator
+            .Setup(target => target.IsUserDomainAllowed(It.IsAny<string>()))
+            .Returns(false);
+
+        _context.Message = "a.pushkin@gmail.com";
+
+        _command.Context = _context;
+        
+        Assert.ThrowsAsync<IncorrectFormatException>(async () => await this._command.ValidateMessage());
+        _client.Verify(target => target.SendMessage(2517, "Некорректный домен почты.\r\n" +
+                                                          "Бот доступен только для сотрудников Infinnity Solutions.\r\n" +
+                                                          "Введите вашу рабочую почту"));
     }
 }

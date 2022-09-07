@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using secretary.logging;
-using secretary.mail.Authentication;
+using secretary.yandex.authentication;
 using secretary.storage.models;
 using secretary.telegram.commands.caches;
 using secretary.telegram.exceptions;

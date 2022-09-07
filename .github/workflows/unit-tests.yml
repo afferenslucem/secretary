@@ -23,8 +23,10 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Copy Config For Documents Tests
-      run: cp tests/config.json secretary.documents.tests/bin/Debug/net6.0/config.json
+      run: cp test-configs/config.json secretary.documents.tests/bin/Debug/net6.0/config.json
     - name: Copy Config For Telegram Tests
-      run: cp tests/config.json secretary.telegram.tests/bin/Debug/net6.0/config.json
+      run: cp test-configs/config.json secretary.telegram.tests/bin/Debug/net6.0/config.json
+    - name: Copy Config For Yandex Tests
+      run: cp test-configs/config.json secretary.yandex.tests/bin/Debug/net6.0/config.json
     - name: Test
       run: dotnet test --no-build --verbosity normal

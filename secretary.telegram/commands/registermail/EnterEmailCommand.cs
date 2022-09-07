@@ -30,10 +30,19 @@ public class EnterEmailCommand : Command
     public override async Task ValidateMessage()
     {
         var emailRegex = new Regex(@"^[\w_\-\.]+@([\w\-_]+\.)+[\w-]{2,4}");
-
         if (!emailRegex.IsMatch(Message))
         {
             await this.Context.TelegramClient.SendMessage(ChatId, "Некорректный формат почты. Введите почту еще раз");
+            throw new IncorrectFormatException();
+        }
+
+        var domainAllowed = Context.YandexAuthenticator.IsUserDomainAllowed(Message);
+
+        if (!domainAllowed)
+        {
+            await this.Context.TelegramClient.SendMessage(ChatId, "Некорректный домен почты.\r\n" +
+                                                                  "Бот доступен только для сотрудников Infinnity Solutions.\r\n" +
+                                                                  "Введите вашу рабочую почту");
             throw new IncorrectFormatException();
         }
     }

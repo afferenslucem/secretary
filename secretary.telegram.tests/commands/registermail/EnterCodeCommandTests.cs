@@ -1,6 +1,6 @@
 ﻿using Moq;
 using secretary.cache;
-using secretary.mail.Authentication;
+using secretary.yandex.authentication;
 using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;

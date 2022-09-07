@@ -6,7 +6,7 @@ using secretary.telegram.commands;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.registeruser;
 
-namespace secretary.telegram.tests.commands.regusteruser;
+namespace secretary.telegram.tests.commands.registeruser;
 
 public class EnterJobTitleGenitiveCommandTests
 {

@@ -3,7 +3,8 @@
   "TelegramApiKey": "",
   "MailConfig": {
     "ClientId": "",
-    "ClientSecret": ""
+    "ClientSecret": "",
+    "AllowedSenderDomains": []
   },
   "DbPath": "",
   "TemplatesPath": "",

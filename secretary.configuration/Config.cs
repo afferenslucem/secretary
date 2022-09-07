@@ -4,16 +4,16 @@ namespace secretary.configuration;
 
 public class Config
 {
-    public string? Environment { get; set; } = null;
-    public string TelegramApiKey { get; set; } = null!;
+    public string? Environment { get; init; } = null;
+    public string TelegramApiKey { get; init; } = null!;
 
-    public MailConfig MailConfig { get; set; } = null!;
+    public MailConfig MailConfig { get; init; } = null!;
     
-    public string DbPath { get; set; } = null!;
+    public string DbPath { get; init; } = null!;
     
-    public string TemplatesPath { get; set; } = null!;
+    public string TemplatesPath { get; init; } = null!;
 
-    public string RedisHost { get; set; } = null!;
+    public string RedisHost { get; init; } = null!;
 
     public static Config Instance { get; set; }
 
@@ -24,5 +24,16 @@ public class Config
         var config = JsonConvert.DeserializeObject<Config>(data);
 
         Instance = config ?? throw new JsonException("Wrong config format");
+        
+        ValidateConfig();
+    }
+
+    private static void ValidateConfig()
+    {
+        var domains = Instance.MailConfig.AllowedSenderDomains;
+        if (domains == null || domains.Count() == 0)
+        {
+            throw new ApplicationException("Config hasn\'t got any allowed domains");
+        }
     }
 }
