@@ -19,13 +19,13 @@ public class EnterWorkingOffCommand : Command
     {
         if (Message == "Пропустить") return ExecuteDirection.RunNext;
 
-        var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
+        var cache = await CacheService.GetEntity<TimeOffCache>();
 
         if (cache == null) throw new InternalException();
         
         cache.WorkingOff = Message;
 
-        await Context.CacheService.SaveEntity(ChatId, cache);
+        await CacheService.SaveEntity(cache);
         
         return ExecuteDirection.RunNext;
     }

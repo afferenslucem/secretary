@@ -78,11 +78,11 @@ public class SetEmailsCommand : Command
     {
         try
         {
-            var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
+            var cache = await CacheService.GetEntity<TimeOffCache>();
             if (cache == null) throw new InternalException();
             
             cache.Emails = new EmailParser().ParseMany(Message);
-            await Context.CacheService.SaveEntity(ChatId, cache);
+            await CacheService.SaveEntity(cache);
 
             return ExecuteDirection.RunNext;
         }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using secretary.cache;
 using secretary.storage;
 using secretary.telegram.exceptions;
 using secretary.telegram.wrappers;
@@ -21,6 +22,7 @@ public abstract class Command
     protected IEmailStorage EmailStorage => Context.EmailStorage;
     protected IYandexAuthenticator YandexAuthenticator => Context.YandexAuthenticator;
     protected IMailClient MailClient => Context.MailClient;
+    protected CacheServiceWrapper CacheService => new CacheServiceWrapper(Context.CacheService, Context.ChatId);
 
     protected long ChatId => Context.ChatId;
 

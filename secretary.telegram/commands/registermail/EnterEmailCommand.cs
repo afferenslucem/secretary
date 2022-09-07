@@ -21,7 +21,7 @@ public class EnterEmailCommand : Command
     {
         var cache = new RegisterMailCache(Message);
 
-        await Context.CacheService.SaveEntity(ChatId, cache);
+        await CacheService.SaveEntity(cache);
         
         return ExecuteDirection.RunNext;
     }

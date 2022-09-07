@@ -20,7 +20,7 @@ public class SessionStorage: ISessionStorage
 
     public async Task SaveSession(long chatId, Session session)
     {
-        await _cacheService.SaveEntity<Session>(chatId, session);
+        await _cacheService.SaveEntity(chatId, session);
     }
 
     public async Task DeleteSession(long chatId)

@@ -28,7 +28,7 @@ public class EnterPeriodCommand : Command
 
         cache.Period = Message;
 
-        await Context.CacheService.SaveEntity(ChatId, cache);
+        await CacheService.SaveEntity(cache);
         
         return ExecuteDirection.RunNext;
     }

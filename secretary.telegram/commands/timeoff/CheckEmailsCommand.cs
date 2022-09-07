@@ -7,7 +7,7 @@ public class CheckEmailsCommand : Command
 {
     public override async Task Execute()
     {
-        var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
+        var cache = await CacheService.GetEntity<TimeOffCache>();
         if (cache?.Emails == null) throw new InternalException();
         
         var emailsPrints = cache.Emails
@@ -29,7 +29,7 @@ public class CheckEmailsCommand : Command
     {
         if (Message.ToLower() == "верно")
         {
-            var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
+            var cache = await CacheService.GetEntity<TimeOffCache>();
             if (cache?.Emails == null) throw new InternalException();
 
             var document = await DocumentStorage.GetOrCreateDocument(TimeOffCommand.Key);

@@ -16,7 +16,7 @@ public class CheckDocumentCommand : Command
     public override async Task Execute()
     {
         var user = (await UserStorage.GetUser())!;
-        var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
+        var cache = await CacheService.GetEntity<TimeOffCache>();
 
         if (cache == null) throw new InternalException();
         
@@ -31,7 +31,7 @@ public class CheckDocumentCommand : Command
         var fileNameParts = new[] { user.Name, data.PeriodYear, "Отгул.docx" };
         var fileName = string.Join('-', fileNameParts).Replace(' ', '-');
 
-        await Context.CacheService.SaveEntity(ChatId, cache);
+        await CacheService.SaveEntity(cache);
         await TelegramClient.SendMessage("Проверьте документ");
         await TelegramClient.SendDocument(path, fileName);
         await TelegramClient.SendMessageWithKeyBoard("Отправить заявление?", new [] {"Да", "Нет"});

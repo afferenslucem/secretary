@@ -20,7 +20,7 @@ public class EnterJobTitleGenitiveCommand : Command
     {
         try
         {
-            var cache = await Context.CacheService.GetEntity<RegisterUserCache>(ChatId);
+            var cache = await CacheService.GetEntity<RegisterUserCache>();
             if (cache == null) throw new InternalException();
 
             var user = await UserStorage.GetUser();
@@ -41,7 +41,7 @@ public class EnterJobTitleGenitiveCommand : Command
         }
         finally
         {
-            await Context.CacheService.DeleteEntity<RegisterUserCache>(ChatId);
+            await CacheService.DeleteEntity<RegisterUserCache>();
         }
     }
 }

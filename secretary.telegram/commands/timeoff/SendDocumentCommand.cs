@@ -25,7 +25,7 @@ public class SendDocumentCommand : Command
 
     public override async Task Execute()
     {
-        var cache = await Context.CacheService.GetEntity<TimeOffCache>(ChatId);
+        var cache = await CacheService.GetEntity<TimeOffCache>();
 
         if (cache == null) throw new InternalException();
         
@@ -106,7 +106,7 @@ public class SendDocumentCommand : Command
         }
         finally
         {
-            await Context.CacheService.DeleteEntity<TimeOffCache>(ChatId);
+            await CacheService.DeleteEntity<TimeOffCache>();
         }
     }
 

@@ -14,12 +14,12 @@ public class EnterNameGenitiveCommand : Command
 
     public override async Task<int> OnMessage()
     {
-        var cache = await Context.CacheService.GetEntity<RegisterUserCache>(ChatId);
+        var cache = await CacheService.GetEntity<RegisterUserCache>();
         if (cache == null) throw new InternalException();
         
         cache.NameGenitive = Message;
 
-        await Context.CacheService.SaveEntity(ChatId, cache);
+        await CacheService.SaveEntity(cache);
         
         return ExecuteDirection.RunNext;
     }

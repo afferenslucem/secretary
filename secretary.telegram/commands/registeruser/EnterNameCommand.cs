@@ -23,7 +23,7 @@ public class EnterNameCommand : Command
         var cache = new RegisterUserCache();
         cache.Name = Message;
 
-        await Context.CacheService.SaveEntity(ChatId, cache);
+        await CacheService.SaveEntity(cache);
         
         return ExecuteDirection.RunNext;
     }

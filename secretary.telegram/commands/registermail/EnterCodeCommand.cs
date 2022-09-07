@@ -48,7 +48,7 @@ public class EnterCodeCommand: Command
         }
         finally
         {
-            await Context.CacheService.DeleteEntity<RegisterMailCache>(ChatId);
+            await CacheService.DeleteEntity<RegisterMailCache>();
         }
     }
 
@@ -72,7 +72,7 @@ public class EnterCodeCommand: Command
 
     private async Task SetTokens(TokenData data)
     {
-        var cache = await Context.CacheService.GetEntity<RegisterMailCache>(ChatId);
+        var cache = await CacheService.GetEntity<RegisterMailCache>();
         if (cache == null) throw new InternalException();
         
         var user = await UserStorage.GetUser();
