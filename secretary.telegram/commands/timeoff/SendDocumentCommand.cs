@@ -1,4 +1,5 @@
-﻿using MailKit.Net.Smtp;
+﻿using System.Globalization;
+using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using MimeKit;
@@ -7,6 +8,7 @@ using secretary.logging;
 using secretary.storage.models;
 using secretary.telegram.commands.caches;
 using secretary.telegram.exceptions;
+using secretary.telegram.models;
 using secretary.yandex.mail;
 
 namespace secretary.telegram.commands.timeoff;
@@ -60,12 +62,12 @@ public class SendDocumentCommand : Command
                     Path = cache.FilePath!,
                     FileName = "Заявление.docx",
                     ContentType = new ContentType("application",
-                        "vnd.openxmlformats-officedocument.wordprocessingml.document")
+                        "msword")
                 }
             },
             Sender = new SecretaryMailAddress(user.Email!, user.Name!),
             Receivers = receivers,
-            Theme = $"{user.Name} [Отгул {data.PeriodYear}]",
+            Theme = $"{user.Name} [Отгул {cache.Period!.DayPeriod}]",
             HtmlBody = MessageCreator.Create(data)
         };
 

@@ -5,6 +5,12 @@ public class DatePeriod: IEquatable<DatePeriod>
     public DateTime StartDate { get; init; }
     public DateTime FinishDate { get; init; }
     public string RawValue { get; init; }
+
+    public bool IsOneDay => StartDate.Year == FinishDate.Year
+                            && StartDate.Month == FinishDate.Month
+                            && StartDate.Day == FinishDate.Day;
+
+    public string DayPeriod => IsOneDay ? $"{StartDate:dd.MM.yyyy}" : $"{StartDate:dd.MM.yyyy} — {FinishDate:dd.MM.yyyy}";
     
     public DatePeriod(DateTime startDate, DateTime finishDate, string rawValue)
     {

@@ -9,6 +9,7 @@ using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
+using secretary.telegram.models;
 using secretary.telegram.sessions;
 using secretary.telegram.utils;
 using secretary.yandex.mail;
@@ -145,7 +146,7 @@ public class SendDocumentCommandTests
                         data.Attachments.First().Path == "timeoff.docx" &&
                         data.Attachments.First().FileName == "Заявление.docx" &&
                         data.Attachments.First().ContentType.MediaType == "application" &&
-                        data.Attachments.First().ContentType.MediaSubtype == "vnd.openxmlformats-officedocument.wordprocessingml.document")
+                        data.Attachments.First().ContentType.MediaSubtype == "msword")
                 )
             );
         
@@ -209,5 +210,25 @@ public class SendDocumentCommandTests
         ));
         
         _cacheService.Verify(target => target.DeleteEntity<TimeOffCache>(2517));
+    }
+
+    [Test]
+    public void ShouldGetNameWithPeriodTheme()
+    {
+        var user = new User()
+        {
+            Name = "Name",
+            Email = "Email"
+        };
+
+        var cache = new TimeOffCache()
+        {
+            FilePath = "FilePath",
+            Period = new DatePeriod(new DateTime(2022, 09, 08), new DateTime(2022, 09, 12), ""),
+        };
+
+        var result = _command.GetMailMessage(user, new Email[0], cache);
+        
+        Assert.That(result.Theme, Is.EqualTo("Name [Отгул 08.09.2022 — 12.09.2022]"));
     }
 }

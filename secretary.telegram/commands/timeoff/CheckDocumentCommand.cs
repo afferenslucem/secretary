@@ -28,7 +28,7 @@ public class CheckDocumentCommand : Command
         var path = Creator.Create(data);
         cache.FilePath = path;
 
-        var fileNameParts = new[] { user.Name, data.PeriodYear, "Отгул.docx" };
+        var fileNameParts = new[] { user.Name, cache.Period!.DayPeriod.Replace(" ", ""), "Отгул.docx" };
         var fileName = string.Join('-', fileNameParts).Replace(' ', '-');
 
         await CacheService.SaveEntity(cache);
