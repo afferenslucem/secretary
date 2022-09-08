@@ -54,7 +54,7 @@ public class CheckDocumentCommandTests
         await _command.Execute();
         
         _client.Verify(target => target.SendMessage(2517, "Проверьте документ"));
-        _client.Verify(target => target.SendDocument(2517, "timeoff-path.docx", "Александр-Пушкин-08.12.2022-Отгул.docx"));
+        _client.Verify(target => target.SendDocument(2517, "timeoff-path.docx", "Заявление на отгул.docx"));
         _client.Verify(target => target.SendMessageWithKeyBoard(2517, "Отправить заявление?", new [] {"Да", "Нет"}));
         _cacheService.Verify(
             target => target.SaveEntity(
@@ -67,21 +67,5 @@ public class CheckDocumentCommandTests
                 It.IsAny<short>()
             )
         );
-    }
-    
-    [Test]
-    public async Task ShouldSendDocumentWithPeriodName()
-    {
-        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(2517)).ReturnsAsync(new TimeOffCache() { Period =
-            new DatePeriodParser().Parse("с 9:00 08.12.2022 до 13:00 09.12.2022")});
-        
-        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { Name = "Александр Пушкин" } );
-        _creator.Setup(target => target.Create(It.IsAny<TimeOffData>())).Returns("timeoff-path.docx");
-
-        _context.Message = "Да";
-        
-        await _command.Execute();
-        
-        _client.Verify(target => target.SendDocument(2517, "timeoff-path.docx", "Александр-Пушкин-08.12.2022—09.12.2022-Отгул.docx"));
     }
 }

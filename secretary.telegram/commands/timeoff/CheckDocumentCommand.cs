@@ -28,12 +28,9 @@ public class CheckDocumentCommand : Command
         var path = Creator.Create(data);
         cache.FilePath = path;
 
-        var fileNameParts = new[] { user.Name, cache.Period!.DayPeriod.Replace(" ", ""), "Отгул.docx" };
-        var fileName = string.Join('-', fileNameParts).Replace(' ', '-');
-
         await CacheService.SaveEntity(cache);
         await TelegramClient.SendMessage("Проверьте документ");
-        await TelegramClient.SendDocument(path, fileName);
+        await TelegramClient.SendDocument(path, "Заявление на отгул.docx");
         await TelegramClient.SendMessageWithKeyBoard("Отправить заявление?", new [] {"Да", "Нет"});
     }
 }
