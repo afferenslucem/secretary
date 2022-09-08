@@ -45,7 +45,7 @@ public class NullCommandTests
         
         await this._command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Извините, я не понял\r\nОтправьте команду"));
+        this._client.Verify(target => target.SendMessage(2517, "Извините, я не понял\nОтправьте команду"));
     }
     
     [Test]

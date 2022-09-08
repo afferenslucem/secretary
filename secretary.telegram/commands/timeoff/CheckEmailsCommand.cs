@@ -13,13 +13,13 @@ public class CheckEmailsCommand : Command
         var emailsPrints = cache.Emails
             .Select(item => item.DisplayName != null ? $"{item.Address} ({item.DisplayName})" : item.Address);
 
-        var emailTable = string.Join("\r\n", emailsPrints);
+        var emailTable = string.Join("\n", emailsPrints);
 
-        var message = "Заявление будет отправлено на следующие адреса:\r\n" +
-                      "<code>\r\n" +
+        var message = "Заявление будет отправлено на следующие адреса:\n" +
+                      "<code>\n" +
                       $"{emailTable}" +
-                      "</code>\r\n" +
-                      "\r\n" +
+                      "</code>\n" +
+                      "\n" +
                       "Все верно?";
         
         await TelegramClient.SendMessageWithKeyBoard(message, new [] { "Верно", "Нет, нужно поправить" });

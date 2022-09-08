@@ -58,13 +58,13 @@ public class CheckEmailsCommandTests
         await _command.Execute();
         
         _client.Verify(target => target.SendMessageWithKeyBoard(2517, 
-            "Заявление будет отправлено на следующие адреса:\r\n" +
-            "<code>\r\n" +
-            "a.pushkin@infinnity.ru (Александр Пушкин)\r\n" +
-            "s.esenin@infinnity.ru (Сергей Есенин)\r\n" +
+            "Заявление будет отправлено на следующие адреса:\n" +
+            "<code>\n" +
+            "a.pushkin@infinnity.ru (Александр Пушкин)\n" +
+            "s.esenin@infinnity.ru (Сергей Есенин)\n" +
             "v.mayakovskii@infinnity.ru" +
-            "</code>\r\n" +
-            "\r\n" +
+            "</code>\n" +
+            "\n" +
             "Все верно?",
             new [] { "Верно", "Нет, нужно поправить" }));
     }

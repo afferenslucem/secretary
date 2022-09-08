@@ -40,8 +40,8 @@ public class EnterJobTitleCommandTests
     {
         await this._command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Введите вашу должность в именительном падеже.\r\n" +
-                                                               "Так она будут указана в подписи письма.\r\n" +
+        this._client.Verify(target => target.SendMessage(2517, "Введите вашу должность в именительном падеже.\n" +
+                                                               "Так она будут указана в подписи письма.\n" +
                                                                @"Например: С уважением, <i>поэт</i> Александр Пушкин"));
     }
     

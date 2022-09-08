@@ -43,8 +43,8 @@ public class EnterJobTitleGenitiveCommandTests
     {
         await this._command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Введите вашу должность в родительном падеже.\r\n" +
-                                                              "Так она будут указана в графе \"от кого\".\r\n" +
+        this._client.Verify(target => target.SendMessage(2517, "Введите вашу должность в родительном падеже.\n" +
+                                                              "Так она будут указана в графе \"от кого\".\n" +
                                                               @"Например: От <i>поэта</i> Пушкина Александра Сергеевича"));
     }
     

@@ -7,8 +7,8 @@ public class EnterNameGenitiveCommand : Command
 {
     public override Task Execute()
     {
-        return TelegramClient.SendMessage("Введите ваши ФИО в родительном падеже.\r\n" +
-                                          "Так они будут указаны в отправляемом документе в графе \"от кого\".\r\n" +
+        return TelegramClient.SendMessage("Введите ваши ФИО в родительном падеже.\n" +
+                                          "Так они будут указаны в отправляемом документе в графе \"от кого\".\n" +
                                           @"Например: От <i>Пушкина Александра Сергеевича</i>");
     }
 

@@ -42,8 +42,8 @@ public class EnterNameCommandTests
 
         await this._command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Введите ваши имя и фамилию в именительном падеже.\r\n" +
-                                                              "Так они будут указаны в почтовом ящике, с которого будет отправляться письмо.\r\n" +
+        this._client.Verify(target => target.SendMessage(2517, "Введите ваши имя и фамилию в именительном падеже.\n" +
+                                                              "Так они будут указаны в почтовом ящике, с которого будет отправляться письмо.\n" +
                                                               @"Например: <i>Александр Пушкин</i>"));
     }
     

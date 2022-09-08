@@ -11,8 +11,8 @@ public class EnterJobTitleGenitiveCommand : Command
     private readonly ILogger<EnterJobTitleGenitiveCommand> _logger = LogPoint.GetLogger<EnterJobTitleGenitiveCommand>();
     public override Task Execute()
     {
-        return TelegramClient.SendMessage("Введите вашу должность в родительном падеже.\r\n" +
-                                          "Так она будут указана в графе \"от кого\".\r\n" +
+        return TelegramClient.SendMessage("Введите вашу должность в родительном падеже.\n" +
+                                          "Так она будут указана в графе \"от кого\".\n" +
                                           @"Например: От <i>поэта</i> Пушкина Александра Сергеевича");
     }
 

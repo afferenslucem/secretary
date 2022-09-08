@@ -14,10 +14,10 @@ public class StartCommand: Command
         _logger.LogInformation($"{ChatId}: Started work");
 
         await TelegramClient.SendMessage(
-            "Добро пожаловать!\r\n" +
-            "\r\n" +
-            "Перед началом работы вам необходимо:\r\n" +
-            "/registeruser – зарегистрироваться\r\n" +
+            "Добро пожаловать!\n" +
+            "\n" +
+            "Перед началом работы вам необходимо:\n" +
+            "/registeruser – зарегистрироваться\n" +
             "/registermail – зарегистрировать рабочую почту");
     }
 }

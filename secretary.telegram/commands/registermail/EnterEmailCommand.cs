@@ -13,7 +13,7 @@ public class EnterEmailCommand : Command
     {
         _logger.LogInformation($"{ChatId}: started register mail");
         
-        return TelegramClient.SendMessage("Введите вашу почту, с которой вы отправляете заявления.\r\n" +
+        return TelegramClient.SendMessage("Введите вашу почту, с которой вы отправляете заявления.\n" +
                                           @"Например: <i>a.pushkin@infinnity.ru</i>");
     }
 
@@ -39,8 +39,8 @@ public class EnterEmailCommand : Command
 
         if (!domainAllowed)
         {
-            await TelegramClient.SendMessage("Некорректный домен почты.\r\n" +
-                                             "Бот доступен только для сотрудников Infinnity Solutions.\r\n" +
+            await TelegramClient.SendMessage("Некорректный домен почты.\n" +
+                                             "Бот доступен только для сотрудников Infinnity Solutions.\n" +
                                              "Введите вашу рабочую почту");
             throw new IncorrectFormatException();
         }

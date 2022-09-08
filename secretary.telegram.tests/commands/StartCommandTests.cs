@@ -41,10 +41,10 @@ public class StartCommandTests
     {
         await this._command.Execute();
 
-        this._client.Verify(target => target.SendMessage(2517, "Добро пожаловать!\r\n" +
-                                                               "\r\n" +
-                                                               "Перед началом работы вам необходимо:\r\n" +
-                                                               "/registeruser – зарегистрироваться\r\n" +
+        this._client.Verify(target => target.SendMessage(2517, "Добро пожаловать!\n" +
+                                                               "\n" +
+                                                               "Перед началом работы вам необходимо:\n" +
+                                                               "/registeruser – зарегистрироваться\n" +
                                                                "/registermail – зарегистрировать рабочую почту"));
     }
 

@@ -13,8 +13,8 @@ public class EnterNameCommand : Command
     {
         _logger.LogInformation($"{ChatId}: Started register user");
         
-        return TelegramClient.SendMessage("Введите ваши имя и фамилию в именительном падеже.\r\n" +
-                                          "Так они будут указаны в почтовом ящике, с которого будет отправляться письмо.\r\n" +
+        return TelegramClient.SendMessage("Введите ваши имя и фамилию в именительном падеже.\n" +
+                                          "Так они будут указаны в почтовом ящике, с которого будет отправляться письмо.\n" +
                                           @"Например: <i>Александр Пушкин</i>");
     }
 

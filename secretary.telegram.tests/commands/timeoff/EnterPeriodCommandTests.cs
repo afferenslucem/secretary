@@ -49,10 +49,12 @@ public class EnterPeriodCommandTests
         
         await this._command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Введите период отгула в формате <strong>DD.MM.YYYY[ с HH:mm до HH:mm]</strong>\r\n" +
-                                                              "Например: <i>26.04.2020 c 9:00 до 13:00</i>\r\n" +
-                                                              "Или: <i>26.04.2020</i>, если вы берете отгул на целый день\r\n" +
-                                                              "В таком виде это будет вставлено в документ"));
+        this._client.Verify(target => target.SendMessage(2517, "Введите период отгула в одном из форматов:\n\n" +
+                                                               "Если отгул на один день:\n<strong>DD.MM.YYYY[ с HH:mm до HH:mm]</strong>\n" +
+                                                               "Например: <i>26.04.2020 c 9:00 до 13:00</i>\n\n" +
+                                                               "Или, если отгул на несколько дней:\n<strong>с [HH:mm ]DD.MM.YYYY до [HH:mm ]DD.MM.YYYY</strong>\n" +
+                                                               "Например: <i>с 9:00 26.04.2020 до 13:00 28.04.2022</i>\n\n" +
+                                                               "В таком виде это будет вставлено в документ"));
     }
     
     [Test]

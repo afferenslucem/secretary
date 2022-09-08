@@ -61,7 +61,7 @@ public class EnterCodeCommandTests
         
         await this._command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Пожалуйста, <strong>УБЕДИТЕСЬ</strong>, что вы авторизуетесь в рабочей почте!\r\n" +
+        this._client.Verify(target => target.SendMessage(2517, "Пожалуйста, <strong>УБЕДИТЕСЬ</strong>, что вы авторизуетесь в рабочей почте!\n" +
                                                               "Введите этот код: <code>code</code> в поле ввода по этой ссылке: url. Регистрация может занять пару минут."));
     }
         
@@ -75,7 +75,7 @@ public class EnterCodeCommandTests
         await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, 
-            "При запросе токена для авторизации произошла ошибка:(\r\n" +
+            "При запросе токена для авторизации произошла ошибка:(\n" +
             "Попробуйте через пару минут, если не сработает, то обратитесь по вот этому адресу @hrodveetnir"));
     }
     
@@ -200,7 +200,7 @@ public class EnterCodeCommandTests
         await this._command.Execute();
         
         this._client.Verify(target => target.SendMessage(2517, 
-            "При запросе токена для авторизации произошла ошибка:(\r\n" +
+            "При запросе токена для авторизации произошла ошибка:(\n" +
             "Попробуйте через пару минут, если не сработает, то обратитесь по вот этому адресу @hrodveetnir"));
     }
 }

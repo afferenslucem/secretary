@@ -96,12 +96,12 @@ public class SetEmailsCommandTests
 
         _client.Verify(target => target.SendMessage(
             2517,
-            "Отправьте список адресов для рассылки в формате:\r\n" +
+            "Отправьте список адресов для рассылки в формате:\n" +
             "<code>" +
-            "a.pushkin@infinnity.ru (Александр Пушкин)\r\n" +
-            "s.esenin@infinnity.ru (Сергей Есенин)\r\n" +
-            "v.mayakovskii@infinnity.ru\r\n" +
-            "</code>\r\n\r\n" +
+            "a.pushkin@infinnity.ru (Александр Пушкин)\n" +
+            "s.esenin@infinnity.ru (Сергей Есенин)\n" +
+            "v.mayakovskii@infinnity.ru\n" +
+            "</code>\n\n" +
             "Если вы укажете адрес без имени в скобках, то в имени отправителя будет продублированпочтовый адрес"
         ));
     }
@@ -130,13 +130,13 @@ public class SetEmailsCommandTests
 
         _client.Verify(target => target.SendMessageWithKeyBoard(
             2517,
-            "В прошлый раз вы сделали рассылку на эти адреса:\r\n" +
-            "<code>\r\n" +
-            "a.pushkin@infinnity.ru (Александр Пушкин)\r\n" +
-            "s.esenin@infinnity.ru (Сергей Есенин)\r\n" +
+            "В прошлый раз вы сделали рассылку на эти адреса:\n" +
+            "<code>\n" +
+            "a.pushkin@infinnity.ru (Александр Пушкин)\n" +
+            "s.esenin@infinnity.ru (Сергей Есенин)\n" +
             "v.mayakovskii@infinnity.ru" +
-            "</code>\r\n" +
-            "\r\n" +
+            "</code>\n" +
+            "\n" +
             "Повторить?",
             new []{ "Повторить" }
         ));
@@ -193,7 +193,7 @@ public class SetEmailsCommandTests
         var step = await this._command.OnMessage();
 
         _client.Verify(target => target.SendMessage(2517, $"Почтовый адрес <code>s.esenin@infinnityru (Сергей Есенин)</code>" +
-            " имеет некорректный формат.\r\n" +
+            " имеет некорректный формат.\n" +
             "Поправьте его и отправте список адресов еще раз."));
         
         Assert.That(step, Is.EqualTo(0));

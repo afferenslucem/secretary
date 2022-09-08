@@ -55,9 +55,9 @@ public class MeCommandTests
         await _command.Execute();
         
         _client.Verify(target => target.SendMessage(2517, 
-                "Вы незарегистрированный пользователь\r\n\r\n" +
-                "Для корректной работы вам необходимо выполнить следующие команды:\r\n" +
-                "/registeruser\r\n" +
+                "Вы незарегистрированный пользователь\n\n" +
+                "Для корректной работы вам необходимо выполнить следующие команды:\n" +
+                "/registeruser\n" +
                 "/registermail"
             )
         );
@@ -77,11 +77,11 @@ public class MeCommandTests
         await _command.Execute();
         
         _client.Verify(target => target.SendMessage(2517, 
-                "<strong>Имя:</strong> Александр Пушкин\r\n" +
-                "<strong>Имя в Р.П.:</strong> Пушкина Александра Сергеевича\r\n" +
-                "<strong>Должность:</strong> поэт\r\n" +
-                "<strong>Должность в Р.П.:</strong> поэта\r\n" +
-                "<strong>Почта:</strong> не задана\r\n\r\n" +
+                "<strong>Имя:</strong> Александр Пушкин\n" +
+                "<strong>Имя в Р.П.:</strong> Пушкина Александра Сергеевича\n" +
+                "<strong>Должность:</strong> поэт\n" +
+                "<strong>Должность в Р.П.:</strong> поэта\n" +
+                "<strong>Почта:</strong> не задана\n\n" +
                 "У вас нет токена для почты. Выполните команду /registermail"));
     }
 
@@ -97,11 +97,11 @@ public class MeCommandTests
         await _command.Execute();
         
         _client.Verify(target => target.SendMessage(2517, 
-            "<strong>Имя:</strong> не задано\r\n" +
-            "<strong>Имя в Р.П.:</strong> не задано\r\n" +
-            "<strong>Должность:</strong> не задана\r\n" +
-            "<strong>Должность в Р.П.:</strong> не задана\r\n" +
-            "<strong>Почта:</strong> a.pushkin@infinnity.ru\r\n\r\n" +
+            "<strong>Имя:</strong> не задано\n" +
+            "<strong>Имя в Р.П.:</strong> не задано\n" +
+            "<strong>Должность:</strong> не задана\n" +
+            "<strong>Должность в Р.П.:</strong> не задана\n" +
+            "<strong>Почта:</strong> a.pushkin@infinnity.ru\n\n" +
             "У вас не заданы данные о пользователе. Выполните команду /registeruser"));
     }
 
@@ -121,10 +121,10 @@ public class MeCommandTests
         await _command.Execute();
         
         _client.Verify(target => target.SendMessage(2517, 
-            "<strong>Имя:</strong> Александр Пушкин\r\n" +
-            "<strong>Имя в Р.П.:</strong> Пушкина Александра Сергеевича\r\n" +
-            "<strong>Должность:</strong> поэт\r\n" +
-            "<strong>Должность в Р.П.:</strong> поэта\r\n" +
+            "<strong>Имя:</strong> Александр Пушкин\n" +
+            "<strong>Имя в Р.П.:</strong> Пушкина Александра Сергеевича\n" +
+            "<strong>Должность:</strong> поэт\n" +
+            "<strong>Должность в Р.П.:</strong> поэта\n" +
             "<strong>Почта:</strong> a.pushkin@infinnity.ru"));
     }
 

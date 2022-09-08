@@ -39,9 +39,9 @@ public class MeCommand: Command
 
     private Task ReturnUnregisteredUser()
     {
-        return TelegramClient.SendMessage("Вы незарегистрированный пользователь\r\n\r\n" +
-                                          "Для корректной работы вам необходимо выполнить следующие команды:\r\n" +
-                                          "/registeruser\r\n" +
+        return TelegramClient.SendMessage("Вы незарегистрированный пользователь\n\n" +
+                                          "Для корректной работы вам необходимо выполнить следующие команды:\n" +
+                                          "/registeruser\n" +
                                           "/registermail");
     }
 
@@ -49,7 +49,7 @@ public class MeCommand: Command
     {
         var userInfo = GetUserInfo(user);
         
-        return TelegramClient.SendMessage($"{userInfo}\r\n\r\n" +
+        return TelegramClient.SendMessage($"{userInfo}\n\n" +
                                            "У вас нет токена для почты. Выполните команду /registermail");
     }
 
@@ -57,7 +57,7 @@ public class MeCommand: Command
     {
         var userInfo = GetUserInfo(user);
         
-        return TelegramClient.SendMessage($"{userInfo}\r\n\r\n" +
+        return TelegramClient.SendMessage($"{userInfo}\n\n" +
                                            "У вас не заданы данные о пользователе. Выполните команду /registeruser");
     }
 
@@ -70,10 +70,10 @@ public class MeCommand: Command
 
     private string GetUserInfo(User user)
     {
-        var result = $"<strong>Имя:</strong> {user.Name ?? "не задано"}\r\n" +
-                   $"<strong>Имя в Р.П.:</strong> {user.NameGenitive ?? "не задано"}\r\n" +
-                   $"<strong>Должность:</strong> {user.JobTitle ?? "не задана"}\r\n" +
-                   $"<strong>Должность в Р.П.:</strong> {user.JobTitleGenitive ?? "не задана"}\r\n" +
+        var result = $"<strong>Имя:</strong> {user.Name ?? "не задано"}\n" +
+                   $"<strong>Имя в Р.П.:</strong> {user.NameGenitive ?? "не задано"}\n" +
+                   $"<strong>Должность:</strong> {user.JobTitle ?? "не задана"}\n" +
+                   $"<strong>Должность в Р.П.:</strong> {user.JobTitleGenitive ?? "не задана"}\n" +
                    $"<strong>Почта:</strong> {user.Email ?? "не задана"}";
 
         return result;

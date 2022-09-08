@@ -93,9 +93,9 @@ public class TimeOffCommandTests
         
         Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
         
-        _client.Verify(target => target.SendMessage(2517, "Вы – незарегистрированный пользователь.\r\n\r\n" +
-                                                          "Выполните команды:\r\n" +
-                                                          "/registeruser\r\n" +
+        _client.Verify(target => target.SendMessage(2517, "Вы – незарегистрированный пользователь.\n\n" +
+                                                          "Выполните команды:\n" +
+                                                          "/registeruser\n" +
                                                           "/registermail"));
     }
 
@@ -108,7 +108,7 @@ public class TimeOffCommandTests
         
         Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
         
-        _client.Verify(target => target.SendMessage(2517, "У вас не зарегистрирована почта.\r\n" +
+        _client.Verify(target => target.SendMessage(2517, "У вас не зарегистрирована почта.\n" +
                                                           "Выполните команду: /registermail"));
     }
 
@@ -122,7 +122,7 @@ public class TimeOffCommandTests
         Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
         
         _client.Verify(target => target.SendMessage(2517, 
-            "У вас не заданы данные о пользователе.\r\n" +
+            "У вас не заданы данные о пользователе.\n" +
             "Выполните команду /registeruser"));
     }
     

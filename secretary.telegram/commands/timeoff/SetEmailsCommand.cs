@@ -36,12 +36,12 @@ public class SetEmailsCommand : Command
     public Task SendAskEmails()
     {
         return TelegramClient.SendMessage( 
-            "Отправьте список адресов для рассылки в формате:\r\n" +
+            "Отправьте список адресов для рассылки в формате:\n" +
             "<code>" +
-            "a.pushkin@infinnity.ru (Александр Пушкин)\r\n" +
-            "s.esenin@infinnity.ru (Сергей Есенин)\r\n" +
-            "v.mayakovskii@infinnity.ru\r\n" +
-            "</code>\r\n\r\n" +
+            "a.pushkin@infinnity.ru (Александр Пушкин)\n" +
+            "s.esenin@infinnity.ru (Сергей Есенин)\n" +
+            "v.mayakovskii@infinnity.ru\n" +
+            "</code>\n\n" +
             "Если вы укажете адрес без имени в скобках, то в имени отправителя будет продублированпочтовый адрес");
     }
 
@@ -50,13 +50,13 @@ public class SetEmailsCommand : Command
         var emailsPrints = emails
             .Select(item => item.DisplayName != null ? $"{item.Address} ({item.DisplayName})" : item.Address);
 
-        var emailTable = string.Join("\r\n", emailsPrints);
+        var emailTable = string.Join("\n", emailsPrints);
 
-        var message = "В прошлый раз вы сделали рассылку на эти адреса:\r\n" +
-                      "<code>\r\n" +
+        var message = "В прошлый раз вы сделали рассылку на эти адреса:\n" +
+                      "<code>\n" +
                       $"{emailTable}" +
-                      "</code>\r\n" +
-                      "\r\n" +
+                      "</code>\n" +
+                      "\n" +
                       "Повторить?";
         
         return TelegramClient.SendMessageWithKeyBoard(message, new [] { "Повторить" });
@@ -88,7 +88,7 @@ public class SetEmailsCommand : Command
         }
         catch (IncorrectEmailException e)
         {
-            await TelegramClient.SendMessage($"Почтовый адрес <code>{e.IncorrectEmail}</code> имеет некорректный формат.\r\n" +
+            await TelegramClient.SendMessage($"Почтовый адрес <code>{e.IncorrectEmail}</code> имеет некорректный формат.\n" +
                 "Поправьте его и отправте список адресов еще раз.");
 
             return ExecuteDirection.Retry;

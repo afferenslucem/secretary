@@ -12,7 +12,7 @@ public class NullCommand: Command
 
         if (session == null)
         {
-            await TelegramClient.SendMessage("Извините, я не понял\r\nОтправьте команду");
+            await TelegramClient.SendMessage("Извините, я не понял\nОтправьте команду");
 
             return;
         }

@@ -7,8 +7,8 @@ public class EnterJobTitleCommand : Command
 {
     public override Task Execute()
     {
-        return TelegramClient.SendMessage("Введите вашу должность в именительном падеже.\r\n" +
-                                          "Так она будут указана в подписи письма.\r\n" +
+        return TelegramClient.SendMessage("Введите вашу должность в именительном падеже.\n" +
+                                          "Так она будут указана в подписи письма.\n" +
                                           @"Например: С уважением, <i>поэт</i> Александр Пушкин");
     }
 
