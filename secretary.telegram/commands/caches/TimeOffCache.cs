@@ -1,11 +1,12 @@
 ﻿using secretary.documents.creators;
 using secretary.storage.models;
+using secretary.telegram.models;
 
 namespace secretary.telegram.commands.caches;
 
 public class TimeOffCache: IEquatable<TimeOffCache>
 {
-    public string? Period { get; set; }
+    public DatePeriod? Period { get; set; }
     public string? Reason { get; set; }
     public string? WorkingOff { get; set; }
     
@@ -17,7 +18,7 @@ public class TimeOffCache: IEquatable<TimeOffCache>
     {
         return new TimeOffData()
         {
-            Period = this.Period,
+            Period = this.Period!.RawValue,
             Reason = this.Reason,
             WorkingOff = this.WorkingOff,
         };
@@ -30,8 +31,10 @@ public class TimeOffCache: IEquatable<TimeOffCache>
 
         if (Emails == null && other.Emails != null) return false;
         if (Emails != null && other.Emails == null) return false;
+        if (Period == null && other.Period != null) return false;
+        if (Period != null && other.Period == null) return false;
         
-        return Period == other.Period 
+        return (Period == other.Period || Period.Equals(other.Period)) 
                && Reason == other.Reason 
                && WorkingOff == other.WorkingOff 
                && (Emails == other.Emails || Emails!.SequenceEqual(other.Emails!))

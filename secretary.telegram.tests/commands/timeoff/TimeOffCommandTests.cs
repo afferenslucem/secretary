@@ -8,7 +8,9 @@ using secretary.telegram.commands;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
 using secretary.telegram.exceptions;
+using secretary.telegram.models;
 using secretary.telegram.sessions;
+using secretary.telegram.utils;
 using secretary.yandex.mail;
 
 namespace secretary.telegram.tests.commands.timeoff;
@@ -129,7 +131,7 @@ public class TimeOffCommandTests
     {
         _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(new TimeOffCache()
         {
-            Period = "05.09.2022",
+            Period = new DatePeriodParser().Parse("05.09.2022"),
             WorkingOff = "Отаботаю",
             Reason = "Ну надо",
         });
@@ -173,7 +175,7 @@ public class TimeOffCommandTests
     {
         _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(new TimeOffCache()
         {
-            Period = "05.09.2022",
+            Period = new DatePeriodParser().Parse("05.09.2022"),
             WorkingOff = "Отаботаю",
             Reason = "Ну надо",
         });
@@ -215,7 +217,7 @@ public class TimeOffCommandTests
     {
         _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(new TimeOffCache()
         {
-            Period = "05.09.2022",
+            Period = new DatePeriodParser().Parse("05.09.2022"),
             WorkingOff = "Отаботаю",
             Reason = "Ну надо",
         });
@@ -264,7 +266,7 @@ public class TimeOffCommandTests
     {
         _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(new TimeOffCache()
         {
-            Period = "05.09.2022",
+            Period = new DatePeriodParser().Parse("05.09.2022"),
             WorkingOff = "Отаботаю",
             Reason = "Ну надо",
         });

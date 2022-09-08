@@ -6,6 +6,7 @@ using secretary.telegram.commands;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
 using secretary.telegram.exceptions;
+using secretary.telegram.utils;
 
 namespace secretary.telegram.tests.commands.subcommands.timeoff;
 
@@ -61,7 +62,8 @@ public class EnterPeriodCommandTests
       
         await this._command.OnMessage();
         
-        _cacheService.Verify(target => target.SaveEntity(2517, new TimeOffCache() { Period = "16.08.2022 c 13:00 до 17:00"}, It.IsAny<short>()), Times.Once);
+        _cacheService.Verify(target => target.SaveEntity(2517, new TimeOffCache() { Period =
+            new DatePeriodParser().Parse("16.08.2022 c 13:00 до 17:00")}, It.IsAny<short>()), Times.Once);
     }
     
     [Test]

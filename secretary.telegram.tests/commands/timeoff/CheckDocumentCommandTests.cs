@@ -6,6 +6,7 @@ using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
+using secretary.telegram.utils;
 
 namespace secretary.telegram.tests.commands.subcommands.timeoff;
 
@@ -43,7 +44,8 @@ public class CheckDocumentCommandTests
     [Test]
     public async Task ShouldSendCheckDocumentCommand()
     {
-        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(2517)).ReturnsAsync(new TimeOffCache() { Period = "08.12.2022 с 9:00 до 13:00"});
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(2517)).ReturnsAsync(new TimeOffCache() { Period =
+            new DatePeriodParser().Parse("08.12.2022 с 9:00 до 13:00")});
         
         _client.Setup(target => target.SendMessage(It.IsAny<long>(), It.IsAny<string>()));
         _client.Setup(target => target.SendDocument(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<string>()));
@@ -62,7 +64,7 @@ public class CheckDocumentCommandTests
                 2517, 
                 new TimeOffCache()
                 {
-                    Period = "08.12.2022 с 9:00 до 13:00",
+                    Period = new DatePeriodParser().Parse("08.12.2022 с 9:00 до 13:00"),
                     FilePath = "timeoff-path.docx"
                 },
                 It.IsAny<short>()

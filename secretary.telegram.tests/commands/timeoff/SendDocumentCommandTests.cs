@@ -10,6 +10,7 @@ using secretary.telegram.commands;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
 using secretary.telegram.sessions;
+using secretary.telegram.utils;
 using secretary.yandex.mail;
 
 namespace secretary.telegram.tests.commands.timeoff;
@@ -94,7 +95,7 @@ public class SendDocumentCommandTests
 
         _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(new TimeOffCache()
         {
-            Period = "28.08.2022",
+            Period = new DatePeriodParser().Parse("28.08.2022"),
             FilePath = "timeoff.docx"
         });
 

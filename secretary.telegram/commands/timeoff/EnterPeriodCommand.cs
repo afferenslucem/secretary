@@ -2,6 +2,7 @@
 using secretary.logging;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.validation;
+using secretary.telegram.utils;
 
 namespace secretary.telegram.commands.timeoff;
 
@@ -25,7 +26,9 @@ public class EnterPeriodCommand : Command
     {
         var cache = new TimeOffCache();
 
-        cache.Period = Message;
+        var period = new DatePeriodParser().Parse(Message);
+
+        cache.Period = period;
 
         await CacheService.SaveEntity(cache);
         

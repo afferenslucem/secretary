@@ -3,6 +3,7 @@ using secretary.cache;
 using secretary.telegram.commands;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
+using secretary.telegram.utils;
 
 namespace secretary.telegram.tests.commands.subcommands.timeoff;
 
@@ -48,7 +49,8 @@ public class EnterReasonCommandTests
     [Test]
     public async Task ShouldSetReasonToCommand()
     {
-        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(2517)).ReturnsAsync(new TimeOffCache() { Period = "05.09.2022" });
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(2517)).ReturnsAsync(new TimeOffCache() { Period =
+            new DatePeriodParser().Parse("05.09.2022") });
         
         _context.Message = "Поеду заниматься ремонтом";
 
@@ -57,7 +59,7 @@ public class EnterReasonCommandTests
         _cacheService.Verify(target => target.SaveEntity(2517, 
             new TimeOffCache()
             {
-                Period = "05.09.2022", 
+                Period = new DatePeriodParser().Parse("05.09.2022"), 
                 Reason = "Поеду заниматься ремонтом"
             }, It.IsAny<short>()), Times.Once);
     }

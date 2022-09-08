@@ -7,6 +7,7 @@ using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
 using secretary.telegram.exceptions;
 using secretary.telegram.sessions;
+using secretary.telegram.utils;
 
 namespace secretary.telegram.tests.commands.subcommands.timeoff;
 
@@ -155,7 +156,7 @@ public class SetEmailsCommandTests
     public async Task ShouldParseEmails()
     {
         _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>()))
-            .ReturnsAsync(new TimeOffCache() { Period = "04.09.2022" });
+            .ReturnsAsync(new TimeOffCache() { Period = new DatePeriodParser().Parse("04.09.2022") });
         
         _context.Message = "a.pushkin@infinnity.ru (Александр Пушкин)\n" +
                            "s.esenin@infinnity.ru (Сергей Есенин)\n" +
@@ -172,7 +173,7 @@ public class SetEmailsCommandTests
         
         _cacheService.Verify(target => target.SaveEntity(2517, new TimeOffCache()
         {
-            Period = "04.09.2022",
+            Period = new DatePeriodParser().Parse("04.09.2022"),
             Emails = expectedEmails,
         }, It.IsAny<short>()), Times.Once);
         
@@ -183,7 +184,7 @@ public class SetEmailsCommandTests
     public async Task ShouldReturnIncorrectEmailFormat()
     {
         _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>()))
-            .ReturnsAsync(new TimeOffCache() { Period = "04.09.2022" });
+            .ReturnsAsync(new TimeOffCache() { Period = new DatePeriodParser().Parse("04.09.2022") });
         
         _context.Message = "a.pushkin@infinnity.ru (Александр Пушкин)\n" +
                            "s.esenin@infinnityru (Сергей Есенин)\n" +
