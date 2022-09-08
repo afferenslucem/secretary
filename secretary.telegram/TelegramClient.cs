@@ -13,12 +13,12 @@ namespace secretary.telegram;
 
 public class TelegramClient: ITelegramClient
 {
-    private ILogger<TelegramClient> _logger = LogPoint.GetLogger<TelegramClient>();
+    private readonly ILogger<TelegramClient> _logger = LogPoint.GetLogger<TelegramClient>();
     public event MessageReceive? OnMessage;
     
-    private TelegramBotClient _botClient;
+    private readonly TelegramBotClient _botClient;
     
-    private CancellationToken _cancellationToken;
+    private readonly CancellationToken _cancellationToken;
 
     public TelegramClient(string token, CancellationToken cancellationToken)
     {
@@ -60,7 +60,7 @@ public class TelegramClient: ITelegramClient
         
         var task = this.OnMessage?.Invoke(botMessage);
 
-        return task == null ? Task.CompletedTask : task;
+        return task ?? Task.CompletedTask;
     }
 
     Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
@@ -85,11 +85,12 @@ public class TelegramClient: ITelegramClient
     {
         var buttons = choices.Select(text => new KeyboardButton(text)).ToArray();
         
-        var keyboard = new ReplyKeyboardMarkup(buttons);
+        var keyboard = new ReplyKeyboardMarkup(buttons)
+        {
+            ResizeKeyboard = true,
+            OneTimeKeyboard = true
+        };
 
-        keyboard.ResizeKeyboard = true;
-        keyboard.OneTimeKeyboard = true;
-        
         return this._botClient.SendTextMessageAsync(chatId, message, parseMode: ParseMode.Html, replyMarkup: keyboard, cancellationToken: this._cancellationToken);
     }
 
