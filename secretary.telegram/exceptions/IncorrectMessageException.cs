@@ -1,6 +1,6 @@
 namespace secretary.telegram.exceptions;
 
-public class IncorrectFormatException: Exception
+public class IncorrectMessageException: Exception
 {
     
 }

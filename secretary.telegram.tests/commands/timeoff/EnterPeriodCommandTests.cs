@@ -69,11 +69,33 @@ public class EnterPeriodCommandTests
     }
     
     [Test]
+    public void ShouldThrowIncorrectMessageExceptionForIncorrectDate()
+    {
+        _context.Message = "16.18.2022";
+      
+        Assert.ThrowsAsync<IncorrectMessageException>(() => _command.OnMessage());
+        
+        _client.Verify(target => target.SendMessage(2517, "Неверный формат даты отгула!\n" +
+                                                          "Попробуйте еще раз"));
+    }
+    
+    [Test]
+    public void ShouldThrowIncorrectMessageExceptionForNonDateMessage()
+    {
+        _context.Message = "hello";
+      
+        Assert.ThrowsAsync<IncorrectMessageException>(() => _command.OnMessage());
+        
+        _client.Verify(target => target.SendMessage(2517, "Неверный формат даты отгула!\n" +
+                                                                                          "Попробуйте еще раз"));
+    }
+    
+    [Test]
     public void ShouldThrowExceptionForUnregisteredUser()
     {
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync((User?)null);
 
-        Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
+        Assert.ThrowsAsync<NonCompleteUserException>(() => _command.Execute());
     }
     
     [Test]
@@ -81,7 +103,7 @@ public class EnterPeriodCommandTests
     {
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { JobTitleGenitive = "" });
 
-        Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
+        Assert.ThrowsAsync<NonCompleteUserException>(() => _command.Execute());
     }
     
     [Test]
@@ -89,6 +111,6 @@ public class EnterPeriodCommandTests
     {
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { AccessToken = "" });
 
-        Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
+        Assert.ThrowsAsync<NonCompleteUserException>(() => _command.Execute());
     }
 }

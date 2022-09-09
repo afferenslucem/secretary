@@ -2,6 +2,7 @@
 using secretary.logging;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.validation;
+using secretary.telegram.exceptions;
 using secretary.telegram.utils;
 
 namespace secretary.telegram.commands.timeoff;
@@ -26,17 +27,40 @@ public class EnterPeriodCommand : Command
     
     public override async Task<int> OnMessage()
     {
-        var cache = new TimeOffCache();
+        try
+        {
+            var cache = new TimeOffCache();
 
-        var period = new DatePeriodParser().Parse(Message);
+            var period = new DatePeriodParser().Parse(Message);
 
-        cache.Period = period;
+            cache.Period = period;
 
-        await CacheService.SaveEntity(cache);
-        
-        return ExecuteDirection.RunNext;
+            await CacheService.SaveEntity(cache);
+
+            return ExecuteDirection.RunNext;
+        }
+        catch (DatePeriodParseException e)
+        {
+            await HandleIncorrectDate(e);
+
+            throw new IncorrectMessageException();
+        }
+        catch (FormatException e)
+        {
+            await HandleIncorrectDate(e);
+
+            throw new IncorrectMessageException();
+        }
     }
 
+    private async Task HandleIncorrectDate(Exception e)
+    {
+        _logger.LogWarning(e, "Could not parse period");
+
+        await TelegramClient.SendMessage("Неверный формат даты отгула!\n" +
+                                         "Попробуйте еще раз");
+    }
+    
     private async Task ValidateUser()
     {
         var user = await UserStorage.GetUser();

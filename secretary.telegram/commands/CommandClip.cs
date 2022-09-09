@@ -72,7 +72,7 @@ public class CommandClip
             _logger.LogInformation($"{context.ChatId}: Start execute command {secondPartCommand.GetType().Name}");
             await secondPartExecutor.Execute();
         }
-        catch (IncorrectFormatException e)
+        catch (IncorrectMessageException e)
         {
             _logger.LogWarning(e, $"Incorrect format of command {firstPartCommand.GetType().Name}: \"{context.Message}\"");
         }

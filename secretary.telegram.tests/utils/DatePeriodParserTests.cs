@@ -1,5 +1,7 @@
+using secretary.telegram.exceptions;
 using secretary.telegram.models;
 using secretary.telegram.utils;
+using FormatException = System.FormatException;
 
 namespace secretary.telegram.tests.utils;
 
@@ -75,5 +77,21 @@ public class DatePeriodParserTests
         var result = _parser.Parse(line);
         
         Assert.That(result, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void ShouldThrowDatePeriodParseException()
+    {
+        var line = "hello";
+
+        Assert.Throws<DatePeriodParseException>(() => _parser.Parse(line));
+    }
+
+    [Test]
+    public void ShouldThrowFormatException()
+    {
+        var line = "20.22.2022";
+
+        Assert.Throws<FormatException>(() => _parser.Parse(line));
     }
 }

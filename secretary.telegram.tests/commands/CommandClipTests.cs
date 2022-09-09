@@ -88,7 +88,7 @@ public class CommandClipTests
     {
         await _clip.Run(_context);
         
-        _secondState.Setup(target => target.ValidateMessage()).ThrowsAsync(new IncorrectFormatException());
+        _secondState.Setup(target => target.ValidateMessage()).ThrowsAsync(new IncorrectMessageException());
         
         Assert.That(_clip.RunIndex, Is.EqualTo(1));
     }

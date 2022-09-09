@@ -72,7 +72,7 @@ public class EnterEmailCommandTests
 
         _command.Context = _context;
         
-        Assert.ThrowsAsync<IncorrectFormatException>(async () => await this._command.ValidateMessage());
+        Assert.ThrowsAsync<IncorrectMessageException>(async () => await this._command.ValidateMessage());
         _client.Verify(target => target.SendMessage(2517, "Некорректный формат почты. Введите почту еще раз"));
     }
         
@@ -87,7 +87,7 @@ public class EnterEmailCommandTests
 
         _command.Context = _context;
         
-        Assert.ThrowsAsync<IncorrectFormatException>(async () => await this._command.ValidateMessage());
+        Assert.ThrowsAsync<IncorrectMessageException>(async () => await this._command.ValidateMessage());
         _client.Verify(target => target.SendMessage(2517, "Некорректный домен почты.\n" +
                                                           "Бот доступен только для сотрудников Infinnity Solutions.\n" +
                                                           "Введите вашу рабочую почту"));

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using secretary.telegram.exceptions;
 using secretary.telegram.models;
 
 namespace secretary.telegram.utils;
@@ -22,7 +23,7 @@ public class DatePeriodParser
             return ParsePeriod(dateMatches, period);
         }
 
-        return null!;
+        throw new DatePeriodParseException(period);
     }
 
     private DatePeriod ParseSingleDate(Match dateMatch, string raw)

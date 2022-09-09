@@ -32,7 +32,7 @@ public class EnterEmailCommand : Command
         if (!emailRegex.IsMatch(Message))
         {
             await TelegramClient.SendMessage("Некорректный формат почты. Введите почту еще раз");
-            throw new IncorrectFormatException();
+            throw new IncorrectMessageException();
         }
 
         var domainAllowed = YandexAuthenticator.IsUserDomainAllowed(Message);
@@ -42,7 +42,7 @@ public class EnterEmailCommand : Command
             await TelegramClient.SendMessage("Некорректный домен почты.\n" +
                                              "Бот доступен только для сотрудников Infinnity Solutions.\n" +
                                              "Введите вашу рабочую почту");
-            throw new IncorrectFormatException();
+            throw new IncorrectMessageException();
         }
     }
 }
