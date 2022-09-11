@@ -197,7 +197,10 @@ public class SendDocumentCommandTests
             .ThrowsAsync(exception);
 
         _command.Context = _context;
-        await _command.SendMail(null!);
+        await _command.SendMail(new SecretaryMailMessage()
+        {
+            Sender = new SecretaryMailAddress("", "")
+        });
         
         _client.Verify(target => target.SendSticker(
             2517, 
