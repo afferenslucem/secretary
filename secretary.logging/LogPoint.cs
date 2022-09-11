@@ -1,39 +1,43 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text;
 using secretary.configuration;
+using Serilog;
+using Serilog.Core;
 
 namespace secretary.logging;
 
 public class LogPoint
 {
-    private static ILoggerFactory _loggerFactory;
+    private static LoggerConfiguration _configuration;
 
     static LogPoint()
     {
-        _loggerFactory = LoggerFactory.Create(builder => Configure(builder));
+        _configuration = Configure();
+
+        Log.Logger = _configuration.CreateLogger();
     }
-
-    private static ILoggingBuilder Configure(ILoggingBuilder builder)
+    private static LoggerConfiguration Configure()
     {
-        builder.AddSimpleConsole(options =>
-        {
-            options.TimestampFormat = "[hh:mm:ss] ";
-        });
-
+        var template = "{Timestamp:HH:mm:ss} [{Level}] — {SourceContext} — {Message}{NewLine}{Exception}";
+        
+        var configuration = new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .WriteTo.Console(outputTemplate: template)
+            .WriteTo.File("logs\\logs.txt", rollingInterval: RollingInterval.Month, outputTemplate: template);
+        
         if (Config.Instance.Environment == "Develop")
         {
-            builder.AddDebug();
-            builder.SetMinimumLevel(LogLevel.Debug);
+            configuration.MinimumLevel.Debug();
         }
         else
         {
-            builder.SetMinimumLevel(LogLevel.Information);
+            configuration.MinimumLevel.Information();
         }
-
-        return builder;
+        
+        return configuration;
     }
     
-    public static ILogger<T> GetLogger<T>()
+    public static ILogger GetLogger<T>()
     {
-        return _loggerFactory.CreateLogger<T>();
+        return Log.Logger.ForContext<T>();
     }
 }

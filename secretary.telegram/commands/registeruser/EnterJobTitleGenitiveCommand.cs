@@ -1,14 +1,15 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
 using secretary.logging;
 using secretary.storage.models;
 using secretary.telegram.commands.caches;
 using secretary.telegram.exceptions;
+using Serilog;
 
 namespace secretary.telegram.commands.registeruser;
 
 public class EnterJobTitleGenitiveCommand : Command
 {
-    private readonly ILogger<EnterJobTitleGenitiveCommand> _logger = LogPoint.GetLogger<EnterJobTitleGenitiveCommand>();
+    private readonly ILogger _logger = LogPoint.GetLogger<EnterJobTitleGenitiveCommand>();
     public override Task Execute()
     {
         return TelegramClient.SendMessage("Введите вашу должность в родительном падеже.\n" +
@@ -35,7 +36,7 @@ public class EnterJobTitleGenitiveCommand : Command
 
             await TelegramClient.SendMessage("Ваш пользователь успешно сохранен");
 
-            _logger.LogInformation($"{ChatId}: registered user {user.Name}");
+            _logger.Information($"{ChatId}: registered user {user.Name}");
 
             return ExecuteDirection.RunNext;
         }

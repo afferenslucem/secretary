@@ -1,12 +1,12 @@
 ﻿using Moq;
 using secretary.cache;
-using secretary.yandex.authentication;
 using secretary.storage;
 using secretary.storage.models;
 using secretary.telegram.commands;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.registermail;
 using secretary.telegram.sessions;
+using secretary.yandex.authentication;
 
 namespace secretary.telegram.tests.commands.registermail;
 

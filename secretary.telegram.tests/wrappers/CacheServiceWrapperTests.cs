@@ -1,7 +1,5 @@
 ﻿using Moq;
 using secretary.cache;
-using secretary.storage;
-using secretary.storage.models;
 using secretary.telegram.wrappers;
 
 namespace secretary.telegram.tests.wrappers;

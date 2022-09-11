@@ -1,21 +1,19 @@
-﻿using System.Globalization;
-using MailKit.Net.Smtp;
+﻿using MailKit.Net.Smtp;
 using MailKit.Security;
-using Microsoft.Extensions.Logging;
 using MimeKit;
 using secretary.documents.creators;
 using secretary.logging;
 using secretary.storage.models;
 using secretary.telegram.commands.caches;
 using secretary.telegram.exceptions;
-using secretary.telegram.models;
 using secretary.yandex.mail;
+using Serilog;
 
 namespace secretary.telegram.commands.timeoff;
 
 public class SendDocumentCommand : Command
 {
-    private readonly ILogger<SendDocumentCommand> _logger = LogPoint.GetLogger<SendDocumentCommand>();
+    private readonly ILogger _logger = LogPoint.GetLogger<SendDocumentCommand>();
     
     public ITimeOffCreator MessageCreator;
 
@@ -57,13 +55,7 @@ public class SendDocumentCommand : Command
             Token = user.AccessToken!,
             Attachments = new[]
             {
-                new SecretaryAttachment()
-                {
-                    Path = cache.FilePath!,
-                    FileName = "Заявление.docx",
-                    ContentType = new ContentType("application",
-                        "msword")
-                }
+                new SecretaryAttachment(cache.FilePath!, "Заявление.docx", new ContentType("application", "msword"))
             },
             Sender = new SecretaryMailAddress(user.Email!, user.Name!),
             Receivers = receivers,
@@ -82,7 +74,7 @@ public class SendDocumentCommand : Command
 
             await TelegramClient.SendMessage("Заяление отправлено");
 
-            _logger.LogInformation($"{ChatId}: sent mail");
+            _logger.Information($"{ChatId}: sent mail");
         }
         catch (AuthenticationException e)
         {
@@ -104,6 +96,8 @@ public class SendDocumentCommand : Command
                 await TelegramClient.SendSticker(Stickers.Guliki);
                 
                 await TelegramClient.SendMessage($"Вы отправляете письмо с токеном не принадлежащим ящику <code>{e.Mailbox.Address}</code>");
+                
+                _logger.Warning(e, "Guliki detected. {@ChatId} tried use {@Email}", ChatId, message.Sender.Address);
             }
         }
         finally
@@ -120,7 +114,7 @@ public class SendDocumentCommand : Command
         }
         catch (Exception e)
         {
-            _logger.LogWarning(e, $"Could not delete file {filename}");
+            _logger.Warning(e, $"Could not delete file {filename}");
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using secretary.cache;
 using secretary.storage;
 using secretary.telegram.exceptions;
 using secretary.telegram.wrappers;

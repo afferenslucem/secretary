@@ -1,16 +1,16 @@
-﻿using Microsoft.Extensions.Logging;
-using secretary.logging;
-using secretary.yandex.authentication;
+﻿using secretary.logging;
 using secretary.storage.models;
 using secretary.telegram.commands.caches;
 using secretary.telegram.exceptions;
+using secretary.yandex.authentication;
 using secretary.yandex.exceptions;
+using Serilog;
 
 namespace secretary.telegram.commands.registermail;
 
 public class EnterCodeCommand: Command
 {
-    private ILogger<EnterCodeCommand> _logger = LogPoint.GetLogger<EnterCodeCommand>();
+    private ILogger _logger = LogPoint.GetLogger<EnterCodeCommand>();
 
     public override Task Execute()
     {
@@ -35,12 +35,12 @@ public class EnterCodeCommand: Command
             {
                 await this.SetTokens(tokenData);
                 await TelegramClient.SendMessage("Ура, вы успешно зарегистрировали почту");
-                _logger.LogInformation($"{ChatId}: handled tokens");
+                _logger.Information($"{ChatId}: handled tokens");
             }
         }
         catch (YandexAuthenticationException e)
         {
-            _logger.LogError(e, "Could not get auth info from server");
+            _logger.Error(e, "Could not get auth info from server");
             
             await this.TelegramClient.SendMessage(
                 "При запросе токена для авторизации произошла ошибка:(\n" +

@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
 using secretary.logging;
+using Serilog;
 
 namespace secretary.telegram.commands;
 
 public class CancelCommand: Command
 {
-    private readonly ILogger<CancelCommand> _logger = LogPoint.GetLogger<CancelCommand>();
+    private readonly ILogger _logger = LogPoint.GetLogger<CancelCommand>();
     
     public const string Key = "/cancel";
     
@@ -20,7 +21,7 @@ public class CancelCommand: Command
 
         var commandTypeName = session?.LastCommand?.GetType()?.Name ?? "null";
         
-        _logger.LogInformation($"{ChatId}: Cancelled command {commandTypeName}");
+        _logger.Information($"{ChatId}: Cancelled command {commandTypeName}");
     }
 
     public override Task OnComplete()

@@ -1,14 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
 using secretary.logging;
-using secretary.telegram.commands.caches;
 using secretary.telegram.commands.exceptionHandlers;
 using secretary.telegram.exceptions;
+using Serilog;
 
 namespace secretary.telegram.commands.timeoff;
 
 public class TimeOffCommand: StatedCommand
 {
-    private ILogger<TimeOffCache> _logger = LogPoint.GetLogger<TimeOffCache>();
+    private ILogger _logger = LogPoint.GetLogger<TimeOffCommand>();
     
     public const string Key = "/timeoff";
     
@@ -37,7 +37,7 @@ public class TimeOffCommand: StatedCommand
         catch (NonCompleteUserException e)
         {
             await HandleUserException(e);
-            this._logger.LogError(e, $"Command was completed by exception");
+            this._logger.Error(e, $"Command was completed by exception");
 
             throw;
         }

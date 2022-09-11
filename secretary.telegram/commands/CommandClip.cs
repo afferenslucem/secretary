@@ -1,14 +1,15 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
 using Newtonsoft.Json;
 using secretary.logging;
 using secretary.telegram.commands.executors;
 using secretary.telegram.exceptions;
+using Serilog;
 
 namespace secretary.telegram.commands;
 
 public class CommandClip
 {
-    private readonly ILogger<CommandClip> _logger = LogPoint.GetLogger<CommandClip>();
+    private readonly ILogger _logger = LogPoint.GetLogger<CommandClip>();
     
     [JsonProperty]
     private readonly Command[] _states;
@@ -69,12 +70,12 @@ public class CommandClip
             var secondPartCommand = _states[_runIndex];
             var secondPartExecutor = new CommandExecutor(secondPartCommand, context);
 
-            _logger.LogInformation($"{context.ChatId}: Start execute command {secondPartCommand.GetType().Name}");
+            _logger.Information($"{context.ChatId}: Start execute command {secondPartCommand.GetType().Name}");
             await secondPartExecutor.Execute();
         }
         catch (IncorrectMessageException e)
         {
-            _logger.LogWarning(e, $"Incorrect format of command {firstPartCommand.GetType().Name}: \"{context.Message}\"");
+            _logger.Warning(e, $"Incorrect format of command {firstPartCommand.GetType().Name}: \"{context.Message}\"");
         }
     }
 

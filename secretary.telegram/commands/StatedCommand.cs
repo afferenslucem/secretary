@@ -1,13 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
 using Newtonsoft.Json;
 using secretary.logging;
 using secretary.telegram.exceptions;
+using Serilog;
 
 namespace secretary.telegram.commands;
 
 public abstract class StatedCommand: Command
 {
-    private ILogger<StatedCommand> _logger = LogPoint.GetLogger<StatedCommand>();
+    private ILogger _logger = LogPoint.GetLogger<StatedCommand>();
 
     [JsonProperty]
     protected CommandClip Clip;
@@ -60,6 +61,6 @@ public abstract class StatedCommand: Command
     protected async Task OnForceComplete(ForceCompleteCommandException e)
     {
         await base.OnComplete();
-        _logger.LogWarning($"Сommand {e.CommandName} force completed");
+        _logger.Warning($"Сommand {e.CommandName} force completed");
     }
 }

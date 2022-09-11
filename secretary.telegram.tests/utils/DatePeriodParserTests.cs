@@ -1,7 +1,6 @@
 using secretary.telegram.exceptions;
 using secretary.telegram.models;
 using secretary.telegram.utils;
-using FormatException = System.FormatException;
 
 namespace secretary.telegram.tests.utils;
 

@@ -1,15 +1,13 @@
-﻿using System.Text.Json.Serialization;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using secretary.logging;
+using Serilog;
 using StackExchange.Redis;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace secretary.cache;
 
 public class RedisCacheService: ICacheService
 {
-    private ILogger<RedisCacheService> _logger = LogPoint.GetLogger<RedisCacheService>();
+    private ILogger _logger = LogPoint.GetLogger<RedisCacheService>();
 
     private ConnectionMultiplexer _connectionMultiplexer;
 
@@ -17,7 +15,7 @@ public class RedisCacheService: ICacheService
     {
         _connectionMultiplexer = ConnectionMultiplexer.Connect(host);
         
-        _logger.LogInformation("Created RedisCacheService");
+        _logger.Information("Created RedisCacheService");
     }
 
     public async Task SaveEntity<T>(long key, T value, short lifetimeSec) where T : class
@@ -36,7 +34,7 @@ public class RedisCacheService: ICacheService
         }
         catch (Exception e)
         {
-            _logger.LogCritical(e, "Could not save entity");
+            _logger.Fatal(e, "Could not save entity");
             throw;
         }
     }
@@ -64,7 +62,7 @@ public class RedisCacheService: ICacheService
         }
         catch (Exception e)
         {
-            _logger.LogCritical(e, "Could not get entity");
+            _logger.Fatal(e, "Could not get entity");
             throw;
         }
     }
@@ -79,7 +77,7 @@ public class RedisCacheService: ICacheService
         }
         catch (Exception e)
         {
-            _logger.LogCritical(e, "Could not delete key");
+            _logger.Fatal(e, "Could not delete key");
             throw;
         }
     }

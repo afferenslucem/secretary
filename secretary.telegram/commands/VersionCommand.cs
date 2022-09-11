@@ -1,17 +1,18 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
 using secretary.logging;
+using Serilog;
 
 namespace secretary.telegram.commands;
 
 public class VersionCommand: Command
 {
-    private readonly ILogger<VersionCommand> _logger = LogPoint.GetLogger<VersionCommand>();
+    private readonly ILogger _logger = LogPoint.GetLogger<VersionCommand>();
     
     public const string Key = "/version";
     
     public override Task Execute()
     {
-        _logger.LogInformation($"{ChatId}: Asked version");
+        _logger.Information($"{ChatId}: Asked version");
         
         return TelegramClient.SendMessage(TelegramBot.Version);
     }

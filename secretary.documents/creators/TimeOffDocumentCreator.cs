@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using secretary.documents.templates.docx;
 using secretary.documents.utils;
 

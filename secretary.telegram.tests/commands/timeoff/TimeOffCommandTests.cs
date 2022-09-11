@@ -8,7 +8,6 @@ using secretary.telegram.commands;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.timeoff;
 using secretary.telegram.exceptions;
-using secretary.telegram.models;
 using secretary.telegram.sessions;
 using secretary.telegram.utils;
 using secretary.yandex.mail;

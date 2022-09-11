@@ -1,17 +1,17 @@
 ﻿using System.Text.RegularExpressions;
-using Microsoft.Extensions.Logging;
 using secretary.logging;
 using secretary.telegram.commands.caches;
 using secretary.telegram.exceptions;
+using Serilog;
 
 namespace secretary.telegram.commands.registermail;
 
 public class EnterEmailCommand : Command
 {
-    private readonly ILogger<EnterEmailCommand> _logger = LogPoint.GetLogger<EnterEmailCommand>();
+    private readonly ILogger _logger = LogPoint.GetLogger<EnterEmailCommand>();
     public override Task Execute()
     {
-        _logger.LogInformation($"{ChatId}: started register mail");
+        _logger.Information($"{ChatId}: started register mail");
         
         return TelegramClient.SendMessage("Введите вашу почту, с которой вы отправляете заявления.\n" +
                                           @"Например: <i>a.pushkin@infinnity.ru</i>");

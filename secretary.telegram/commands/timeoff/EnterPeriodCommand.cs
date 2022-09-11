@@ -1,21 +1,22 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
 using secretary.logging;
 using secretary.telegram.commands.caches;
 using secretary.telegram.commands.validation;
 using secretary.telegram.exceptions;
 using secretary.telegram.utils;
+using Serilog;
 
 namespace secretary.telegram.commands.timeoff;
 
 public class EnterPeriodCommand : Command
 {
-    private readonly ILogger<EnterPeriodCommand> _logger = LogPoint.GetLogger<EnterPeriodCommand>();
+    private readonly ILogger _logger = LogPoint.GetLogger<EnterPeriodCommand>();
 
     public override async Task Execute()
     {
         await ValidateUser();
         
-        _logger.LogInformation($"{ChatId}: Started time off");
+        _logger.Information($"{ChatId}: Started time off");
 
         await TelegramClient.SendMessage("Введите период отгула в одном из форматов:\n\n" +
                                          "Если отгул на один день:\n<strong>DD.MM.YYYY[ с HH:mm до HH:mm]</strong>\n" +
@@ -55,7 +56,7 @@ public class EnterPeriodCommand : Command
 
     private async Task HandleIncorrectDate(Exception e)
     {
-        _logger.LogWarning(e, "Could not parse period");
+        _logger.Warning(e, "Could not parse period");
 
         await TelegramClient.SendMessage("Неверный формат даты отгула!\n" +
                                          "Попробуйте еще раз");

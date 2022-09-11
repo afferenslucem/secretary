@@ -1,22 +1,23 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
 using secretary.cache;
 using secretary.configuration;
 using secretary.logging;
-using secretary.yandex.authentication;
 using secretary.storage;
 using secretary.telegram.chains;
 using secretary.telegram.commands;
 using secretary.telegram.commands.executors;
 using secretary.telegram.sessions;
+using secretary.yandex.authentication;
 using secretary.yandex.mail;
+using Serilog;
 
 namespace secretary.telegram;
 
 public class TelegramBot
 {
-    public const string Version = "v0.4.3";
+    public const string Version = "v0.4.4";
     
-    private readonly ILogger<TelegramBot> _logger = LogPoint.GetLogger<TelegramBot>();
+    private readonly ILogger _logger = LogPoint.GetLogger<TelegramBot>();
     
     private readonly CommandsListeningChain _chain;
 
@@ -79,14 +80,14 @@ public class TelegramBot
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"{message.ChatId}: Сommand execution fault {command.GetType().Name}");
+            _logger.Error(e, $"{message.ChatId}: Сommand execution fault {command.GetType().Name}");
             await _sessionStorage.DeleteSession(message.ChatId);
         }
     }
     
     public Task Listen()
     {
-        _logger.LogInformation("Start work");
+        _logger.Information("Start work");
         return this._telegramClient.RunDriver();
     }
 
@@ -99,6 +100,6 @@ public class TelegramBot
     {
         if (command.GetType() == typeof(NullCommand)) return;
         
-        _logger.LogInformation(message);
+        _logger.Information(message);
     }
 }

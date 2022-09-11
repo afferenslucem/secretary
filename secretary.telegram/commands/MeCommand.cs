@@ -1,18 +1,19 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
 using secretary.logging;
 using secretary.storage.models;
+using Serilog;
 
 namespace secretary.telegram.commands;
 
 public class MeCommand: Command
 {
-    private readonly ILogger<MeCommand> _logger = LogPoint.GetLogger<MeCommand>();
+    private readonly ILogger _logger = LogPoint.GetLogger<MeCommand>();
     
     public const string Key = "/me";
     
     public override async Task Execute()
     {
-        _logger.LogInformation($"{ChatId}: Asked user info");
+        _logger.Information($"{ChatId}: Asked user info");
 
         var user = await UserStorage.GetUser();
 
