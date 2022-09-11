@@ -5,6 +5,6 @@ execPath=&
 pushd $execPath
 docker-compose pull bot
 sleep 1m
-docker-compose up -d --force-recreate bot
+docker-compose up -d bot
 sleep 1m
 popd
