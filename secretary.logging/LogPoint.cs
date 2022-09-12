@@ -22,7 +22,7 @@ public class LogPoint
         var configuration = new LoggerConfiguration()
             .Enrich.FromLogContext()
             .WriteTo.Console(outputTemplate: template)
-            .WriteTo.File("logs\\logs.txt", rollingInterval: RollingInterval.Month, outputTemplate: template);
+            .WriteTo.File("logs/logs.txt", rollingInterval: RollingInterval.Month, outputTemplate: template);
         
         if (Config.Instance.Environment == "Develop")
         {
