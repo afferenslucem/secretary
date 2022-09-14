@@ -15,8 +15,8 @@ services:
       - "./config.prod.json:/app/config.json"
       - "./data:/data"
       - "./templates:/templates"
-      - "/var/log/secretary:/logs"
-      - "/tmp/secretary:/tmp"
+      - "/var/log/Secretary:/logs"
+      - "/tmp/Secretary:/tmp"
 
     depends_on:
       - redis

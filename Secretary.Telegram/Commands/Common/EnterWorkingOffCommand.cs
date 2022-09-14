@@ -1,0 +1,34 @@
+﻿using Secretary.Telegram.Commands.Caches;
+using Secretary.Telegram.Commands.Caches.Interfaces;
+using Secretary.Telegram.Exceptions;
+
+namespace Secretary.Telegram.Commands.Common;
+
+public class EnterWorkingOffCommand<T> : Command
+    where T: class, IWorkingOffCache
+{
+    public override Task Execute()
+    {
+        return TelegramClient.SendMessageWithKeyBoard( 
+            "Введите данные об отработке в свободном формате.\n" +
+            "Например: <i>Отгул обязуюсь отработать</i>\n" +
+            "Или: Отгул <i>без отработки</i>\n\n" +
+            "Если вы нажмете \"Пропустить\", то эти данные просто не будут указаны в документе.",
+            new [] { "Пропустить" });
+    }
+    
+    public override async Task<int> OnMessage()
+    {
+        if (Message == "Пропустить") return ExecuteDirection.RunNext;
+
+        var cache = await CacheService.GetEntity<T>();
+
+        if (cache == null) throw new InternalException();
+        
+        cache.WorkingOff = Message;
+
+        await CacheService.SaveEntity(cache);
+        
+        return ExecuteDirection.RunNext;
+    }
+}
