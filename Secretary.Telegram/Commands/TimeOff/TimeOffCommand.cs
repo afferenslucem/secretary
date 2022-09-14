@@ -1,4 +1,5 @@
-﻿using Secretary.Logging;
+﻿using Secretary.Documents.utils;
+using Secretary.Logging;
 using Secretary.Telegram.Commands.Caches;
 using Secretary.Telegram.Commands.Common;
 using Secretary.Telegram.Commands.ExceptionHandlers;
@@ -8,8 +9,15 @@ using Serilog;
 namespace Secretary.Telegram.Commands.TimeOff;
 
 public class TimeOffCommand: StatedCommand
-{
+{    
+    public IFileManager FileManager { get; set; }
+    
     public const string Key = "/timeoff";
+    
+    public TimeOffCommand(): base()
+    {
+        this.FileManager = new FileManager();
+    }
     
     public override List<Command> ConfigureStates()
     {
@@ -25,5 +33,15 @@ public class TimeOffCommand: StatedCommand
             new SendDocumentCommand<TimeOffCache>(),
             new AssymetricCompleteCommand(),
         };
+    }
+
+    public override async Task OnForceComplete()
+    {
+        var cache = await CacheService.GetEntity<TimeOffCache>();
+
+        FileManager.DeleteFile(cache?.FilePath);
+        
+        await CacheService.DeleteEntity<TimeOffCache>();
+        await base.OnForceComplete();
     }
 }

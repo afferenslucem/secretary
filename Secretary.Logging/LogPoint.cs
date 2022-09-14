@@ -1,19 +1,15 @@
-﻿using System.Text;
-using Secretary.Configuration;
+﻿using Secretary.Configuration;
 using Serilog;
-using Serilog.Core;
 
 namespace Secretary.Logging;
 
 public class LogPoint
 {
-    private static LoggerConfiguration _configuration;
-
     static LogPoint()
     {
-        _configuration = Configure();
+        var configuration = Configure();
 
-        Log.Logger = _configuration.CreateLogger();
+        Log.Logger = configuration.CreateLogger();
     }
     private static LoggerConfiguration Configure()
     {

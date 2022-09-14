@@ -6,6 +6,7 @@ using Secretary.Storage;
 using Secretary.Telegram.chains;
 using Secretary.Telegram.Commands;
 using Secretary.Telegram.Commands.Executors;
+using Secretary.Telegram.Exceptions;
 using Secretary.Telegram.Sessions;
 using Secretary.Yandex.Authentication;
 using Secretary.Yandex.Mail;
@@ -77,6 +78,10 @@ public class TelegramBot
 
             await new CommandExecutor(command, context).Execute();
             await new CommandExecutor(command, context).OnComplete();
+        }
+        catch (ForceCompleteCommandException e)
+        {
+            _logger.Error(e, $"{message.ChatId}: Сommand execution fault {command.GetType().Name}");
         }
         catch (Exception e)
         {

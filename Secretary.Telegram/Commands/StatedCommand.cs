@@ -34,12 +34,13 @@ public abstract class StatedCommand: Command
         }
         catch (ForceCompleteCommandException e)
         {
-            await this.OnForceComplete(e);
+            await OnForceComplete();
+            _logger.Warning($"Сommand {e.CommandName} force completed");
         }
         catch (NonCompleteUserException e)
         {
             await HandleUserException(e);
-            this._logger.Error(e, $"Command was completed by exception");
+            _logger.Error(e, $"Command was completed by exception");
 
             throw;
         }
@@ -64,12 +65,6 @@ public abstract class StatedCommand: Command
         {
             await base.OnComplete();
         }
-    }
-
-    protected async Task OnForceComplete(ForceCompleteCommandException e)
-    {
-        await base.OnComplete();
-        _logger.Warning($"Сommand {e.CommandName} force completed");
     }
 
     private async Task HandleUserException(NonCompleteUserException e)

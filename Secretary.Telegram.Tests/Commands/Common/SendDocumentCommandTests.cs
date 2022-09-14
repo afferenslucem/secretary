@@ -3,6 +3,7 @@ using MailKit.Security;
 using MimeKit;
 using Moq;
 using Secretary.Cache;
+using Secretary.Documents.utils;
 using Secretary.Storage;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
@@ -26,6 +27,7 @@ public class SendDocumentCommandTests
     private Mock<IEmailStorage> _emailStorage = null!;
     private Mock<IUserStorage> _userStorage = null!;
     private Mock<ISessionStorage> _sessionStorage = null!;
+    private Mock<IFileManager> _fileManager = null!;
     
     
     private SendDocumentCommand<TimeOffCache> _command = null!;
@@ -34,18 +36,21 @@ public class SendDocumentCommandTests
     [SetUp]
     public void Setup()
     {
-        this._documentStorage = new Mock<IDocumentStorage>();
-        this._emailStorage = new Mock<IEmailStorage>();
-        this._cacheService = new Mock<ICacheService>();
-        this._cache = new Mock<TimeOffCache>();
-        this._userStorage = new Mock<IUserStorage>();
-        this._client = new Mock<ITelegramClient>();
-        this._mailClient = new Mock<IMailClient>();
-        this._sessionStorage = new Mock<ISessionStorage>();
-
-        this._command = new SendDocumentCommand<TimeOffCache>();
+        _documentStorage = new Mock<IDocumentStorage>();
+        _emailStorage = new Mock<IEmailStorage>();
+        _cacheService = new Mock<ICacheService>();
+        _cache = new Mock<TimeOffCache>();
+        _userStorage = new Mock<IUserStorage>();
+        _client = new Mock<ITelegramClient>();
+        _mailClient = new Mock<IMailClient>();
+        _sessionStorage = new Mock<ISessionStorage>();
+        _fileManager = new Mock<IFileManager>();
         
-        this._context = new CommandContext()
+
+        _command = new SendDocumentCommand<TimeOffCache>();
+        _command.FileManager = _fileManager.Object;
+        
+        _context = new CommandContext()
         { 
             ChatId = 2517, 
             TelegramClient = this._client.Object, 
@@ -57,7 +62,7 @@ public class SendDocumentCommandTests
             CacheService = this._cacheService.Object,
         };
         
-        this._command.Context = _context;
+        _command.Context = _context;
     }
 
     [Test]
@@ -148,6 +153,8 @@ public class SendDocumentCommandTests
         _client.Verify(target => target.SendMessage(2517, "Заяление отправлено"));
         
         _cacheService.Verify(target => target.DeleteEntity<TimeOffCache>(2517));
+        
+        _fileManager.Verify(target => target.DeleteFile("timeoff.docx"));
     }
 
     [Test]

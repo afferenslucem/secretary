@@ -1,4 +1,5 @@
 ﻿using Secretary.Logging;
+using Secretary.Telegram.Commands.Executors;
 using Serilog;
 
 namespace Secretary.Telegram.Commands;
@@ -12,14 +13,21 @@ public class CancelCommand: Command
     public override async Task Execute()
     {
         var session = await SessionStorage.GetSession();
-        
-        session?.LastCommand?.Cancel();
-        
-        await SessionStorage.DeleteSession();
+
+        if (session == null)
+        {
+            _logger.Warning($"{ChatId}: Cancelled requested for empty session");
+            return;
+        };
+
+        await new CommandExecutor(session.LastCommand, Context).Cancel();
+
         await TelegramClient.SendMessage("Дальнейшее выполнение команды прервано");
 
-        var commandTypeName = session?.LastCommand?.GetType()?.Name ?? "null";
+
+        await new CommandExecutor(session.LastCommand, Context).OnForceComplete();
         
+        var commandTypeName = session?.LastCommand.GetType()?.Name ?? "null";
         _logger.Information($"{ChatId}: Cancelled command {commandTypeName}");
     }
 

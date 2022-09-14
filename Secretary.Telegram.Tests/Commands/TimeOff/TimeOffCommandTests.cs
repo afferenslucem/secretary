@@ -2,11 +2,13 @@
 using Secretary.Cache;
 using Secretary.Configuration;
 using Secretary.Documents;
+using Secretary.Documents.utils;
 using Secretary.Storage;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
 using Secretary.Telegram.Commands.Caches;
 using Secretary.Telegram.Commands.TimeOff;
+using Secretary.Telegram.Commands.Vacation;
 using Secretary.Telegram.Exceptions;
 using Secretary.Telegram.Sessions;
 using Secretary.Telegram.Utils;
@@ -23,6 +25,7 @@ public class TimeOffCommandTests
     private Mock<IEmailStorage> _emailStorage = null!;
     private Mock<IMailClient> _mailClient = null!;
     private Mock<ICacheService> _cacheService = null!;
+    private Mock<IFileManager> _fileManager = null!;
 
     private TimeOffCommand _command = null!;
     private CommandContext _context = null!;
@@ -30,19 +33,19 @@ public class TimeOffCommandTests
     [SetUp]
     public void Setup()
     {
-        this._client = new Mock<ITelegramClient>();
+        _client = new Mock<ITelegramClient>();
+        _sessionStorage = new Mock<ISessionStorage>();
+        _userStorage = new Mock<IUserStorage>();
+        _documentStorage = new Mock<IDocumentStorage>();
+        _emailStorage = new Mock<IEmailStorage>();
+        _mailClient = new Mock<IMailClient>();
+        _cacheService = new Mock<ICacheService>();
+        _fileManager = new Mock<IFileManager>();
 
-        this._sessionStorage = new Mock<ISessionStorage>();
-
-        this._userStorage = new Mock<IUserStorage>();
-        this._documentStorage = new Mock<IDocumentStorage>();
-        this._emailStorage = new Mock<IEmailStorage>();
-        this._mailClient = new Mock<IMailClient>();
-        this._cacheService = new Mock<ICacheService>();
-
-        this._command = new TimeOffCommand();
+        _command = new TimeOffCommand();
+        _command.FileManager = _fileManager.Object;
         
-        this._context = new CommandContext()
+        _context = new CommandContext()
             { 
                 ChatId = 2517, 
                 TelegramClient = _client.Object, 
@@ -297,5 +300,22 @@ public class TimeOffCommandTests
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         await this._command.OnMessage();
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
+    }
+
+    [Test]
+    public async Task ShouldCleanForceComplete()
+    {
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(2517)).ReturnsAsync(
+            new TimeOffCache
+            {
+                FilePath = "/timeoff-path.docx"
+            }
+        );
+
+        await _command.OnForceComplete();
+        
+        _fileManager.Verify(target => target.DeleteFile("/timeoff-path.docx"));
+        _cacheService.Verify(target => target.DeleteEntity<TimeOffCache>(2517));
+        _sessionStorage.Verify(target => target.DeleteSession(2517));
     }
 }

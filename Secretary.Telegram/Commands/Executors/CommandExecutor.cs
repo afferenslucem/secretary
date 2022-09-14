@@ -31,6 +31,11 @@ public class CommandExecutor
         return Command.Cancel();
     }
     
+    public Task OnForceComplete()
+    {
+        return Command.OnForceComplete();
+    }
+    
     public Task OnComplete()
     {
         return Command.OnComplete();

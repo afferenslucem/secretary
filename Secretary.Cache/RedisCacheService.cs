@@ -21,6 +21,8 @@ public class RedisCacheService : ICacheService
     {
         try
         {
+            _logger.Debug($"Save entity {typeof(T).Name}:{key}");
+            
             var db = _connectionMultiplexer.GetDatabase();
 
             var json = JsonConvert.SerializeObject(value, new JsonSerializerSettings
@@ -42,6 +44,8 @@ public class RedisCacheService : ICacheService
     {
         try
         {
+            _logger.Debug($"Ask entity {typeof(T).Name}:{key}");
+            
             var db = _connectionMultiplexer.GetDatabase();
 
             var redisValue = await db.StringGetAsync(new RedisKey($"{typeof(T)}:{key}"));
@@ -67,6 +71,8 @@ public class RedisCacheService : ICacheService
     {
         try
         {
+            _logger.Debug($"Delete entity {typeof(T).Name}:{key}");
+            
             var db = _connectionMultiplexer.GetDatabase();
 
             await db.KeyDeleteAsync(new RedisKey($"{typeof(T)}:{key}"));

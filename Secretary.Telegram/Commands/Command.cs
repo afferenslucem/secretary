@@ -51,9 +51,14 @@ public abstract class Command
         return Task.CompletedTask;
     }
 
-    protected void ForceComplete()
+    protected internal void ForceComplete()
     {
         throw new ForceCompleteCommandException(this.GetType().Name);
+    }
+
+    public virtual async Task OnForceComplete()
+    {
+        await SessionStorage.DeleteSession();
     }
     
     public virtual async Task OnComplete()

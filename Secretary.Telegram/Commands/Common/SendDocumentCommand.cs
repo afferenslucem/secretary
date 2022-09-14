@@ -1,6 +1,7 @@
 ﻿using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
+using Secretary.Documents.utils;
 using Secretary.Logging;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands.Caches;
@@ -17,7 +18,13 @@ public class SendDocumentCommand<T> : Command
     where T: class, IMailCreator, IDocumentKeyCache, IFilePathCache, IPeriodCache
 {
     private readonly ILogger _logger = LogPoint.GetLogger<SendDocumentCommand<T>>();
-    
+
+    public IFileManager FileManager;
+
+    public SendDocumentCommand()
+    {
+        FileManager = new FileManager();
+    }
 
     public override async Task Execute()
     {
@@ -102,13 +109,6 @@ public class SendDocumentCommand<T> : Command
 
     private void DeleteDocument(string filename)
     {
-        try
-        {
-            File.Delete(filename);
-        }
-        catch (Exception e)
-        {
-            _logger.Warning(e, $"Could not delete file {filename}");
-        }
+        FileManager.DeleteFile(filename);
     }
 }

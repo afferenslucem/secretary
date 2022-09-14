@@ -2,6 +2,7 @@
 using Secretary.Cache;
 using Secretary.Configuration;
 using Secretary.Documents;
+using Secretary.Documents.utils;
 using Secretary.Storage;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
@@ -22,6 +23,7 @@ public class VacationCommandTests
     private Mock<IEmailStorage> _emailStorage = null!;
     private Mock<IMailClient> _mailClient = null!;
     private Mock<ICacheService> _cacheService = null!;
+    private Mock<IFileManager> _fileManager = null!;
 
     private VacationCommand _command = null!;
     private CommandContext _context = null!;
@@ -29,19 +31,20 @@ public class VacationCommandTests
     [SetUp]
     public void Setup()
     {
-        this._client = new Mock<ITelegramClient>();
+        _client = new Mock<ITelegramClient>();
 
-        this._sessionStorage = new Mock<ISessionStorage>();
+        _sessionStorage = new Mock<ISessionStorage>();
 
-        this._userStorage = new Mock<IUserStorage>();
-        this._documentStorage = new Mock<IDocumentStorage>();
-        this._emailStorage = new Mock<IEmailStorage>();
-        this._mailClient = new Mock<IMailClient>();
-        this._cacheService = new Mock<ICacheService>();
+        _userStorage = new Mock<IUserStorage>();
+        _documentStorage = new Mock<IDocumentStorage>();
+        _emailStorage = new Mock<IEmailStorage>();
+        _mailClient = new Mock<IMailClient>();
+        _cacheService = new Mock<ICacheService>();
+        _fileManager = new Mock<IFileManager>();
 
-        this._command = new VacationCommand();
+        _command = new VacationCommand();
         
-        this._context = new CommandContext()
+        _context = new CommandContext()
             { 
                 ChatId = 2517, 
                 TelegramClient = _client.Object, 
@@ -53,7 +56,8 @@ public class VacationCommandTests
                 CacheService = _cacheService.Object,
             };
         
-        this._command.Context = _context;
+        _command.Context = _context;
+        _command.FileManager = _fileManager.Object;
         
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { JobTitleGenitive = "", AccessToken = ""});
         
@@ -133,5 +137,22 @@ public class VacationCommandTests
         await this._command.OnMessage();
         
         _mailClient.Verify(target => target.SendMail(It.IsAny<SecretaryMailMessage>()), Times.Once);
+    }
+
+    [Test]
+    public async Task ShouldCleanForceComplete()
+    {
+        _cacheService.Setup(target => target.GetEntity<VacationCache>(2517)).ReturnsAsync(
+            new VacationCache
+            {
+                FilePath = "/vacation-path.docx"
+            }
+        );
+
+        await _command.OnForceComplete();
+        
+        _fileManager.Verify(target => target.DeleteFile("/vacation-path.docx"));
+        _cacheService.Verify(target => target.DeleteEntity<VacationCache>(2517));
+        _sessionStorage.Verify(target => target.DeleteSession(2517));
     }
 }

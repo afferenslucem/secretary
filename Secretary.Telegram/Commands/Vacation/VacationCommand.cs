@@ -1,3 +1,4 @@
+using Secretary.Documents.utils;
 using Secretary.Telegram.Commands.Caches;
 using Secretary.Telegram.Commands.Common;
 
@@ -5,7 +6,14 @@ namespace Secretary.Telegram.Commands.Vacation;
 
 public class VacationCommand: StatedCommand
 {
+    public IFileManager FileManager { get; set; }
+    
     public const string Key = "/vacation";
+
+    public VacationCommand(): base()
+    {
+        this.FileManager = new FileManager();
+    }
     
     public override List<Command> ConfigureStates()
     {
@@ -19,5 +27,15 @@ public class VacationCommand: StatedCommand
             new SendDocumentCommand<VacationCache>(),
             new AssymetricCompleteCommand(),
         };
+    }
+
+    public override async Task OnForceComplete()
+    {
+        var cache = await CacheService.GetEntity<VacationCache>();
+
+        FileManager.DeleteFile(cache?.FilePath);
+        
+        await CacheService.DeleteEntity<VacationCache>();
+        await base.OnForceComplete();
     }
 }
