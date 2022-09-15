@@ -13,7 +13,7 @@ public class LogPoint
     }
     private static LoggerConfiguration Configure()
     {
-        var template = "{Timestamp:HH:mm:ss} [{Level}] — {TypeName} — {Message}{NewLine}{Exception}";
+        var template = "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] — {TypeName} — {Message}{NewLine}{Exception}";
         
         var configuration = new LoggerConfiguration()
             .Enrich.FromLogContext()
