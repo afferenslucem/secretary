@@ -15,13 +15,13 @@ public class CommandsListeningChainTests
     [SetUp]
     public void Setup()
     {
-        this._chain = new CommandsListeningChain();
+        _chain = new CommandsListeningChain();
     }
 
     [Test]
     public void ShouldReturnNullCommand()
     {
-        var result = this._chain.Get("random string");
+        var result = _chain.Get("random string");
         
         Assert.IsInstanceOf<NullCommand>(result);
     }
@@ -29,7 +29,7 @@ public class CommandsListeningChainTests
     [Test]
     public void ShouldReturnStartCommand()
     {
-        var result = this._chain.Get("/start");
+        var result = _chain.Get("/start");
         
         Assert.IsInstanceOf<StartCommand>(result);
     }
@@ -37,7 +37,7 @@ public class CommandsListeningChainTests
     [Test]
     public void ShouldReturnSetEmailsCommand()
     {
-        var result = this._chain.Get("/setemails");
+        var result = _chain.Get("/setemails");
         
         Assert.IsInstanceOf<SetEmailsCommand>(result);
     }
@@ -45,15 +45,23 @@ public class CommandsListeningChainTests
     [Test]
     public void ShouldReturnCancelCommand()
     {
-        var result = this._chain.Get("/cancel");
+        var result = _chain.Get("/cancel");
         
         Assert.IsInstanceOf<CancelCommand>(result);
     }
 
     [Test]
+    public void ShouldReturnUptimeCommand()
+    {
+        var result = _chain.Get("/uptime");
+        
+        Assert.IsInstanceOf<UptimeCommand>(result);
+    }
+
+    [Test]
     public void ShouldReturnTimeOffCommand()
     {
-        var result = this._chain.Get(TimeOffCommand.Key);
+        var result = _chain.Get(TimeOffCommand.Key);
         
         Assert.IsInstanceOf<TimeOffCommand>(result);
     }
@@ -61,7 +69,7 @@ public class CommandsListeningChainTests
     [Test]
     public void ShouldReturnVacationCommand()
     {
-        var result = this._chain.Get(VacationCommand.Key);
+        var result = _chain.Get(VacationCommand.Key);
         
         Assert.IsInstanceOf<VacationCommand>(result);
     }
@@ -69,7 +77,7 @@ public class CommandsListeningChainTests
     [Test]
     public void ShouldReturnRegisterMailCommand()
     {
-        var result = this._chain.Get(RegisterMailCommand.Key);
+        var result = _chain.Get(RegisterMailCommand.Key);
         
         Assert.IsInstanceOf<RegisterMailCommand>(result);
     }
@@ -77,7 +85,7 @@ public class CommandsListeningChainTests
     [Test]
     public void ShouldReturnRegisterUserCommand()
     {
-        var result = this._chain.Get(RegisterUserCommand.Key);
+        var result = _chain.Get(RegisterUserCommand.Key);
         
         Assert.IsInstanceOf<RegisterUserCommand>(result);
     }
@@ -85,7 +93,7 @@ public class CommandsListeningChainTests
     [Test]
     public void ShouldReturnMeCommand()
     {
-        var result = this._chain.Get(MeCommand.Key);
+        var result = _chain.Get(MeCommand.Key);
         
         Assert.IsInstanceOf<MeCommand>(result);
     }
@@ -93,7 +101,7 @@ public class CommandsListeningChainTests
     [Test]
     public void ShouldReturnVersionCommand()
     {
-        var result = this._chain.Get(VersionCommand.Key);
+        var result = _chain.Get(VersionCommand.Key);
         
         Assert.IsInstanceOf<VersionCommand>(result);
     }

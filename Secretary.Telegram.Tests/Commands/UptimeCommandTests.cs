@@ -4,44 +4,46 @@ using Secretary.Telegram.Sessions;
 
 namespace Secretary.Telegram.Tests.Commands;
 
-public class VersionCommandTests
+public class UptimeCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
     private Mock<ISessionStorage> _sessionStorage = null!;
 
-    private VersionCommand _command = null!;
+    private UptimeCommand _command = null!;
     private CommandContext _context = null!;
 
     [SetUp]
     public void Setup()
     {
-        this._client = new Mock<ITelegramClient>();
+        _client = new Mock<ITelegramClient>();
 
-        this._command = new VersionCommand();
-        this._sessionStorage = new Mock<ISessionStorage>();
+        _command = new UptimeCommand();
+        _sessionStorage = new Mock<ISessionStorage>();
 
-        this._context = new CommandContext()
+        _context = new CommandContext()
         {
             ChatId = 2517,
-            TelegramClient = this._client.Object,
-            SessionStorage = this._sessionStorage.Object,
+            TelegramClient = _client.Object,
+            SessionStorage = _sessionStorage.Object,
         };
 
-        this._command.Context = _context;
+        _command.Context = _context;
     }
 
     [Test]
     public void ShouldHaveCorrectKey()
     {
-        Assert.That(VersionCommand.Key, Is.EqualTo("/version"));
+        Assert.That(UptimeCommand.Key, Is.EqualTo("/uptime"));
     }
 
     [Test]
     public async Task ShouldSendVersion()
     {
-        await this._command.Execute();
+        await _command.Execute();
 
-        this._client.Verify(target => target.SendMessage(2517, "v1.2.0"));
+        var expected = TelegramBot.Uptime.ToString("yyyy-MM-dd HH:mm:ss zz");
+
+        _client.Verify(target => target.SendMessage(2517, expected));
     }
 
     [Test]

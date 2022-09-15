@@ -16,7 +16,9 @@ namespace Secretary.Telegram;
 
 public class TelegramBot
 {
-    public const string Version = "v1.1.0";
+    public const string Version = "v1.2.0";
+    
+    public static readonly DateTime Uptime = DateTime.Now;
     
     private readonly ILogger _logger = LogPoint.GetLogger<TelegramBot>();
     

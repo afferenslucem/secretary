@@ -23,6 +23,7 @@ public class CommandsListeningChain
         this._commandsChain.Add(MeCommand.Key, new CommandFactory<MeCommand>());
         this._commandsChain.Add(SetEmailsCommand.Key, new CommandFactory<SetEmailsCommand>());
         this._commandsChain.Add(VersionCommand.Key, new CommandFactory<VersionCommand>());
+        this._commandsChain.Add(UptimeCommand.Key, new CommandFactory<UptimeCommand>());
         this._commandsChain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
     }
 
