@@ -5,7 +5,7 @@ public class SecretaryMailAddress: IEquatable<SecretaryMailAddress>
     public readonly string Address;
     public readonly string? DisplayName;
     
-    public SecretaryMailAddress(string address, string displayName)
+    public SecretaryMailAddress(string address, string? displayName)
     {
         Address = address;
         DisplayName = displayName;

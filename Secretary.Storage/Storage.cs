@@ -1,18 +1,12 @@
 ﻿using System.Data.SQLite;
+using Secretary.Storage.Models;
 
 namespace Secretary.Storage;
 
 public abstract class Storage
-{ 
-    public string DbFile { get; private set; }
-    
-    public Storage(string dbFile)
+{
+    protected DatabaseContext GetContext()
     {
-        DbFile = dbFile;
-    }
-    
-    protected SQLiteConnection GetConnection()
-    {
-        return new SQLiteConnection("Data Source=" + DbFile);
+        return new DatabaseContext();
     }
 }

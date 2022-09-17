@@ -5,6 +5,17 @@ services:
 
     ports:
       - 6379:6379
+      
+  database:
+    image: postgres:14-bullseye
+    
+    environment:
+      POSTGRES_PASSWORD: masterkey
+      PGDATA: /var/lib/postgresql/data/secretary/
+    ports:
+      - "5432:5432"
+    volumes: 
+      - "./database/init-db/:/docker-entrypoint-initdb.d"
 
   bot:
     build: 
@@ -20,3 +31,4 @@ services:
 
     depends_on:
       - redis
+      - database

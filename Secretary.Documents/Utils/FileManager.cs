@@ -49,7 +49,7 @@ public class FileManager : IFileManager
         {
             return action();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             if (times <= 1) throw;
 

@@ -1,18 +1,33 @@
-﻿namespace Secretary.Storage.Models;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class User
+namespace Secretary.Storage.Models
 {
-    public long ChatId { get; set; }
-    public string? Name { get; set; }
-    
-    public string? NameGenitive { get; set; }
-    
-    public string? JobTitle { get; set; }
-    
-    public string? JobTitleGenitive { get; set; }
-    
-    public string? Email { get; set; }
-    
-    public string? AccessToken { get; set; }
-    public string? RefreshToken { get; set; }
+    public partial class User
+    {
+        [Key]
+        public long ChatId { get; set; }
+        
+        [MaxLength(256)]
+        public string? Name { get; set; }
+        
+        [MaxLength(256)]
+        public string? NameGenitive { get; set; }
+        
+        [MaxLength(256)]
+        public string? JobTitle { get; set; }
+        
+        [MaxLength(256)]
+        public string? JobTitleGenitive { get; set; }
+        
+        [MaxLength(128)]
+        public string? Email { get; set; }
+        
+        [MaxLength(256)]
+        public string? AccessToken { get; set; }
+        
+        [MaxLength(256)]
+        public string? RefreshToken { get; set; }
+
+        public IEnumerable<Document> Documents = null;
+    }
 }

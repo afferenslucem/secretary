@@ -1,17 +1,13 @@
-﻿using Dapper;
+﻿using Microsoft.EntityFrameworkCore;
 using Secretary.Storage.Models;
 
 namespace Secretary.Storage;
 
 public class DocumentStorage: Storage, IDocumentStorage
 {
-    public DocumentStorage(string dbFile) : base(dbFile)
-    {
-    }
-
     public async Task<Document> GetOrCreateDocument(long chatId, string documentName)
     {
-        var document = await this.GetDocument(chatId, documentName);
+        var document = await GetDocument(chatId, documentName);
 
         if (document != null) return document;
 
@@ -20,56 +16,27 @@ public class DocumentStorage: Storage, IDocumentStorage
         return document;
     }
 
-    private async Task<Document> GetDocument(long chatId, string documentName)
+    private async Task<Document?> GetDocument(long chatId, string documentName)
     {
-        using var connection = this.GetConnection();
+        await using var context = GetContext();
 
-        await connection.OpenAsync();
-
-        var document = await connection.QueryFirstOrDefaultAsync<Document>(
-            @"select Id, ChatId, DocumentName from Documents where ChatId = @chatId and DocumentName = @documentName",
-            new { chatId, documentName }
-        );
+        var document =
+            await context.Documents.FirstOrDefaultAsync(item =>
+                item.ChatId == chatId && item.DocumentName == documentName);
 
         return document;
     }
 
     private async Task<Document> SaveDocument(long chatId, string documentName)
     {
-        using var connection = this.GetConnection();
-
-        await connection.OpenAsync();
-
         var document = new Document(chatId, documentName);
         
-        var id = await connection.QueryFirstOrDefaultAsync<long>(
-            @"insert into Documents 
-                (ChatId, DocumentName) values 
-                (@ChatId, @DocumentName);" + 
-            "select last_insert_rowid()",
-            document
-        );
+        await using var context = GetContext();
 
-        document.Id = id;
-        
+        context.Documents.Add(document);
+
+        await context.SaveChangesAsync();
+
         return document;
-    }
-
-    public void CreateTable()
-    {
-        using var connection = GetConnection();
-        
-        connection.Open();
-        connection.Execute(
-            @"create table Documents
-            (
-                ChatId              integer not null,
-                DocumentName        varchar(128) not null,
-                Id                  integer primary key autoincrement not null
-            )");
-        
-        connection.Execute(
-            @"CREATE INDEX Documents_ChatId_idx
-                ON Documents (ChatId);");
     }
 }

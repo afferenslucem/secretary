@@ -17,7 +17,7 @@ namespace Secretary.Documents.Templates.Html
             SetValue("time-off_period", Placeholders.Period, value);
         }
 
-        public void SetReason(string value)
+        public void SetReason(string? value)
         {
             if (value != null)
             {
@@ -27,7 +27,7 @@ namespace Secretary.Documents.Templates.Html
             SetValue("time-off_reason", Placeholders.Reason, value);
         }
 
-        public void SetWorkingOff(string value)
+        public void SetWorkingOff(string? value)
         {
             if (value != null)
             {

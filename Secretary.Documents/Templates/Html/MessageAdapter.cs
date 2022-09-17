@@ -27,7 +27,7 @@ public class MessageAdapter
         this.Doc.Save(writer);
     }
 
-    protected void SetValue(string id, string placehoder, string value)
+    protected void SetValue(string id, string placehoder, string? value)
     {
         var reason = Doc.GetElementbyId(id);
 

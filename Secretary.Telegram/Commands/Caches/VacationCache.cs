@@ -24,8 +24,8 @@ public class VacationCache:
         var data = new VacationData()
         {
             Period = this.Period!.RawValue,
-            Name = user.NameGenitive,
-            JobTitle = user.JobTitleGenitive
+            Name = user.NameGenitive!,
+            JobTitle = user.JobTitleGenitive!
         };
 
         var document = new VacationDocumentCreator().Create(data);
@@ -38,8 +38,8 @@ public class VacationCache:
         var data = new VacationData()
         {
             Period = Period!.RawValue,
-            Name = user.Name,
-            JobTitle = user.JobTitle
+            Name = user.Name!,
+            JobTitle = user.JobTitle!
         };
 
         var document = new VacationMessageCreator().Create(data);

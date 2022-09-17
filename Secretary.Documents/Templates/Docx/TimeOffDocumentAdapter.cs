@@ -9,7 +9,7 @@ namespace Secretary.Documents.Templates.Docx
         {
         }
 
-        public void SetPeriod(string value)
+        public void SetPeriod(string? value)
         {
             if (value != null)
             {
@@ -19,7 +19,7 @@ namespace Secretary.Documents.Templates.Docx
             SetValue(Placeholders.Period, value);
         }
 
-        public void SetReason(string value)
+        public void SetReason(string? value)
         {
             if (value != null)
             {
@@ -29,7 +29,7 @@ namespace Secretary.Documents.Templates.Docx
             SetValue(Placeholders.Reason, value);
         }
 
-        public void SetWorkingOff(string value)
+        public void SetWorkingOff(string? value)
         {
             if (value != null)
             {

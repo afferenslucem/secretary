@@ -12,11 +12,7 @@ internal class Program
     {
         DocumentTemplatesStorage.Initialize(Config.Instance.TemplatesPath);
 
-        var database = new Database(Config.Instance.DbPath);
-
-        database.InitDb();
-
-        var bot = new TelegramBot(Config.Instance, database);
+        var bot = new TelegramBot(Config.Instance);
 
         await bot.Listen();
     }

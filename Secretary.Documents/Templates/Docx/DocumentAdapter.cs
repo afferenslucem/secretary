@@ -39,7 +39,7 @@ public class DocumentAdapter : IDisposable
         Document?.Dispose();
     }
 
-    protected void SetValue(string placeholder, string value)
+    protected void SetValue(string placeholder, string? value)
     {
         var target = this.Document.Paragraphs.FirstOrDefault(paragraph => paragraph.Text.Contains(placeholder));
 

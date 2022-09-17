@@ -26,10 +26,10 @@ public class TimeOffCache:
         var data = new TimeOffData()
         {
             Period = this.Period!.RawValue,
-            Reason = this.Reason,
-            WorkingOff = this.WorkingOff,
-            Name = user.NameGenitive,
-            JobTitle = user.JobTitleGenitive
+            Reason = this.Reason!,
+            WorkingOff = this.WorkingOff!,
+            Name = user.NameGenitive!,
+            JobTitle = user.JobTitleGenitive!
         };
 
         var document = new TimeOffDocumentCreator().Create(data);
@@ -42,10 +42,10 @@ public class TimeOffCache:
         var data = new TimeOffData()
         {
             Period = Period!.RawValue,
-            Reason = Reason,
-            WorkingOff = WorkingOff,
-            Name = user.Name,
-            JobTitle = user.JobTitle
+            Reason = Reason!,
+            WorkingOff = WorkingOff!,
+            Name = user.Name!,
+            JobTitle = user.JobTitle!
         };
 
         var document = new TimeOffMessageCreator().Create(data);

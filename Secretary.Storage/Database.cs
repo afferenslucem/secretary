@@ -23,22 +23,10 @@ public class Database
         get => _emailStorage;
     }
 
-    public Database(string dbFile)
+    public Database()
     {
-        DbFile = dbFile;
-
-        this._userStorage = new UserStorage(dbFile);
-        this._documentStorage = new DocumentStorage(dbFile);
-        this._emailStorage = new EmailStorage(dbFile);
-    }
-    
-    public void InitDb()
-    {
-        if (!File.Exists(DbFile))
-        {
-            _userStorage.CreateTable();
-            _documentStorage.CreateTable();
-            _emailStorage.CreateTable();
-        }
+        _userStorage = new UserStorage();
+        _documentStorage = new DocumentStorage();
+        _emailStorage = new EmailStorage();
     }
 }

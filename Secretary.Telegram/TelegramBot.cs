@@ -38,9 +38,9 @@ public class TelegramBot
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-    public TelegramBot(Config config, Database database)
+    public TelegramBot(Config config)
     {
-        _database = database;
+        _database = new Database();
 
         _cacheService = new RedisCacheService(config.RedisHost);
 

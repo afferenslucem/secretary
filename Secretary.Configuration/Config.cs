@@ -20,7 +20,7 @@ public class Config
 
     public MailConfig MailConfig { get; init; } = null!;
 
-    public string DbPath { get; init; } = null!;
+    public string DbConnectionString { get; init; } = null!;
 
     public string TemplatesPath { get; init; } = null!;
 

@@ -4,9 +4,9 @@
   "MailConfig": {
     "ClientId": "",
     "ClientSecret": "",
-    "AllowedSenderDomains": []
+    "AllowedSenderDomains": [""]
   },
-  "DbConnectionString": "",
+  "DbConnectionString": "Server=localhost;Port=5432;Database=secretary;User Id=secretary;Password=masterkey;",
   "TemplatesPath": "",
   "RedisHost": ""
 }

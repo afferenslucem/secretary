@@ -9,7 +9,7 @@ namespace Secretary.Documents.Templates.Docx
         {
         }
 
-        public void SetPeriod(string value)
+        public void SetPeriod(string? value)
         {
             if (value != null)
             {

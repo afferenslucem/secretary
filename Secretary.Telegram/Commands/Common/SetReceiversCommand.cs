@@ -14,7 +14,7 @@ public class SetReceiversCommand<T> : Command
     {
         T cache = await CacheService.GetEntity<T>();
 
-        var document = await DocumentStorage.GetOrCreateDocument(cache.DocumentKey);
+        var document = await DocumentStorage.GetOrCreateDocument(cache!.DocumentKey);
         var emails = await EmailStorage.GetForDocument(document.Id);
 
         if (emails.Count() > 0)
