@@ -1,9 +1,10 @@
-﻿namespace Secretary.Storage;
+﻿using Microsoft.EntityFrameworkCore;
+using Secretary.Storage.Models;
+
+namespace Secretary.Storage;
 
 public class Database
 {
-    public string DbFile { get; private set; }
-    
     private UserStorage _userStorage;
     private DocumentStorage _documentStorage;
     private EmailStorage _emailStorage;
@@ -25,8 +26,16 @@ public class Database
 
     public Database()
     {
+        this.MigrateDatabase();
+
         _userStorage = new UserStorage();
         _documentStorage = new DocumentStorage();
         _emailStorage = new EmailStorage();
+    }
+
+    private void MigrateDatabase()
+    {
+        using var context = new DatabaseContext();
+        context.Database.Migrate();
     }
 }
