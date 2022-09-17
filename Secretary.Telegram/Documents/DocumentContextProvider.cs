@@ -1,4 +1,5 @@
 using Secretary.Logging;
+using Secretary.Telegram.Commands.Distant;
 using Secretary.Telegram.Commands.TimeOff;
 using Secretary.Telegram.Commands.Vacation;
 using Serilog;
@@ -17,6 +18,7 @@ public class DocumentContextProvider
     {
         _dictionary.Add(TimeOffCommand.Key, new DocumentContext(TimeOffCommand.Key, "Заявление на отгул.docx", "Отгул"));
         _dictionary.Add(VacationCommand.Key, new DocumentContext(VacationCommand.Key, "Заявление на отпуск.docx", "Отпуск"));
+        _dictionary.Add(DistantCommand.Key, new DocumentContext(DistantCommand.Key, "Заявление на удаленную работу.docx", "Удаленная работа"));
     }
     
     private DocumentContextProvider() {}

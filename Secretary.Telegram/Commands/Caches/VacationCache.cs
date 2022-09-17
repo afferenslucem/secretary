@@ -1,4 +1,5 @@
-﻿using Secretary.Documents.Creators;
+﻿using Newtonsoft.Json;
+using Secretary.Documents.Creators;
 using Secretary.Documents.Creators.Data;
 using Secretary.Documents.Creators.DocumentCreators;
 using Secretary.Documents.Creators.MessageCreators;
@@ -12,7 +13,7 @@ namespace Secretary.Telegram.Commands.Caches;
 public class VacationCache: 
     IVacationDocumentCache
 {
-    public virtual string DocumentKey { get; set; } = VacationCommand.Key;
+    [JsonIgnore] public virtual string DocumentKey => VacationCommand.Key;
     public virtual DatePeriod? Period { get; set; }
     
     public IEnumerable<Email>? Emails { get; set; }

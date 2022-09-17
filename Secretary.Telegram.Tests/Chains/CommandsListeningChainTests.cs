@@ -1,5 +1,6 @@
 using Secretary.Telegram.chains;
 using Secretary.Telegram.Commands;
+using Secretary.Telegram.Commands.Distant;
 using Secretary.Telegram.Commands.RegisterMail;
 using Secretary.Telegram.Commands.RegisterUser;
 using Secretary.Telegram.Commands.SetEmails;
@@ -96,6 +97,14 @@ public class CommandsListeningChainTests
         var result = _chain.Get(MeCommand.Key);
         
         Assert.IsInstanceOf<MeCommand>(result);
+    }
+
+    [Test]
+    public void ShouldDistantCommand()
+    {
+        var result = _chain.Get(DistantCommand.Key);
+        
+        Assert.IsInstanceOf<DistantCommand>(result);
     }
 
     [Test]

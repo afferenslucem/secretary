@@ -63,6 +63,22 @@ public class DatePeriodParserTests
     }
 
     [Test]
+    public void ShouldParsePeriodГтызусЕшьу()
+    {
+        var line = "с 08.09.2022 на неопределенный срок";
+
+        var expected = new DatePeriod(
+            new DateTime(2022, 09, 08),
+            new DateTime(2022, 09, 08),
+            line
+        );
+
+        var result = _parser.Parse(line);
+        
+        Assert.That(result, Is.EqualTo(expected));
+    }
+
+    [Test]
     public void ShouldParsePeriodWithTimes()
     {
         var line = "с 09:00 08.09.2022 до 13:00 10.09.2022";

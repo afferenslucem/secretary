@@ -16,7 +16,7 @@ public class ChooseDocumentCommand: Command
         
         var allDocs = DocumentContextProvider.AllDocuments.Select(item => item.MailTheme);
 
-        await TelegramClient.SendMessageWithKeyBoard("Выберете документ для установки получателей", allDocs.ToArray());
+        await TelegramClient.SendMessageWithKeyBoard("Выберете документ для установки получателей", allDocs.Chunk(2).ToArray());
     }
 
     public override async Task<int> OnMessage()

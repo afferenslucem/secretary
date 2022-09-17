@@ -29,21 +29,21 @@ public class MessageAdapter
 
     protected void SetValue(string id, string placehoder, string? value)
     {
-        var reason = Doc.GetElementbyId(id);
+        var node = Doc.GetElementbyId(id);
 
-        var parent = reason.ParentNode;
+        var parent = node.ParentNode;
              
         if (value == null)
         {
-            parent.RemoveChild(reason);
+            parent.RemoveChild(node);
         }
         else
         {
-            var replaced = reason.OuterHtml.Replace(placehoder, value);
+            var replaced = node.OuterHtml.Replace(placehoder, value);
 
             var newNode = HtmlNode.CreateNode(replaced);
 
-            parent.ReplaceChild(newNode, reason);
+            parent.ReplaceChild(newNode, node);
         }
     }
 }

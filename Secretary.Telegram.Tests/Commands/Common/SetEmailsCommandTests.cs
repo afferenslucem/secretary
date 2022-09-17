@@ -51,10 +51,10 @@ public class SetEmailsCommandTests
     {
         _context.Message = "Да";
 
-        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(new TimeOffCache()
-        {
-            DocumentKey = "/key"
-        });
+        var cacheMock = new Mock<TimeOffCache>();
+        cacheMock.SetupGet(target => target.DocumentKey).Returns("/key");
+        
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(cacheMock.Object);
 
         _documentStorage
             .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))
@@ -87,10 +87,10 @@ public class SetEmailsCommandTests
     {
         _context.Message = "Да";
         
-        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(new TimeOffCache()
-        {
-            DocumentKey = "/key"
-        });
+        var cacheMock = new Mock<TimeOffCache>();
+        cacheMock.SetupGet(target => target.DocumentKey).Returns("/key");
+        
+        _cacheService.Setup(target => target.GetEntity<TimeOffCache>(It.IsAny<long>())).ReturnsAsync(cacheMock.Object);
 
         _documentStorage
             .Setup(target => target.GetOrCreateDocument(It.IsAny<long>(), It.IsAny<string>()))

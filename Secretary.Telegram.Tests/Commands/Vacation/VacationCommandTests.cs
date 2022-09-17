@@ -78,11 +78,11 @@ public class VacationCommandTests
     [Test]
     public async Task ShouldRemoveSessionForNo()
     {
-        _cacheService.Setup(target => target.GetEntity<VacationCache>(It.IsAny<long>())).ReturnsAsync(new VacationCache()
-        {
-            Period = new DatePeriodParser().Parse("с 05.09.2022 по 18.09.2022"),
-            DocumentKey = "/vacation"
-        });
+        var cacheMock = new Mock<VacationCache>();
+        cacheMock.SetupGet(target => target.DocumentKey).Returns("/vacation");
+        cacheMock.SetupGet(target => target.Period).Returns(new DatePeriodParser().Parse("с 05.09.2022 по 18.09.2022"));
+        
+        _cacheService.Setup(target => target.GetEntity<VacationCache>(It.IsAny<long>())).ReturnsAsync(cacheMock.Object);
 
         
         _context.Message = "/vacation";
@@ -108,12 +108,11 @@ public class VacationCommandTests
     [Test]
     public async Task ShouldExecuteReturnToEmailEnter()
     {
-        _cacheService.Setup(target => target.GetEntity<VacationCache>(It.IsAny<long>())).ReturnsAsync(new VacationCache()
-        {
-            Period = new DatePeriodParser().Parse("05.09.2022"),
-            DocumentKey = "/vacation"
-        });
-
+        var cacheMock = new Mock<VacationCache>();
+        cacheMock.SetupGet(target => target.DocumentKey).Returns("/vacation");
+        cacheMock.SetupGet(target => target.Period).Returns(new DatePeriodParser().Parse("05.09.2022"));
+        
+        _cacheService.Setup(target => target.GetEntity<VacationCache>(It.IsAny<long>())).ReturnsAsync(cacheMock.Object);
         
         _context.Message = "/vacation";
         await this._command.Execute();

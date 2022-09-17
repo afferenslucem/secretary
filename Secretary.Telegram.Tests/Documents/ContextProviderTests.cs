@@ -1,3 +1,4 @@
+using Secretary.Telegram.Commands.Distant;
 using Secretary.Telegram.Commands.TimeOff;
 using Secretary.Telegram.Commands.Vacation;
 using Secretary.Telegram.Documents;
@@ -24,5 +25,15 @@ public class ContextProviderTests
         Assert.That(context.DisplayName, Is.EqualTo("Заявление на отпуск.docx"));
         Assert.That(context.MailTheme, Is.EqualTo("Отпуск"));
         Assert.That(context.Key, Is.EqualTo(VacationCommand.Key));
+    }
+    
+    [Test]
+    public void ShouldReturnDistantContext()
+    {
+        var context = DocumentContextProvider.GetContext(DistantCommand.Key);
+        
+        Assert.That(context.DisplayName, Is.EqualTo("Заявление на удаленную работу.docx"));
+        Assert.That(context.MailTheme, Is.EqualTo("Удаленная работа"));
+        Assert.That(context.Key, Is.EqualTo(DistantCommand.Key));
     }
 }

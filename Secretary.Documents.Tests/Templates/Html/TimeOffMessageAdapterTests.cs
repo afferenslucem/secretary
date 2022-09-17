@@ -172,8 +172,6 @@ namespace Secretary.Documents.Tests.Templates.Html
         {
             var adapter = new TimeOffMessageAdapter(this.Document);
             
-            adapter.SetWorkingOff(null);
-
             var writer = new StringWriter();
             
             adapter.SaveAs(writer);

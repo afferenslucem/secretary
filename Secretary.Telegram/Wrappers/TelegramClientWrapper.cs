@@ -21,6 +21,11 @@ public class TelegramClientWrapper
         return _telegramClient.SendMessageWithKeyBoard(_chatId, message, choices);
     }
 
+    public Task SendMessageWithKeyBoard(string message, string[][] choices)
+    {
+        return _telegramClient.SendMessageWithKeyBoard(_chatId, message, choices);
+    }
+
     public Task SendDocument(string path, string fileName)
     {
         return _telegramClient.SendDocument(_chatId, path, fileName);

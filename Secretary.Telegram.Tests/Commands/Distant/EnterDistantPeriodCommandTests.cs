@@ -4,19 +4,19 @@ using Secretary.Storage;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
 using Secretary.Telegram.Commands.Caches;
-using Secretary.Telegram.Commands.TimeOff;
+using Secretary.Telegram.Commands.Distant;
 using Secretary.Telegram.Exceptions;
 using Secretary.Telegram.Utils;
 
-namespace Secretary.Telegram.Tests.Commands.TimeOff;
+namespace Secretary.Telegram.Tests.Commands.Distant;
 
-public class EnterTimeOffPeriodCommandTests
+public class EnterDistantPeriodCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
     private Mock<IUserStorage> _userStorage = null!;
     private Mock<ICacheService> _cacheService = null!;
     
-    private EnterTimeOffPeriodCommand<TimeOffCache> _command = null!;
+    private EnterDistantPeriodCommand<DistantCache> _command = null!;
     private CommandContext _context = null!;
         
     [SetUp]
@@ -26,7 +26,7 @@ public class EnterTimeOffPeriodCommandTests
         _userStorage = new Mock<IUserStorage>();
         _cacheService = new Mock<ICacheService>();
 
-        _command = new EnterTimeOffPeriodCommand<TimeOffCache>();
+        _command = new EnterDistantPeriodCommand<DistantCache>();
 
         _context = new CommandContext()
         { 
@@ -49,11 +49,13 @@ public class EnterTimeOffPeriodCommandTests
         
         await this._command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Введите период отгула в одном из форматов:\n\n" +
-                                                               "Если отгул на один день:\n<strong>DD.MM.YYYY[ с HH:mm до HH:mm]</strong>\n" +
+        this._client.Verify(target => target.SendMessage(2517, "Введите период удаленной работы в одном из форматов:\n\n" +
+                                                               "Если на один день:\n<strong>DD.MM.YYYY[ с HH:mm до HH:mm]</strong>\n" +
                                                                "Например: <i>26.04.2020 c 9:00 до 13:00</i>\n\n" +
-                                                               "Или, если отгул на несколько дней:\n<strong>с [HH:mm ]DD.MM.YYYY до [HH:mm ]DD.MM.YYYY</strong>\n" +
-                                                               "Например: <i>с 9:00 26.04.2020 до 13:00 28.04.2022</i>\n\n" +
+                                                               "Или, если на несколько дней:\n<strong>с DD.MM.YYYY до DD.MM.YYYY</strong>\n" +
+                                                               "Например: <i>с 26.04.2020 до 28.04.2022</i>\n\n" +
+                                                               "Или, на неопределенный срок:\n<strong>с DD.MM.YYYY до DD.MM.YYYY</strong>\n" +
+                                                               "Например: <i>с 26.04.2020 на неопределенный срок</i>\n\n" +
                                                                "В таком виде это будет вставлено в документ"));
     }
     
@@ -64,7 +66,7 @@ public class EnterTimeOffPeriodCommandTests
       
         await this._command.OnMessage();
         
-        _cacheService.Verify(target => target.SaveEntity(2517, new TimeOffCache() { Period =
+        _cacheService.Verify(target => target.SaveEntity(2517, new DistantCache() { Period =
             new DatePeriodParser().Parse("16.08.2022 c 13:00 до 17:00")}, It.IsAny<short>()), Times.Once);
     }
     

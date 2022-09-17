@@ -12,13 +12,13 @@ namespace Secretary.Documents.Tests.Templates.Html
         public void Setup()
         {
             DocumentTemplatesStorage.Initialize(Config.Instance.TemplatesPath);
-            this.Document = DocumentTemplatesStorage.Instance.GetVacationMessageTemplate();
+            Document = DocumentTemplatesStorage.Instance.GetVacationMessageTemplate();
         }
 
         [Test]
         public void ShouldCreateInstance()
         {
-            var adapter = new VacationMessageAdapter(this.Document);
+            var adapter = new VacationMessageAdapter(Document);
             
             Assert.Pass();
         }
@@ -26,11 +26,11 @@ namespace Secretary.Documents.Tests.Templates.Html
         [Test]
         public void ShouldSetJobTitle()
         {
-            var adapter = new VacationMessageAdapter(this.Document);
+            var adapter = new VacationMessageAdapter(Document);
             
             adapter.SetJobTitle("инженер-программист");
 
-            var node = this.Document.GetElementbyId("signature_job-title");
+            var node = Document.GetElementbyId("signature_job-title");
             
             Assert.That(node.InnerHtml, Is.EqualTo("инженер-программист"));
         }
@@ -42,7 +42,7 @@ namespace Secretary.Documents.Tests.Templates.Html
             
             adapter.SetPersonName("Александр Пушкин");
 
-            var node = this.Document.GetElementbyId("signature_name");
+            var node = Document.GetElementbyId("signature_name");
             
             Assert.That(node.InnerHtml, Is.EqualTo("Александр Пушкин"));
         }
@@ -54,7 +54,7 @@ namespace Secretary.Documents.Tests.Templates.Html
             
             adapter.SetDate("с 26.12.1825 по 09.01.1826");
 
-            var node = this.Document.GetElementbyId("vacation_period");
+            var node = Document.GetElementbyId("vacation_period");
             
             Assert.That(node.InnerHtml, Is.EqualTo("Прошу предоставить ежегодный оплачиваемый отпуск с 26.12.1825 по 09.01.1826, включительно."));
         }

@@ -4,19 +4,19 @@ using Secretary.Documents.Creators.Data;
 using Secretary.Documents.Creators.DocumentCreators;
 using Secretary.Documents.Creators.MessageCreators;
 using Secretary.Storage.Models;
+using Secretary.Telegram.Commands.Distant;
 using Secretary.Telegram.Commands.TimeOff;
 using Secretary.Telegram.Models;
 
 namespace Secretary.Telegram.Commands.Caches;
 
-public class TimeOffCache: 
-    IEquatable<TimeOffCache>, 
-    ITimeOffDocumentCache
+public class DistantCache: 
+    IEquatable<DistantCache>, 
+    IDistantDocumentCache
 {
-    [JsonIgnore] public virtual string DocumentKey => TimeOffCommand.Key;
+    [JsonIgnore] public virtual string DocumentKey => DistantCommand.Key;
     public virtual DatePeriod? Period { get; set; }
     public string? Reason { get; set; }
-    public string? WorkingOff { get; set; }
     
     public IEnumerable<Email>? Emails { get; set; }
 
@@ -24,37 +24,35 @@ public class TimeOffCache:
 
     public virtual string CreateDocument(User user)
     {
-        var data = new TimeOffData()
+        var data = new DistantData()
         {
-            Period = this.Period!.RawValue,
-            Reason = this.Reason!,
-            WorkingOff = this.WorkingOff!,
+            Period = Period!.RawValue,
+            Reason = Reason!,
             Name = user.NameGenitive!,
             JobTitle = user.JobTitleGenitive!
         };
 
-        var document = new TimeOffDocumentCreator().Create(data);
+        var document = new DistantDocumentCreator().Create(data);
 
         return document;
     }
 
     public virtual string CreateMail(User user)
     {
-        var data = new TimeOffData()
+        var data = new DistantData()
         {
             Period = Period!.RawValue,
             Reason = Reason!,
-            WorkingOff = WorkingOff!,
             Name = user.Name!,
             JobTitle = user.JobTitle!
         };
 
-        var document = new TimeOffMessageCreator().Create(data);
+        var document = new DistantMessageCreator().Create(data);
 
         return document;
     }
 
-    public bool Equals(TimeOffCache? other)
+    public bool Equals(DistantCache? other)
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
@@ -66,7 +64,6 @@ public class TimeOffCache:
         
         return (Period == other.Period || Period.Equals(other.Period)) 
                && Reason == other.Reason 
-               && WorkingOff == other.WorkingOff 
                && (Emails == other.Emails || Emails!.SequenceEqual(other.Emails!))
                && FilePath == other.FilePath;
     }
@@ -76,11 +73,11 @@ public class TimeOffCache:
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != this.GetType()) return false;
-        return Equals((TimeOffCache)obj);
+        return Equals((DistantCache)obj);
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Period, Reason, WorkingOff, Emails, FilePath);
+        return HashCode.Combine(Period, Reason, Emails, FilePath);
     }
 }

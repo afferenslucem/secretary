@@ -43,7 +43,12 @@ public class ChooseDocumentCommandTests
         
         _client.Verify(target => target.SendMessageWithKeyBoard(2517,
             "Выберете документ для установки получателей",
-            new []{ "Отгул", "Отпуск" }
+            It.Is<string[][]>(item => item[0].SequenceEqual(new[] { "Отгул", "Отпуск" }))
+        ));
+        
+        _client.Verify(target => target.SendMessageWithKeyBoard(2517,
+            "Выберете документ для установки получателей",
+            It.Is<string[][]>(item => item[1].SequenceEqual(new[] { "Удаленная работа" }))
         ));
     }
     

@@ -1,4 +1,5 @@
 ﻿using Secretary.Telegram.Commands;
+using Secretary.Telegram.Commands.Distant;
 using Secretary.Telegram.Commands.Factories;
 using Secretary.Telegram.Commands.RegisterMail;
 using Secretary.Telegram.Commands.RegisterUser;
@@ -19,6 +20,7 @@ public class CommandsListeningChain
         this._commandsChain.Add(RegisterMailCommand.Key, new CommandFactory<RegisterMailCommand>());
         this._commandsChain.Add(TimeOffCommand.Key, new CommandFactory<TimeOffCommand>());
         this._commandsChain.Add(VacationCommand.Key, new CommandFactory<VacationCommand>());
+        this._commandsChain.Add(DistantCommand.Key, new CommandFactory<DistantCommand>());
         this._commandsChain.Add(CancelCommand.Key, new CommandFactory<CancelCommand>());
         this._commandsChain.Add(MeCommand.Key, new CommandFactory<MeCommand>());
         this._commandsChain.Add(SetEmailsCommand.Key, new CommandFactory<SetEmailsCommand>());

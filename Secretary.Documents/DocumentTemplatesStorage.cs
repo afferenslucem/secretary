@@ -5,7 +5,7 @@ namespace Secretary.Documents;
 
 public class DocumentTemplatesStorage
 {
-    public static DocumentTemplatesStorage Instance { get; private set; }
+    public static DocumentTemplatesStorage Instance { get; }
     
     public static string Path = null!;
 
@@ -29,6 +29,11 @@ public class DocumentTemplatesStorage
         return DocX.Load($"{Path}/docx/vacation.docx");
     }
 
+    public DocX GetDistantDocument()
+    {
+        return DocX.Load($"{Path}/docx/distant.docx");
+    }
+
     public HtmlDocument GetTimeOffMessageTemplate()
     {
         var doc = new HtmlDocument();
@@ -41,6 +46,14 @@ public class DocumentTemplatesStorage
     {
         var doc = new HtmlDocument();
         doc.Load($"{Path}/html/vacation.html");
+        
+        return doc;
+    }
+
+    public HtmlDocument GetDistantMessageTemplate()
+    {
+        var doc = new HtmlDocument();
+        doc.Load($"{Path}/html/distant.html");
         
         return doc;
     }

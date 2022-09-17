@@ -23,7 +23,7 @@ public class TelegramClient: ITelegramClient
     public TelegramClient(string token, CancellationToken cancellationToken)
     {
         _cancellationToken = cancellationToken;
-        this._botClient = new TelegramBotClient(token);
+        _botClient = new TelegramBotClient(token);
     }
 
     public async Task RunDriver()
@@ -35,13 +35,13 @@ public class TelegramClient: ITelegramClient
             AllowedUpdates = new [] { UpdateType.Message }
         };
         
-        while (!this._cancellationToken.IsCancellationRequested)
+        while (!_cancellationToken.IsCancellationRequested)
         {
-            await this._botClient.ReceiveAsync(
-                updateHandler: this.HandleUpdateAsync,
-                pollingErrorHandler: this.HandlePollingErrorAsync,
+            await _botClient.ReceiveAsync(
+                updateHandler: HandleUpdateAsync,
+                pollingErrorHandler: HandlePollingErrorAsync,
                 receiverOptions: receiverOptions,
-                cancellationToken: this._cancellationToken);
+                cancellationToken: _cancellationToken);
         }
     }
     
@@ -58,7 +58,7 @@ public class TelegramClient: ITelegramClient
         
         _logger.Debug($"({botMessage.ChatId}): {botMessage.Text}");
         
-        var task = this.OnMessage?.Invoke(botMessage);
+        var task = OnMessage?.Invoke(botMessage);
 
         return task ?? Task.CompletedTask;
     }
@@ -78,7 +78,7 @@ public class TelegramClient: ITelegramClient
     
     public Task SendMessage(long chatId, string message)
     {
-        return this._botClient.SendTextMessageAsync(chatId, message, cancellationToken: this._cancellationToken, parseMode: ParseMode.Html, replyMarkup: new ReplyKeyboardRemove());
+        return _botClient.SendTextMessageAsync(chatId, message, cancellationToken: _cancellationToken, parseMode: ParseMode.Html, replyMarkup: new ReplyKeyboardRemove());
     }
 
     public Task SendMessageWithKeyBoard(long chatId, string message, string[] choices)
@@ -91,20 +91,33 @@ public class TelegramClient: ITelegramClient
             OneTimeKeyboard = true
         };
 
-        return this._botClient.SendTextMessageAsync(chatId, message, parseMode: ParseMode.Html, replyMarkup: keyboard, cancellationToken: this._cancellationToken);
+        return _botClient.SendTextMessageAsync(chatId, message, parseMode: ParseMode.Html, replyMarkup: keyboard, cancellationToken: _cancellationToken);
+    }
+
+    public Task SendMessageWithKeyBoard(long chatId, string message, string[][] choices)
+    {
+        var buttons = choices.Select(row => row.Select(text => new KeyboardButton(text))).ToArray();
+        
+        var keyboard = new ReplyKeyboardMarkup(buttons)
+        {
+            ResizeKeyboard = true,
+            OneTimeKeyboard = true
+        };
+
+        return _botClient.SendTextMessageAsync(chatId, message, parseMode: ParseMode.Html, replyMarkup: keyboard, cancellationToken: _cancellationToken);
     }
 
     public async Task SendDocument(long chatId, string path, string fileName)
     {
         await using var fileStream = File.OpenRead(path);
         
-        await this._botClient.SendDocumentAsync(
+        await _botClient.SendDocumentAsync(
             chatId: chatId,
-            document: new InputOnlineFile(content: fileStream, fileName: fileName), cancellationToken: this._cancellationToken);
+            document: new InputOnlineFile(content: fileStream, fileName: fileName), cancellationToken: _cancellationToken);
     }
 
     public async Task SendSticker(long chatId, string stickerId)
     {
-        await this._botClient.SendStickerAsync(chatId, new InputOnlineFile(stickerId));
+        await _botClient.SendStickerAsync(chatId, new InputOnlineFile(stickerId));
     }
 }
