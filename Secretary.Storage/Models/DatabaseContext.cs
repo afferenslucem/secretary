@@ -38,6 +38,10 @@ namespace Secretary.Storage.Models
                 .HasOne(document => document.User)
                 .WithMany(user => user.Documents)
                 .HasForeignKey(document => document.ChatId);
+            
+            modelBuilder.Entity<User>()
+                .Property(e => e.ChatId)
+                .ValueGeneratedNever();
         }
     }
 }
