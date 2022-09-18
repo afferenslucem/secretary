@@ -14,7 +14,7 @@ public class TokenRefresher
     private readonly IYandexAuthenticator _yandexAuthenticator;
     private readonly Database _database;
     private readonly CancellationToken _cancellationToken;
-    private Task _refresher;
+    private Task? _refresher;
 
     private IUserStorage UserStorage => _database.UserStorage;
     
