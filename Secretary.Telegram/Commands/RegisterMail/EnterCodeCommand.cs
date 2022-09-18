@@ -81,6 +81,9 @@ public class EnterCodeCommand: Command
         user.Email = cache.Email;
         user.AccessToken = data.access_token;
         user.RefreshToken = data.refresh_token;
+        user.TokenExpirationSeconds = data.expires_in;
+        
+        user.TokenCreationTime = DateTime.UtcNow;
 
         await UserStorage.SetUser(user);
     }

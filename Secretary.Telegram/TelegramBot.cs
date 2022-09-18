@@ -38,6 +38,8 @@ public class TelegramBot
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
+    private readonly TokenRefresher _refresher;
+
     public TelegramBot(Config config)
     {
         _database = new Database();
@@ -55,6 +57,8 @@ public class TelegramBot
         _telegramClient = new TelegramClient(config.TelegramApiKey, _cancellationTokenSource.Token);
 
         _telegramClient.OnMessage += this.WorkWithMessage;
+
+        _refresher = new TokenRefresher(config, _cancellationTokenSource.Token);
     }
 
     private async Task WorkWithMessage(BotMessage message)
@@ -97,6 +101,8 @@ public class TelegramBot
         _logger.Information($"Version: {Version}");
         _logger.Information($"Uptime: {Uptime}");
 
+        _refresher.RunThread();
+        
         return this._telegramClient.RunDriver();
     }
 

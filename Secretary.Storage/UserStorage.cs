@@ -1,16 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Secretary.Logging;
 using Secretary.Storage.Models;
+using Serilog;
 
 namespace Secretary.Storage;
 
 public class UserStorage: Storage, IUserStorage
 {
+    private ILogger _logger = LogPoint.GetLogger<UserStorage>();
+    
     public async Task<User?> GetUser(long chatId)
     {
         await using var context = GetContext();
 
         var user =
-            await context.Users.FirstOrDefaultAsync(item =>
+            await context.Users.SingleOrDefaultAsync(item =>
                 item.ChatId == chatId);
 
         return user;
@@ -18,33 +22,36 @@ public class UserStorage: Storage, IUserStorage
 
     public async Task SetUser(User user)
     {
-        var data = await this.GetUser(user.ChatId);
-
-        if (data == null)
+        await using var context = GetContext();
+        
+        var exists = await context.Users.AnyAsync(item => item.ChatId == user.ChatId);
+        _logger.Debug("Check entity existing");
+        
+        if (exists)
         {
-            await this.InsertUser(user);
+            context.Update(user);
+            _logger.Debug("Entity updated");
         }
         else
         {
-            await UpdateUser(user);
+            await context.Users.AddAsync(user);
+            _logger.Debug("Entity inserted");
         }
-    }
-
-    private async Task InsertUser(User user)
-    {
-        await using var context = GetContext();
-
-        await context.Users.AddAsync(user);
-
+        
         await context.SaveChangesAsync();
     }
 
-    private async Task UpdateUser(User user)
+    public async Task<int> GetCount()
     {
         await using var context = GetContext();
 
-        context.Users.Update(user);
+        return await context.Users.CountAsync();
+    }
 
-        await context.SaveChangesAsync();
+    public async Task<User[]> GetUsers(int from, int length)
+    {
+        await using var context = GetContext();
+        
+        return await context.Users.Skip(from).Take(length).ToArrayAsync();
     }
 }

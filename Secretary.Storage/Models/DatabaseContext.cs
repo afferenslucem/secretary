@@ -1,10 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Logging;
 using Secretary.Configuration;
+using Secretary.Logging;
+using ILogger = Serilog.ILogger;
 
 namespace Secretary.Storage.Models
 {
     public partial class DatabaseContext : DbContext
     {
+        private ILogger _logger = LogPoint.GetLogger<DatabaseContext>();
+        
         public DatabaseContext()
         {
         }
@@ -24,6 +30,8 @@ namespace Secretary.Storage.Models
             {
                 optionsBuilder.UseNpgsql(Config.Instance.DbConnectionString);
             }
+
+            // optionsBuilder.LogTo(_logger.Debug);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

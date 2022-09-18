@@ -35,6 +35,14 @@ public class YandexAuthenticator: IYandexAuthenticator
         );
     }
 
+    public Task<TokenData?> RefreshToken(string refreshToken, CancellationToken cancellationToken)
+    {
+        return Retry(
+            () => this.SendRefreshTokenRequest(refreshToken, cancellationToken),
+            cancellationToken
+        );
+    }
+
     private async Task<T> Retry<T>(Func<Task<T>> action, CancellationToken cancellationToken)
     {
         try
@@ -94,6 +102,32 @@ public class YandexAuthenticator: IYandexAuthenticator
         {
             _logger.Error(e, "Ошибка при получении токена");
             throw new YandexAuthenticationException("Could not get token", e);
+        }
+    }
+    
+    private async Task<TokenData?> SendRefreshTokenRequest(string refreshToken, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://oauth.yandex.ru/token");
+
+            request.Content =
+                new StringContent(
+                    $"grant_type=refresh_token&refresh_token={refreshToken}&client_id={_mailConfig.ClientId}&client_secret={_mailConfig.ClientSecret}");
+
+            var response = await _httpClient.SendAsync(request, cancellationToken);
+
+            var responseData = await response.Content.ReadAsStringAsync();
+
+            var result = JsonSerializer.Deserialize<TokenData>(responseData);
+
+            return result;
+
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "Ошибка при обновлении токена");
+            throw new YandexAuthenticationException("Could not refresh token", e);
         }
     }
 
