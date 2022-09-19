@@ -38,4 +38,14 @@ public class VacationCommand: StatedCommand
         await CacheService.DeleteEntity<VacationCache>();
         await base.OnForceComplete();
     }
+    
+    public override async Task OnComplete()
+    {
+        await base.OnComplete();
+        
+        if (IsCompleted)
+        {
+            await StatisticService.LogVacation(ChatId);
+        }
+    }
 }

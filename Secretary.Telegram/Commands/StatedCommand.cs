@@ -14,6 +14,9 @@ public abstract class StatedCommand: Command
     [JsonProperty]
     protected CommandClip Clip;
 
+    [JsonIgnore]
+    public virtual bool IsCompleted => Clip.IsCompleted;
+
     protected StatedCommand()
     {
         var states = this.ConfigureStates();
@@ -61,8 +64,9 @@ public abstract class StatedCommand: Command
 
     public override async Task OnComplete()
     {
-        if (Clip.IsCompleted)
+        if (IsCompleted)
         {
+            _logger.Debug($"{this.GetType().Name} completed");
             await base.OnComplete();
         }
     }

@@ -1,10 +1,6 @@
 ﻿using Secretary.Documents.utils;
-using Secretary.Logging;
 using Secretary.Telegram.Commands.Caches;
 using Secretary.Telegram.Commands.Common;
-using Secretary.Telegram.Commands.ExceptionHandlers;
-using Secretary.Telegram.Exceptions;
-using Serilog;
 
 namespace Secretary.Telegram.Commands.TimeOff;
 
@@ -43,5 +39,15 @@ public class TimeOffCommand: StatedCommand
         
         await CacheService.DeleteEntity<TimeOffCache>();
         await base.OnForceComplete();
+    }
+
+    public override async Task OnComplete()
+    {
+        await base.OnComplete();
+        
+        if (IsCompleted)
+        {
+            await StatisticService.LogTimeOff(ChatId);
+        }
     }
 }

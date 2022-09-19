@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Secretary.Storage;
+using Secretary.Storage.Interfaces;
 using Secretary.Telegram.Exceptions;
 using Secretary.Telegram.Wrappers;
 using Secretary.Yandex.Authentication;
@@ -21,7 +22,8 @@ public abstract class Command
     protected IEmailStorage EmailStorage => Context.EmailStorage;
     protected IYandexAuthenticator YandexAuthenticator => Context.YandexAuthenticator;
     protected IMailClient MailClient => Context.MailClient;
-    protected CacheServiceWrapper CacheService => new CacheServiceWrapper(Context.CacheService, Context.ChatId);
+    protected CacheServiceWrapper CacheService => new (Context.CacheService, Context.ChatId);
+    protected StatisticService StatisticService => new (Context.EventLogStorage);
 
     protected long ChatId => Context.ChatId;
 

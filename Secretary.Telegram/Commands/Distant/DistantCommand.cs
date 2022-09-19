@@ -39,4 +39,14 @@ public class DistantCommand: StatedCommand
         await CacheService.DeleteEntity<DistantCache>();
         await base.OnForceComplete();
     }
+    
+    public override async Task OnComplete()
+    {
+        await base.OnComplete();
+        
+        if (IsCompleted)
+        {
+            await StatisticService.LogDistant(ChatId);
+        }
+    }
 }

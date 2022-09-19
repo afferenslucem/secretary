@@ -23,6 +23,7 @@ namespace Secretary.Storage.Models
         public virtual DbSet<Document> Documents { get; set; } = null!;
         public virtual DbSet<Email> Emails { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
+        public virtual DbSet<EventLog> EventLogs { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -31,7 +32,7 @@ namespace Secretary.Storage.Models
                 optionsBuilder.UseNpgsql(Config.Instance.DbConnectionString);
             }
 
-            // optionsBuilder.LogTo(_logger.Debug);
+            optionsBuilder.LogTo(_logger.Debug);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,11 +46,16 @@ namespace Secretary.Storage.Models
             modelBuilder.Entity<Document>()
                 .HasOne(document => document.User)
                 .WithMany(user => user.Documents)
-                .HasForeignKey(document => document.ChatId);
+                .HasForeignKey(document => document.UserChatId);
             
             modelBuilder.Entity<User>()
                 .Property(e => e.ChatId)
                 .ValueGeneratedNever();
+            
+            modelBuilder.Entity<EventLog>()
+                .HasOne(@event => @event.User)
+                .WithMany(user => user.Events)
+                .HasForeignKey(@event => @event.UserChatId);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 
 namespace Secretary.Storage;
@@ -22,7 +23,7 @@ public class DocumentStorage: Storage, IDocumentStorage
 
         var document =
             await context.Documents.FirstOrDefaultAsync(item =>
-                item.ChatId == chatId && item.DocumentName == documentName);
+                item.UserChatId == chatId && item.DocumentName == documentName);
 
         return document;
     }

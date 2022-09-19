@@ -4,6 +4,7 @@ using Secretary.Configuration;
 using Secretary.Documents;
 using Secretary.Documents.utils;
 using Secretary.Storage;
+using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
 using Secretary.Telegram.Commands.Caches;
@@ -21,6 +22,7 @@ public class VacationCommandTests
     private Mock<IUserStorage> _userStorage = null!;
     private Mock<IDocumentStorage> _documentStorage = null!;
     private Mock<IEmailStorage> _emailStorage = null!;
+    private Mock<IEventLogStorage> _eventLogStorage = null!;
     private Mock<IMailClient> _mailClient = null!;
     private Mock<ICacheService> _cacheService = null!;
     private Mock<IFileManager> _fileManager = null!;
@@ -37,6 +39,7 @@ public class VacationCommandTests
 
         _userStorage = new Mock<IUserStorage>();
         _documentStorage = new Mock<IDocumentStorage>();
+        _eventLogStorage = new Mock<IEventLogStorage>();
         _emailStorage = new Mock<IEmailStorage>();
         _mailClient = new Mock<IMailClient>();
         _cacheService = new Mock<ICacheService>();
@@ -52,6 +55,7 @@ public class VacationCommandTests
                 UserStorage = _userStorage.Object,
                 DocumentStorage = _documentStorage.Object,
                 EmailStorage = _emailStorage.Object,
+                EventLogStorage = _eventLogStorage.Object,
                 MailClient = _mailClient.Object,
                 CacheService = _cacheService.Object,
             };
@@ -74,7 +78,46 @@ public class VacationCommandTests
     public void ShouldHaveCorrectKey()
     {
         Assert.That(VacationCommand.Key, Is.EqualTo("/vacation"));
-    }    
+    }
+    
+    [Test]
+    public async Task ShouldSaveEventOnComplete()
+    {
+        var command = new Mock<VacationCommand>();
+        command.CallBase = true;
+        command.SetupGet(target => target.IsCompleted).Returns(true);
+        
+        command.Object.Context = _context;
+
+        await command.Object.OnComplete();
+        
+        _eventLogStorage.Verify(target => target.Save(
+            It.Is<EventLog>(log => log.Description == "Created Vacation")
+        ));
+        
+        _eventLogStorage.Verify(target => target.Save(
+            It.Is<EventLog>(log => log.UserChatId == 2517)
+        ));
+        
+        _eventLogStorage.Verify(target => target.Save(
+            It.Is<EventLog>(log => log.EventType == VacationCommand.Key)
+        ));
+    }
+    
+    [Test]
+    public async Task ShouldDeleteSessionOnComplete()
+    {
+        var command = new Mock<VacationCommand>();
+        command.CallBase = true;
+        command.SetupGet(target => target.IsCompleted).Returns(true);
+        
+        command.Object.Context = _context;
+
+        await command.Object.OnComplete();
+        
+        _sessionStorage.Verify(target => target.DeleteSession(2517));
+    }
+    
     [Test]
     public async Task ShouldRemoveSessionForNo()
     {

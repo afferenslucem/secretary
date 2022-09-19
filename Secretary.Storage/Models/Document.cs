@@ -8,7 +8,7 @@ namespace Secretary.Storage.Models
         [Key]
         public long Id { get; set; }
         
-        public long ChatId { get; set; }
+        public long UserChatId { get; set; }
 
         public User User { get; set; } = null!;
         
@@ -20,9 +20,9 @@ namespace Secretary.Storage.Models
 
         public Document() {}
 
-        public Document(long chatId, string documentName)
+        public Document(long userChatId, string documentName)
         {
-            ChatId = chatId;
+            UserChatId = userChatId;
             DocumentName = documentName;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Secretary.Logging;
+using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Serilog;
 

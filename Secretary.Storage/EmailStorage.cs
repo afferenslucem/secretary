@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 
 namespace Secretary.Storage;

@@ -1,4 +1,5 @@
 ﻿using Secretary.Storage;
+using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 
 namespace Secretary.Telegram.Wrappers;

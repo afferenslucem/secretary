@@ -1,7 +1,9 @@
 ﻿using Secretary.Cache;
 using Secretary.Storage;
+using Secretary.Storage.Interfaces;
 using Secretary.Telegram;
 using Secretary.Telegram.Sessions;
+using Secretary.Telegram.Wrappers;
 using Secretary.Yandex.Authentication;
 using Secretary.Yandex.Mail;
 
@@ -25,11 +27,11 @@ public class CommandContext
 
     public IMailClient MailClient = null!;
 
+    public IEventLogStorage EventLogStorage = null!;
+    
     public ICacheService CacheService = null!;
 
     public string Message = null!;
-
-    public bool BackwardRedirect = false;
 
     public CommandContext(
         long chatId, 
@@ -38,6 +40,7 @@ public class CommandContext
         IUserStorage userStorage, 
         IDocumentStorage documentStorage, 
         IEmailStorage emailStorage,
+        IEventLogStorage eventLogStorage,
         IYandexAuthenticator yandexAuthenticator, 
         IMailClient mailClient, 
         ICacheService cacheService,
@@ -51,6 +54,7 @@ public class CommandContext
         EmailStorage = emailStorage;
         YandexAuthenticator = yandexAuthenticator;
         MailClient = mailClient;
+        EventLogStorage = eventLogStorage;
         CacheService = cacheService;
         Message = message;
     }

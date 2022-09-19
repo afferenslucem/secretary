@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Secretary.Storage;
+using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
 using Secretary.Telegram.Sessions;

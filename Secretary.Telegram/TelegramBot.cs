@@ -76,6 +76,7 @@ public class TelegramBot
                 _database.UserStorage,
                 _database.DocumentStorage,
                 _database.EmailStorage,
+                _database.EventLogStorage,
                 _yandexAuthenticator,
                 _mailClient,
                 _cacheService,

@@ -1,6 +1,7 @@
 ﻿using Secretary.Configuration;
 using Secretary.Logging;
 using Secretary.Storage;
+using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Yandex.Authentication;
 using Serilog;

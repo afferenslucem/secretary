@@ -4,6 +4,7 @@ using Secretary.Configuration;
 using Secretary.Documents;
 using Secretary.Documents.utils;
 using Secretary.Storage;
+using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
 using Secretary.Telegram.Commands.Caches;
@@ -23,6 +24,7 @@ public class TimeOffCommandTests
     private Mock<IUserStorage> _userStorage = null!;
     private Mock<IDocumentStorage> _documentStorage = null!;
     private Mock<IEmailStorage> _emailStorage = null!;
+    private Mock<IEventLogStorage> _eventLogStorage = null!;
     private Mock<IMailClient> _mailClient = null!;
     private Mock<ICacheService> _cacheService = null!;
     private Mock<IFileManager> _fileManager = null!;
@@ -38,6 +40,7 @@ public class TimeOffCommandTests
         _userStorage = new Mock<IUserStorage>();
         _documentStorage = new Mock<IDocumentStorage>();
         _emailStorage = new Mock<IEmailStorage>();
+        _eventLogStorage = new Mock<IEventLogStorage>();
         _mailClient = new Mock<IMailClient>();
         _cacheService = new Mock<ICacheService>();
         _fileManager = new Mock<IFileManager>();
@@ -53,11 +56,12 @@ public class TimeOffCommandTests
                 UserStorage = _userStorage.Object,
                 DocumentStorage = _documentStorage.Object,
                 EmailStorage = _emailStorage.Object,
+                EventLogStorage = _eventLogStorage.Object,
                 MailClient = _mailClient.Object,
                 CacheService = _cacheService.Object,
             };
         
-        this._command.Context = _context;
+        _command.Context = _context;
         
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { JobTitleGenitive = "", AccessToken = ""});
         
@@ -84,6 +88,44 @@ public class TimeOffCommandTests
         await this._command.Execute();
         
         this._sessionStorage.Verify(target => target.SaveSession(2517, It.Is<Session>(session => session.ChatId == 2517 && session.LastCommand == _command)));
+    }
+    
+    [Test]
+    public async Task ShouldSaveEventOnComplete()
+    {
+        var command = new Mock<TimeOffCommand>();
+        command.CallBase = true;
+        command.SetupGet(target => target.IsCompleted).Returns(true);
+        
+        command.Object.Context = _context;
+
+        await command.Object.OnComplete();
+        
+        _eventLogStorage.Verify(target => target.Save(
+            It.Is<EventLog>(log => log.Description == "Created Time Off")
+        ));
+        
+        _eventLogStorage.Verify(target => target.Save(
+            It.Is<EventLog>(log => log.UserChatId == 2517)
+        ));
+        
+        _eventLogStorage.Verify(target => target.Save(
+            It.Is<EventLog>(log => log.EventType == TimeOffCommand.Key)
+        ));
+    }
+    
+    [Test]
+    public async Task ShouldDeleteSessionOnComplete()
+    {
+        var command = new Mock<TimeOffCommand>();
+        command.CallBase = true;
+        command.SetupGet(target => target.IsCompleted).Returns(true);
+        
+        command.Object.Context = _context;
+
+        await command.Object.OnComplete();
+        
+        _sessionStorage.Verify(target => target.DeleteSession(2517));
     }
 
     [Test]
@@ -162,13 +204,9 @@ public class TimeOffCommandTests
             .ReturnsAsync(new [] { new Email("a.pushkin@infinnity.ru") });
         _context.Message = "Да";
         await this._command.OnMessage();
-        await _command.OnComplete();
         
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         _context.Message = "Повторить";
         await this._command.OnMessage();
-        await _command.OnComplete();
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
         _mailClient.Verify(target => target.SendMail(It.IsAny<SecretaryMailMessage>()), Times.Once);
     }
     

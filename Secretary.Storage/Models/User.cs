@@ -28,5 +28,7 @@ namespace Secretary.Storage.Models
         public int? TokenExpirationSeconds { get; set; }
 
         public IEnumerable<Document> Documents = null;
+
+        public IEnumerable<EventLog> Events = null;
     }
 }

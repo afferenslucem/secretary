@@ -1,6 +1,7 @@
 ﻿using Moq;
 using Secretary.Cache;
 using Secretary.Storage;
+using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
 using Secretary.Telegram.Commands.Caches;
@@ -23,23 +24,23 @@ public class EnterVacationPeriodCommandTests
     [SetUp]
     public void Setup()
     {
-        this._client = new Mock<ITelegramClient>();
-        this._userStorage = new Mock<IUserStorage>();
-        this._cacheService = new Mock<ICacheService>();
+        _client = new Mock<ITelegramClient>();
+        _userStorage = new Mock<IUserStorage>();
+        _cacheService = new Mock<ICacheService>();
 
-        this._command = new EnterVacationPeriodCommand<TimeOffCache>();
+        _command = new EnterVacationPeriodCommand<TimeOffCache>();
 
-        this._context = new CommandContext()
+        _context = new CommandContext()
         { 
             ChatId = 2517, 
-            TelegramClient = this._client.Object, 
+            TelegramClient = _client.Object, 
             UserStorage = _userStorage.Object,
             CacheService = _cacheService.Object,
         };
         
-        this._command.Context = _context;
+        _command.Context = _context;
 
-        this._userStorage.Setup(target => target.GetUser(It.IsAny<long>()))
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>()))
             .ReturnsAsync(new User() { JobTitleGenitive = "", AccessToken = "" });
     }
     
@@ -48,9 +49,9 @@ public class EnterVacationPeriodCommandTests
     {
         _client.Setup(obj => obj.SendMessage(It.IsAny<long>(), It.IsAny<string>()));
         
-        await this._command.Execute();
+        await _command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Введите период отпуска в формате:\n" +
+        _client.Verify(target => target.SendMessage(2517, "Введите период отпуска в формате:\n" +
                                                                "<strong> с DD.MM.YYYY по DD.MM.YYYY</strong>\n" +
                                                                "Например: <i>с 07.02.2022 по 13.02.2022</i>\n\n" +
                                                                "В таком виде это будет вставлено в документ"));
@@ -61,7 +62,7 @@ public class EnterVacationPeriodCommandTests
     {
         _context.Message = "с 16.08.2022 до 29.08.2022";
       
-        await this._command.OnMessage();
+        await _command.OnMessage();
         
         _cacheService.Verify(target => target.SaveEntity(2517, new TimeOffCache() { Period =
             new DatePeriodParser().Parse("с 16.08.2022 до 29.08.2022")}, It.IsAny<short>()), Times.Once);

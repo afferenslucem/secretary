@@ -4,6 +4,7 @@ using Secretary.Configuration;
 using Secretary.Documents;
 using Secretary.Documents.utils;
 using Secretary.Storage;
+using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
 using Secretary.Telegram.Commands.Caches;
@@ -23,6 +24,7 @@ public class DistantCommandTests
     private Mock<IUserStorage> _userStorage = null!;
     private Mock<IDocumentStorage> _documentStorage = null!;
     private Mock<IEmailStorage> _emailStorage = null!;
+    private Mock<IEventLogStorage> _eventLogStorage = null!;
     private Mock<IMailClient> _mailClient = null!;
     private Mock<ICacheService> _cacheService = null!;
     private Mock<IFileManager> _fileManager = null!;
@@ -38,6 +40,7 @@ public class DistantCommandTests
         _userStorage = new Mock<IUserStorage>();
         _documentStorage = new Mock<IDocumentStorage>();
         _emailStorage = new Mock<IEmailStorage>();
+        _eventLogStorage = new Mock<IEventLogStorage>();
         _mailClient = new Mock<IMailClient>();
         _cacheService = new Mock<ICacheService>();
         _fileManager = new Mock<IFileManager>();
@@ -53,6 +56,7 @@ public class DistantCommandTests
                 UserStorage = _userStorage.Object,
                 DocumentStorage = _documentStorage.Object,
                 EmailStorage = _emailStorage.Object,
+                EventLogStorage = _eventLogStorage.Object,
                 MailClient = _mailClient.Object,
                 CacheService = _cacheService.Object,
             };
@@ -84,6 +88,44 @@ public class DistantCommandTests
         await this._command.Execute();
         
         this._sessionStorage.Verify(target => target.SaveSession(2517, It.Is<Session>(session => session.ChatId == 2517 && session.LastCommand == _command)));
+    }
+    
+    [Test]
+    public async Task ShouldSaveEventOnComplete()
+    {
+        var command = new Mock<DistantCommand>();
+        command.CallBase = true;
+        command.SetupGet(target => target.IsCompleted).Returns(true);
+        
+        command.Object.Context = _context;
+
+        await command.Object.OnComplete();
+        
+        _eventLogStorage.Verify(target => target.Save(
+            It.Is<EventLog>(log => log.Description == "Created Distant")
+        ));
+        
+        _eventLogStorage.Verify(target => target.Save(
+            It.Is<EventLog>(log => log.UserChatId == 2517)
+        ));
+        
+        _eventLogStorage.Verify(target => target.Save(
+            It.Is<EventLog>(log => log.EventType == DistantCommand.Key)
+        ));
+    }
+    
+    [Test]
+    public async Task ShouldDeleteSessionOnComplete()
+    {
+        var command = new Mock<DistantCommand>();
+        command.CallBase = true;
+        command.SetupGet(target => target.IsCompleted).Returns(true);
+        
+        command.Object.Context = _context;
+
+        await command.Object.OnComplete();
+        
+        _sessionStorage.Verify(target => target.DeleteSession(2517));
     }
 
     [Test]
@@ -140,7 +182,6 @@ public class DistantCommandTests
         
         _context.Message = "/distant";
         await this._command.Execute();
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         
         _context.Message = "30.08.2022";
         await this._command.OnMessage();
@@ -162,8 +203,6 @@ public class DistantCommandTests
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         _context.Message = "Повторить";
         await this._command.OnMessage();
-        await _command.OnComplete();
-        _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
         _mailClient.Verify(target => target.SendMail(It.IsAny<SecretaryMailMessage>()), Times.Once);
     }
     
