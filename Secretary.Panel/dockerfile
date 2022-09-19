@@ -1,0 +1,18 @@
+﻿FROM mcr.microsoft.com/dotnet/aspnet:6.0-bullseye-slim AS base
+WORKDIR /app
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS build
+WORKDIR /src
+COPY ["Secretary.Panel/Secretary.Panel.csproj", "Secretary.Panel/Secretary.Panel.csproj"]
+RUN dotnet restore "Secretary.Panel/Secretary.Panel.csproj"
+COPY . .
+WORKDIR "/src/Secretary.Panel"
+RUN dotnet build "Secretary.Panel.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "Secretary.Panel.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Secretary.Panel.dll"]

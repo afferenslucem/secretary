@@ -352,3 +352,5 @@ MigrationBackup/
 config.prod.json
 data/database.sqlite
 Secretary.Storage/config.json
+Secretary.Panel/config.json
+Secretary.Frontend/.vscode

@@ -49,6 +49,16 @@ public class UserStorage: Storage, IUserStorage
         return await context.Users.CountAsync();
     }
 
+    public async Task<int> GetCountWithDocuments()
+    {
+        await using var context = GetContext();
+
+        return await context.Users
+            .Include(user => user.Documents)
+            .Where(user => user.Documents.Count() > 0)
+            .CountAsync();
+    }
+
     public async Task<User[]> GetUsers(int from, int length)
     {
         await using var context = GetContext();

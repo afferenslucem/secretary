@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 
@@ -12,5 +13,18 @@ public class EventLogStorage : IEventLogStorage
         await context.EventLogs.AddAsync(@event);
 
         await context.SaveChangesAsync();
+    }
+
+    public async Task<(string DocumentName, int Count)[]> GetDocumentStatistic(params string[] documentTypes)
+    {
+        await using var context = new DatabaseContext();
+
+        var data = await context.EventLogs
+            .Where(item => documentTypes.Contains(item.EventType))
+            .GroupBy(item => item.EventType)
+            .Select(grouping => new { DocumentName = grouping.Key, Count = grouping.Count() })
+            .ToArrayAsync();
+
+        return data.Select(item => (item.DocumentName, item.Count)).ToArray();
     }
 }

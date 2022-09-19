@@ -7,6 +7,7 @@ public interface IUserStorage
     Task<User?> GetUser(long chatId);
     Task SetUser(User user);
     Task<int> GetCount();
+    Task<int> GetCountWithDocuments();
 
     Task<User[]> GetUsers(int from, int length);
 }

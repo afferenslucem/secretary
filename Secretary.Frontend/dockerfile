@@ -1,0 +1,14 @@
+FROM node:16-alpine as builder
+WORKDIR /app
+COPY Secretary.Frontend/package*.json ./
+RUN npm ci
+COPY Secretary.Frontend/ ./
+RUN npm run build -- panel
+
+# этап production (production-stage)
+FROM nginx:1.23.1 as production-stage
+COPY --from=builder /app/dist/panel /usr/share/nginx/html
+RUN rm /etc/nginx/conf.d/default.conf
+COPY Secretary.Frontend/nginx.conf /etc/nginx/conf.d/nginx.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

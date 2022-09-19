@@ -4,7 +4,7 @@ services:
     image: redis:7-bullseye
 
     ports:
-      - 6379:6379
+      - 127.0.0.1:6379:6379
       
   database:
     image: postgres:14-bullseye
@@ -20,15 +20,43 @@ services:
   bot:
     build: 
       context: .
-      dockerfile: dockerfile
+      dockerfile: ./Secretary.Console/dockerfile
     
     volumes:
       - "./config.prod.json:/app/config.json"
       - "./data:/data"
       - "./templates:/templates"
-      - "/var/log/Secretary:/logs"
-      - "/tmp/Secretary:/tmp"
+      - "/var/log/secretary/bot:/logs"
+      - "/tmp/secretary:/tmp"
 
     depends_on:
       - redis
       - database
+
+  panel-backend:
+    build: 
+      context: .
+      dockerfile: ./Secretary.Panel/dockerfile
+    
+    ports:
+      - 127.0.0.1:38080:80
+      
+    volumes:
+      - "./config.prod.json:/app/config.json"
+
+    depends_on:
+      - database
+
+  panel-frontend:
+    build: 
+      context: .
+      dockerfile: ./Secretary.Frontend/dockerfile
+    
+    volumes:
+      - "/var/log/secretary/panel:/logs"
+    
+    ports:
+      - 127.0.0.1:30080:80
+
+    depends_on:
+      - panel-backend

@@ -1,0 +1,92 @@
+<div class="container">
+  <div class="mb-5">
+    <h1>Secretary</h1>
+  </div>
+
+  <div class="statistic-tape">
+    <div class="statistic">
+      <div class="statistic__header">
+        Оформленные заявления
+      </div>
+      <div class="statistic__chart">
+        <canvas #documentsChart></canvas>
+      </div>
+      <div class="statistic__count">
+        <div class="line">
+          <div class="line__header">
+            Отгул
+          </div>
+          <div class="line__value">
+            {{ statistic.documentStatistic.timeOffCount }}
+          </div>
+        </div>
+        <div class="line">
+          <div class="line__header">
+            Отпуск
+          </div>
+          <div class="line__value">
+            {{ statistic.documentStatistic.vacationCount }}
+          </div>
+        </div>
+        <div class="line">
+          <div class="line__header">
+            Удаленка
+          </div>
+          <div class="line__value">
+            {{ statistic.documentStatistic.distantCount }}
+          </div>
+        </div>
+        <div class="line total">
+          <div class="line__header">
+            Всего
+          </div>
+          <div class="line__value">
+            {{
+            statistic.documentStatistic.timeOffCount +
+            statistic.documentStatistic.vacationCount +
+            statistic.documentStatistic.distantCount
+            }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="statistic">
+      <div class="statistic__header">
+        Пользователи
+      </div>
+      <div class="statistic__chart">
+        <canvas #userChart></canvas>
+      </div>
+      <div class="statistic__count">
+        <div class="line">
+          <div class="line__header">
+            С документами
+          </div>
+          <div class="line__value">
+            {{ statistic.userStatistic.userWithDocuments }}
+          </div>
+        </div>
+        <div class="line">
+          <div class="line__header">
+            Без документов
+          </div>
+          <div class="line__value">
+            {{
+            statistic.userStatistic.totalUsers -
+            statistic.userStatistic.userWithDocuments
+            }}
+          </div>
+        </div>
+        <div class="line total">
+          <div class="line__header">
+            Всего
+          </div>
+          <div class="line__value">
+            {{ statistic.userStatistic.totalUsers }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
