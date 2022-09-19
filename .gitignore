@@ -351,3 +351,4 @@ MigrationBackup/
 .idea
 config.prod.json
 data/database.sqlite
+Secretary.Storage/config.json
