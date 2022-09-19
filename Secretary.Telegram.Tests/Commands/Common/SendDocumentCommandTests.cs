@@ -180,6 +180,25 @@ public class SendDocumentCommandTests
     }
 
     [Test]
+    public async Task ShouldProtectIncorrectToken()
+    {
+        _mailClient.Setup(target => target.SendMail(It.IsAny<SecretaryMailMessage>()))
+            .ThrowsAsync(new AuthenticationException("Invalid user or password"));
+
+        _command.Context = _context;
+        await _command.SendMail(null!);
+        
+        _client.Verify(target => target.SendMessage(
+            2517, 
+            "Проблема с токеном!\n\n" +
+            "Выполните команду /registermail.\n" +
+            "Если проблема не исчезнет, то напишите @hrodveetnir"
+        ));
+        
+        _cacheService.Verify(target => target.DeleteEntity<TimeOffCache>(2517));
+    }
+
+    [Test]
     public async Task ShouldProtectNotOwnTokenUsage()
     {
         var exception = new SmtpCommandException(

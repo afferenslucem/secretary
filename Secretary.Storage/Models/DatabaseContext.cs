@@ -32,7 +32,7 @@ namespace Secretary.Storage.Models
                 optionsBuilder.UseNpgsql(Config.Instance.DbConnectionString);
             }
 
-            optionsBuilder.LogTo(_logger.Debug);
+            // optionsBuilder.LogTo(_logger.Debug);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -28,20 +28,26 @@ public class SendDocumentCommand<T> : Command
 
     public override async Task Execute()
     {
-        var cache = await CacheService.GetEntity<T>();
-
-        if (cache == null) throw new InternalException();
-        
-        var document = await DocumentStorage.GetOrCreateDocument(cache.DocumentKey);
-        var user = await UserStorage.GetUser();
-
-        IEnumerable<Email> emails = await EmailStorage.GetForDocument(document.Id);
-
-        var message = this.GetMailMessage(user!, emails, cache);
-
-        await SendMail(message);
-        
-        DeleteDocument(cache.FilePath!);
+        try {
+            var cache = await CacheService.GetEntity<T>();
+    
+            if (cache == null) throw new InternalException();
+            
+            var document = await DocumentStorage.GetOrCreateDocument(cache.DocumentKey);
+            var user = await UserStorage.GetUser();
+    
+            IEnumerable<Email> emails = await EmailStorage.GetForDocument(document.Id);
+    
+            var message = this.GetMailMessage(user!, emails, cache);
+    
+            await SendMail(message);
+            
+            DeleteDocument(cache.FilePath!);
+        }
+        catch (Exception e) {
+            _logger.Error(e, "Could not send message");
+            throw;
+        }
     }
 
     public SecretaryMailMessage GetMailMessage(User user, IEnumerable<Email> emails, T cache)
@@ -87,6 +93,15 @@ public class SendDocumentCommand<T> : Command
                     "Если ящик нужный, то перейдите в <a href=\"https://mail.yandex.ru/#setup/client\">настройки</a> " +
                     "и разрешите отправку по OAuth-токену с сервера imap.\n" +
                     "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке"
+                );
+            }
+            
+            if (e.Message.Contains("Invalid user or password"))
+            {
+                await TelegramClient.SendMessage(
+                    "Проблема с токеном!\n\n" +
+                    "Выполните команду /registermail.\n" +
+                    "Если проблема не исчезнет, то напишите @hrodveetnir"
                 );
             }
         }
