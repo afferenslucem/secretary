@@ -77,7 +77,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build image
-        run: docker build . --file Secretary.Frontend/dockerfile --tag $BACKEND_IMAGE_NAME
+        run: docker build . --file Secretary.Frontend/dockerfile --tag $FRONTEND_IMAGE_NAME
 
       - name: Tag image
         run: docker tag $FRONTEND_IMAGE_NAME ghcr.io/${{ github.actor }}/$FRONTEND_IMAGE_NAME:latest
