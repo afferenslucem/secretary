@@ -19,7 +19,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BOT_IMAGE_NAME: ${{ github.repository }}
+  BOT_IMAGE_NAME: secretary
   FRONTEND_IMAGE_NAME: panel-frontend
   BACKEND_IMAGE_NAME: panel-backend
 
