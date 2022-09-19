@@ -10,9 +10,9 @@ public class TimeOffCommand: StatedCommand
     
     public const string Key = "/timeoff";
     
-    public TimeOffCommand(): base()
+    public TimeOffCommand()
     {
-        this.FileManager = new FileManager();
+        FileManager = new FileManager();
     }
     
     public override List<Command> ConfigureStates()

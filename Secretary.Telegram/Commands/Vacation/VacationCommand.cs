@@ -10,9 +10,9 @@ public class VacationCommand: StatedCommand
     
     public const string Key = "/vacation";
 
-    public VacationCommand(): base()
+    public VacationCommand()
     {
-        this.FileManager = new FileManager();
+        FileManager = new FileManager();
     }
     
     public override List<Command> ConfigureStates()

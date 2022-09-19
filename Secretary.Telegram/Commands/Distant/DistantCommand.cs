@@ -10,9 +10,9 @@ public class DistantCommand: StatedCommand
     
     public const string Key = "/distant";
     
-    public DistantCommand(): base()
+    public DistantCommand()
     {
-        this.FileManager = new FileManager();
+        FileManager = new FileManager();
     }
     
     public override List<Command> ConfigureStates()

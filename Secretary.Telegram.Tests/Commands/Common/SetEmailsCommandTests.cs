@@ -77,7 +77,7 @@ public class SetEmailsCommandTests
             "s.esenin@infinnity.ru (Сергей Есенин)\n" +
             "v.mayakovskii@infinnity.ru\n" +
             "</code>\n\n" +
-            "Если вы укажете адрес без имени в скобках, то в имени отправителя будет продублированпочтовый адрес"
+            "Если вы укажете адрес без имени в скобках, то в имени отправителя будет продублирован почтовый адрес"
         ));
         
         _documentStorage.Verify(target => target.GetOrCreateDocument(2517, "/key"));
