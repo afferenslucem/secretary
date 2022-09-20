@@ -25,11 +25,18 @@ env:
 
 
 jobs:
-  run-tests:
-    uses: ./.github/workflows/unit-tests.yml
+  run-tests-bot:
+    uses: ./.github/workflows/unit-tests-bot.yml
+    
+  run-tests-panel-frontend:
+    uses: ./.github/workflows/unit-tests-panel-frontend.yml
+    
+  run-tests-panel-backend:
+    uses: ./.github/workflows/unit-tests-panel-backend.yml
 
   build-and-push-bot:
-    needs: [run-tests]
+    needs: [run-tests-bot]
+
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -58,6 +65,8 @@ jobs:
         run: docker push ghcr.io/${{ github.actor }}/$BOT_IMAGE_NAME:latest
 
   build-and-push-frontend:
+    needs: [run-tests-panel-frontend]
+
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -86,6 +95,8 @@ jobs:
         run: docker push ghcr.io/${{ github.actor }}/$FRONTEND_IMAGE_NAME:latest
 
   build-and-push-backend:
+    needs: [run-tests-panel-backend]
+
     runs-on: ubuntu-latest
     permissions:
       contents: read
