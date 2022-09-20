@@ -3,8 +3,6 @@
 execPath=&
 
 pushd $execPath
-docker-compose pull bot
-sleep 1m
-docker-compose up -d bot
-sleep 1m
+/usr/local/bin/docker-compose pull bot panel-backend panel-frontend
+/usr/local/bin/docker-compose up -d bot panel-backend panel-frontend
 popd
