@@ -27,24 +27,37 @@ public class TokenRefresher
         _yandexAuthenticator = new YandexAuthenticator(config.MailConfig);
     }
 
-    public void RunThread()
+    public async Task RunThread()
     {
         _logger.Information("Run refresh token thread");
 
-        _refresher = this.RefreshRoutine();
+        while (!_cancellationToken.IsCancellationRequested)
+        {
+            await this.RefreshRoutine();
+        }
     }
 
     private async Task RefreshRoutine()
     {
-        var now = DateTime.UtcNow;
+        try
+        {
+            var now = DateTime.UtcNow;
 
-        if (now.Day == 19 && now.Hour == 23)
-        {
-            await RefreshTokens();
+            if ((now.Day % 10 == 1) && now.Hour == 0)
+            {
+                _logger.Information("Run token refreshing");
+                await RefreshTokens();
+                await Task.Delay(TimeSpan.FromDays(9), _cancellationToken);
+                _logger.Information("Tokens refreshed");
+            }
+            else
+            {
+                await Task.Delay(TimeSpan.FromMinutes(15), _cancellationToken);
+            }
         }
-        else
+        catch (Exception e)
         {
-            await Task.Delay(60 * 60 * 1000);
+            _logger.Error(e, "Could not refresh tokens");
         }
     }
 
@@ -72,7 +85,7 @@ public class TokenRefresher
 
                 if (refreshed)
                 {
-                     await Task.Delay(30 * 1000);
+                    await Task.Delay(TimeSpan.FromSeconds(30), _cancellationToken);
                 }
             }
             catch (Exception e)
@@ -86,7 +99,7 @@ public class TokenRefresher
     {
         if (user.RefreshToken == null)
         {
-            _logger.Information($"Skip refresh for user {user.ChatId}");
+            _logger.Debug($"Skip refresh for user {user.ChatId}");
             
             return false;
         }
