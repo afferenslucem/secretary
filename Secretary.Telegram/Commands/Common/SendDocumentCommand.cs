@@ -6,7 +6,6 @@ using Secretary.Logging;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands.Caches;
 using Secretary.Telegram.Commands.Caches.Interfaces;
-using Secretary.Telegram.Commands.TimeOff;
 using Secretary.Telegram.Documents;
 using Secretary.Telegram.Exceptions;
 using Secretary.Yandex.Mail;
@@ -28,26 +27,20 @@ public class SendDocumentCommand<T> : Command
 
     public override async Task Execute()
     {
-        try {
-            var cache = await CacheService.GetEntity<T>();
-    
-            if (cache == null) throw new InternalException();
-            
-            var document = await DocumentStorage.GetOrCreateDocument(cache.DocumentKey);
-            var user = await UserStorage.GetUser();
-    
-            IEnumerable<Email> emails = await EmailStorage.GetForDocument(document.Id);
-    
-            var message = this.GetMailMessage(user!, emails, cache);
-    
-            await SendMail(message);
-            
-            DeleteDocument(cache.FilePath!);
-        }
-        catch (Exception e) {
-            _logger.Error(e, "Could not send message");
-            throw;
-        }
+        var cache = await CacheService.GetEntity<T>();
+
+        if (cache == null) throw new InternalException();
+        
+        var document = await DocumentStorage.GetOrCreateDocument(cache.DocumentKey);
+        var user = await UserStorage.GetUser();
+
+        IEnumerable<Email> emails = await EmailStorage.GetForDocument(document.Id);
+
+        var message = this.GetMailMessage(user!, emails, cache);
+
+        await SendMail(message);
+        
+        DeleteDocument(cache.FilePath!);
     }
 
     public SecretaryMailMessage GetMailMessage(User user, IEnumerable<Email> emails, T cache)
@@ -85,6 +78,8 @@ public class SendDocumentCommand<T> : Command
         }
         catch (AuthenticationException e)
         {
+            _logger.Warning(e, "Yandex authentications exception");
+            
             if (e.Message.Contains("This user does not have access rights to this service"))
             {
                 await TelegramClient.SendMessage(
@@ -94,6 +89,8 @@ public class SendDocumentCommand<T> : Command
                     "и разрешите отправку по OAuth-токену с сервера imap.\n" +
                     "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке"
                 );
+                
+                return;
             }
             
             if (e.Message.Contains("Invalid user or password"))
@@ -103,18 +100,26 @@ public class SendDocumentCommand<T> : Command
                     "Выполните команду /registermail.\n" +
                     "Если проблема не исчезнет, то напишите @hrodveetnir"
                 );
+                
+                return;
             }
+
+            throw;
         }
         catch (SmtpCommandException e)
         {
+            _logger.Warning(e, "SMTP exception");
+            
             if (e.Message.Contains("Sender address rejected: not owned by auth user"))
             {
                 await TelegramClient.SendSticker(Stickers.Guliki);
                 
                 await TelegramClient.SendMessage($"Вы отправляете письмо с токеном не принадлежащим ящику <code>{e.Mailbox.Address}</code>");
                 
-                _logger.Warning(e, "Guliki detected. {@ChatId} tried use {@Email}", ChatId, message.Sender.Address);
+                return;
             }
+            
+            throw;
         }
         finally
         {

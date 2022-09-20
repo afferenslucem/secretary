@@ -165,6 +165,7 @@ public class SendDocumentCommandTests
             .ThrowsAsync(new AuthenticationException("This user does not have access rights to this service"));
 
         _command.Context = _context;
+        
         await _command.SendMail(null!);
         
         _client.Verify(target => target.SendMessage(
