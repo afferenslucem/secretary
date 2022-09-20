@@ -9,10 +9,10 @@ namespace Secretary.Panel.Controllers;
 [Route("[controller]")]
 public class StatisticController : ControllerBase
 {
-    private readonly IEventLogStorage _eventLogStorage = new EventLogStorage();
-    private readonly IUserStorage _userStorage = new UserStorage();
+    public IEventLogStorage _eventLogStorage = new EventLogStorage();
+    public IUserStorage _userStorage = new UserStorage();
 
-    [HttpGet(Name = "GetStatistic")]
+    [HttpGet(Name = "GetData")]
     public async Task<Statistic> GetData()
     {
         var result = new Statistic();
@@ -23,7 +23,8 @@ public class StatisticController : ControllerBase
         return result;
     }
 
-    private async Task<DocumentStatistic> GetDocumentStatistic()
+    [NonAction]
+    public async Task<DocumentStatistic> GetDocumentStatistic()
     {
         var data = await _eventLogStorage.GetDocumentStatistic("/timeoff", "/distant", "/vacation");
 
@@ -46,7 +47,8 @@ public class StatisticController : ControllerBase
         return result;
     }
 
-    private async Task<UserStatistic> GetUserStatistic()
+    [NonAction]
+    public async Task<UserStatistic> GetUserStatistic()
     {
         var result = new UserStatistic()
         {
