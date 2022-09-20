@@ -1,4 +1,4 @@
-name: Secretary Unit Tests
+name: Secretary Panel Frontend Tests
 
 on:
   push:
