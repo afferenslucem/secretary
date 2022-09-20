@@ -6,6 +6,7 @@ public interface IUserStorage
 {
     Task<User?> GetUser(long chatId);
     Task SetUser(User user);
+    Task RemoveTokens(long chatId);
     Task<int> GetCount();
     Task<int> GetCountWithDocuments();
 

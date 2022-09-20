@@ -42,6 +42,20 @@ public class UserStorage: Storage, IUserStorage
         await context.SaveChangesAsync();
     }
 
+    public async Task RemoveTokens(long chatId)
+    {
+        await using var context = GetContext();
+
+        var user = context.Users.Single(item => item.ChatId == chatId);
+
+        user.AccessToken = null;
+        user.RefreshToken = null;
+        user.TokenCreationTime = null;
+        user.TokenExpirationSeconds = null;
+        
+        await context.SaveChangesAsync();
+    }
+
     public async Task<int> GetCount()
     {
         await using var context = GetContext();

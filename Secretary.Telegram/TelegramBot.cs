@@ -5,6 +5,7 @@ using Secretary.Logging;
 using Secretary.Storage;
 using Secretary.Telegram.chains;
 using Secretary.Telegram.Commands;
+using Secretary.Telegram.Commands.ExceptionHandlers;
 using Secretary.Telegram.Commands.Executors;
 using Secretary.Telegram.Exceptions;
 using Secretary.Telegram.Sessions;
@@ -16,7 +17,7 @@ namespace Secretary.Telegram;
 
 public class TelegramBot
 {
-    public static readonly string Version = "v2.5.1";
+    public static readonly string Version = "v2.6.0";
     
     public static readonly DateTime Uptime = DateTime.Now;
     
@@ -58,7 +59,7 @@ public class TelegramBot
 
         _telegramClient.OnMessage += this.WorkWithMessage;
 
-        _refresher = new TokenRefresher(config, _cancellationTokenSource.Token);
+        _refresher = new TokenRefresher(_yandexAuthenticator, _telegramClient, _database, _cancellationTokenSource.Token);
     }
 
     private async Task WorkWithMessage(BotMessage message)
@@ -92,6 +93,8 @@ public class TelegramBot
         }
         catch (Exception e)
         {
+            await CatchException(e, message.ChatId);
+            
             _logger.Error(e, $"{message.ChatId}: Сommand execution fault {command.GetType().Name}");
             await _sessionStorage.DeleteSession(message.ChatId);
         }
@@ -117,5 +120,13 @@ public class TelegramBot
         if (command.GetType() == typeof(NullCommand)) return;
         
         _logger.Information(message);
+    }
+
+    private async Task CatchException(Exception e, long chatId)
+    {
+        if (e is NonCompleteUserException nonCompleteUserException)
+        {
+            await new NonCompleteUserExceptionHandler().Handle(nonCompleteUserException, chatId, _telegramClient);
+        }
     }
 }

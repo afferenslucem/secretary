@@ -40,13 +40,6 @@ public abstract class StatedCommand: Command
             await OnForceComplete();
             _logger.Warning($"Сommand {e.CommandName} force completed");
         }
-        catch (NonCompleteUserException e)
-        {
-            await HandleUserException(e);
-            _logger.Error(e, $"Command was completed by exception");
-
-            throw;
-        }
     }
 
     public override async Task<int> OnMessage()
@@ -69,10 +62,5 @@ public abstract class StatedCommand: Command
             _logger.Debug($"{this.GetType().Name} completed");
             await base.OnComplete();
         }
-    }
-
-    private async Task HandleUserException(NonCompleteUserException e)
-    {
-        await new NonCompleteUserExceptionHandlerVisitor().Handle(e, ChatId, Context.TelegramClient);
     }
 }

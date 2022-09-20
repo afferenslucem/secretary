@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Text.Json;
 using Secretary.Configuration;
 using Secretary.Logging;
 using Secretary.Yandex.Exceptions;
@@ -47,6 +48,16 @@ public class YandexAuthenticator: IYandexAuthenticator
     {
         try
         {
+            return await action();
+        }
+        catch (YandexAuthenticationException e)
+        {
+            if (e.Message == "Refresh token expired")
+            {
+                throw;
+            }
+            
+            await Task.Delay(10000, cancellationToken);
             return await action();
         }
         catch (Exception)
@@ -116,13 +127,22 @@ public class YandexAuthenticator: IYandexAuthenticator
                     $"grant_type=refresh_token&refresh_token={refreshToken}&client_id={_mailConfig.ClientId}&client_secret={_mailConfig.ClientSecret}");
 
             var response = await _httpClient.SendAsync(request, cancellationToken);
-
+            
             var responseData = await response.Content.ReadAsStringAsync();
-
+            
+            if (response.StatusCode == HttpStatusCode.BadRequest && responseData.Contains("expired_token"))
+            {
+                throw new YandexAuthenticationException("Refresh token expired");
+            }
+            
             var result = JsonSerializer.Deserialize<TokenData>(responseData);
 
             return result;
 
+        }
+        catch (YandexAuthenticationException e)
+        {
+            throw;
         }
         catch (Exception e)
         {

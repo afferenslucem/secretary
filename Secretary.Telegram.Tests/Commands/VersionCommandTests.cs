@@ -41,7 +41,7 @@ public class VersionCommandTests
     {
         await this._command.Execute();
 
-        this._client.Verify(target => target.SendMessage(2517, "v2.5.1"));
+        this._client.Verify(target => target.SendMessage(2517, "v2.6.0"));
     }
 
     [Test]

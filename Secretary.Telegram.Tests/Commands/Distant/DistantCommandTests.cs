@@ -136,11 +136,6 @@ public class DistantCommandTests
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync((User?)null);
         
         Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
-        
-        _client.Verify(target => target.SendMessage(2517, "Вы – незарегистрированный пользователь.\n\n" +
-                                                          "Выполните команды:\n" +
-                                                          "/registeruser\n" +
-                                                          "/registermail"));
     }
 
     [Test]
@@ -151,9 +146,6 @@ public class DistantCommandTests
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { JobTitleGenitive = ""});
         
         Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
-        
-        _client.Verify(target => target.SendMessage(2517, "У вас не зарегистрирована почта.\n" +
-                                                          "Выполните команду: /registermail"));
     }
 
     [Test]
@@ -164,10 +156,6 @@ public class DistantCommandTests
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { AccessToken = ""});
         
         Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
-        
-        _client.Verify(target => target.SendMessage(2517, 
-            "У вас не заданы данные о пользователе.\n" +
-            "Выполните команду /registeruser"));
     }
     
     [Test]

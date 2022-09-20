@@ -8,7 +8,7 @@ public class UserValidationVisitor
     public void Validate(User? user)
     {
         
-        if (user == null)
+        if (user == null || (user.AccessToken == null && user.JobTitleGenitive == null))
         {
             throw new NonCompleteUserException("User does not exist");
         }

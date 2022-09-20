@@ -97,9 +97,10 @@ public class SendDocumentCommand<T> : Command
             {
                 await TelegramClient.SendMessage(
                     "Проблема с токеном!\n\n" +
-                    "Выполните команду /registermail.\n" +
-                    "Если проблема не исчезнет, то напишите @hrodveetnir"
+                    "Выполните команду /registermail"
                 );
+
+                await UserStorage.RemoveTokens();
                 
                 return;
             }
@@ -114,7 +115,10 @@ public class SendDocumentCommand<T> : Command
             {
                 await TelegramClient.SendSticker(Stickers.Guliki);
                 
-                await TelegramClient.SendMessage($"Вы отправляете письмо с токеном не принадлежащим ящику <code>{e.Mailbox.Address}</code>");
+                await TelegramClient.SendMessage($"Вы отправляете письмо с токеном не принадлежащим ящику <code>{e.Mailbox.Address}</code>\n\n" +
+                                                 $"Выполните команду /registermail");
+
+                await UserStorage.RemoveTokens();
                 
                 return;
             }

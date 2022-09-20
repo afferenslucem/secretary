@@ -24,4 +24,9 @@ public class UserStorageWrapper
     {
         return _userStorage.SetUser(user);
     }
+
+    public Task RemoveTokens()
+    {
+        return _userStorage.RemoveTokens(_chatId);
+    }
 }

@@ -3,7 +3,7 @@ using Secretary.Telegram.Exceptions;
 
 namespace Secretary.Telegram.Commands.ExceptionHandlers;
 
-public class NonCompleteUserExceptionHandlerVisitor
+public class NonCompleteUserExceptionHandler
 {
     public async Task Handle(NonCompleteUserException e, long chatId, ITelegramClient client)
     {

@@ -104,10 +104,5 @@ public class SetEmailsCommandTests
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync((User?)null);
         
         Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
-        
-        _client.Verify(target => target.SendMessage(2517, "Вы – незарегистрированный пользователь.\n\n" +
-                                                          "Выполните команды:\n" +
-                                                          "/registeruser\n" +
-                                                          "/registermail"));
     }
 }
