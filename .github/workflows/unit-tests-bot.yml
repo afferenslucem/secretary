@@ -1,0 +1,76 @@
+name: Secretary Unit Tests
+
+on:
+  push:
+    branches: [ "master", "develop" ]
+
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Run Tests'  
+
+  workflow_call:
+
+jobs:
+  document-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore Secretary.Documents.Tests
+
+    - name: Copy Config For Documents Tests
+      run: cp test-configs/config.json Secretary.Documents.Tests/bin/Debug/net6.0/config.json
+
+    - name: Test
+      run: dotnet test Secretary.Documents.Tests --no-build --verbosity normal
+
+  yandex-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore Secretary.Yandex.Tests
+
+    - name: Copy Config For Yandex Tests
+      run: cp test-configs/config.json Secretary.Yandex.Tests/bin/Debug/net6.0/config.json
+
+    - name: Test
+      run: dotnet test Secretary.Yandex.Tests --no-build --verbosity normal
+
+  telegram-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore Secretary.Telegram.Tests
+
+    - name: Copy Config For Telegram Tests
+      run: cp test-configs/config.json Secretary.Telegram.Tests/bin/Debug/net6.0/config.json
+
+    - name: Test
+      run: dotnet test Secretary.Telegram.Tests --no-build --verbosity normal
