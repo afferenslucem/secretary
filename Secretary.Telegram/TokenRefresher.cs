@@ -45,7 +45,9 @@ public class TokenRefresher
         {
             var now = DateTime.UtcNow;
 
-            if ((now.Month % 3 == 0) && (now.Day == 21) && (now.Hour == 0))
+            _logger.Information($"Now UTC: {now}");
+
+            if ((now.Month % 3 == 0) && (now.Day == 21) && (now.Hour == 2))
             {
                 _logger.Information("Run token refreshing");
                 await RefreshTokens();
@@ -55,7 +57,7 @@ public class TokenRefresher
             }
             else
             {
-                await Task.Delay(TimeSpan.FromHours(12), _cancellationToken);
+                await Task.Delay(TimeSpan.FromMinutes(15), _cancellationToken);
             }
         }
         catch (Exception e)
