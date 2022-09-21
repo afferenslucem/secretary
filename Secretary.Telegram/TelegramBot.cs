@@ -3,6 +3,7 @@ using Secretary.Cache;
 using Secretary.Configuration;
 using Secretary.Logging;
 using Secretary.Storage;
+using Secretary.Storage.Models;
 using Secretary.Telegram.chains;
 using Secretary.Telegram.Commands;
 using Secretary.Telegram.Commands.ExceptionHandlers;
@@ -20,46 +21,71 @@ public class TelegramBot
     public static readonly string Version = "v2.6.1";
     
     public static readonly DateTime Uptime = DateTime.Now;
+
+    private Config _config;
     
-    private readonly ILogger _logger = LogPoint.GetLogger<TelegramBot>();
+    private ILogger _logger = LogPoint.GetLogger<TelegramBot>();
     
-    private readonly CommandsListeningChain _chain;
+    private CommandsListeningChain _chain;
 
-    private readonly ISessionStorage _sessionStorage;
+    private ISessionStorage _sessionStorage;
 
-    private readonly Database _database;
+    private Database _database;
 
-    private readonly IYandexAuthenticator _yandexAuthenticator;
+    private IYandexAuthenticator _yandexAuthenticator;
     
-    private readonly ICacheService _cacheService;
+    private ICacheService _cacheService;
 
-    private readonly IMailClient _mailClient;
+    private IMailClient _mailClient;
 
-    private readonly ITelegramClient _telegramClient;
+    public virtual ITelegramClient TelegramClient { get; set; }
 
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private CancellationTokenSource _cancellationTokenSource = new();
 
-    private readonly TokenRefresher _refresher;
+    private TokenRefresher _refresher;
+    
+    public TelegramBot(
+        Config config, 
+        Database database
+    ) {
+        _database = database;
+        _config = config;
+    }
 
-    public TelegramBot(Config config)
+    public void Init()
     {
-        _database = new Database();
-
-        _cacheService = new RedisCacheService(config.RedisHost);
+        _cacheService = new RedisCacheService(_config.RedisHost);
 
         _sessionStorage = new SessionStorage(_cacheService);
 
-        _yandexAuthenticator = new YandexAuthenticator(config.MailConfig);
+        _yandexAuthenticator = new YandexAuthenticator(_config.MailConfig);
 
         _chain = new CommandsListeningChain();
 
         _mailClient = new MailClient();
 
-        _telegramClient = new TelegramClient(config.TelegramApiKey, _cancellationTokenSource.Token);
+        TelegramClient = new TelegramClient(_config.TelegramApiKey, _cancellationTokenSource.Token);
 
-        _telegramClient.OnMessage += this.WorkWithMessage;
+        TelegramClient.OnMessage += WorkWithMessage;
 
-        _refresher = new TokenRefresher(_yandexAuthenticator, _telegramClient, _database, _cancellationTokenSource.Token);
+        _refresher = new TokenRefresher(
+            _yandexAuthenticator, 
+            TelegramClient, 
+            _database.UserStorage, 
+            _cancellationTokenSource.Token
+        );
+
+        _refresher.OnUserInvalidToken += HandleUserTokenExpired;
+    }
+
+    public async Task HandleUserTokenExpired(User user)
+    {
+        await _database.UserStorage.RemoveTokens(user.ChatId);
+        await TelegramClient.SendMessage(
+            user.ChatId, 
+            "У вас истек токен для отправки почты!\n\n" +
+                   $"Выполните команду /registermail для адреса {user.Email}"
+            );
     }
 
     private async Task WorkWithMessage(BotMessage message)
@@ -72,7 +98,7 @@ public class TelegramBot
 
             var context = new CommandContext(
                 message.ChatId,
-                _telegramClient,
+                TelegramClient,
                 _sessionStorage,
                 _database.UserStorage,
                 _database.DocumentStorage,
@@ -107,7 +133,7 @@ public class TelegramBot
 
         _refresher.RunThread();
         
-        return this._telegramClient.RunDriver();
+        return TelegramClient.RunDriver();
     }
 
     public void Cancel()
@@ -126,7 +152,7 @@ public class TelegramBot
     {
         if (e is NonCompleteUserException nonCompleteUserException)
         {
-            await new NonCompleteUserExceptionHandler().Handle(nonCompleteUserException, chatId, _telegramClient);
+            await new NonCompleteUserExceptionHandler().Handle(nonCompleteUserException, chatId, TelegramClient);
         }
     }
 }

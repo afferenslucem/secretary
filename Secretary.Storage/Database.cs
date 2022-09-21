@@ -15,7 +15,7 @@ public class Database
     private EmailStorage _emailStorage;
     private EventLogStorage _eventLogStorage;
 
-    public IUserStorage UserStorage
+    public virtual IUserStorage UserStorage
     {
         get => _userStorage;
     }
@@ -37,15 +37,13 @@ public class Database
 
     public Database()
     {
-        this.MigrateDatabase();
-
         _userStorage = new UserStorage();
         _documentStorage = new DocumentStorage();
         _emailStorage = new EmailStorage();
         _eventLogStorage = new EventLogStorage();
     }
 
-    private void MigrateDatabase()
+    public void MigrateDatabase()
     {
         try
         {

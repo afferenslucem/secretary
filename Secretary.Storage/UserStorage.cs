@@ -42,6 +42,19 @@ public class UserStorage: Storage, IUserStorage
         await context.SaveChangesAsync();
     }
 
+    public async Task UpdateUser(User user)
+    {
+        await using var context = GetContext();
+        
+        _logger.Debug("Check entity existing");
+ 
+        context.Update(user);
+        
+        _logger.Debug("Entity updated");
+        
+        await context.SaveChangesAsync();
+    }
+
     public async Task RemoveTokens(long chatId)
     {
         await using var context = GetContext();

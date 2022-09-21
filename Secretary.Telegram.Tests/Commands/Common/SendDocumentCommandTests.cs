@@ -41,8 +41,8 @@ public class SendDocumentCommandTests
         _emailStorage = new Mock<IEmailStorage>();
         _cacheService = new Mock<ICacheService>();
         _cache = new Mock<TimeOffCache>();
-        _userStorage = new Mock<IUserStorage>();
         _client = new Mock<ITelegramClient>();
+        _userStorage = new Mock<IUserStorage>();
         _mailClient = new Mock<IMailClient>();
         _sessionStorage = new Mock<ISessionStorage>();
         _fileManager = new Mock<IFileManager>();

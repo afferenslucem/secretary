@@ -1,6 +1,4 @@
-﻿using Secretary.Configuration;
-using Secretary.Logging;
-using Secretary.Storage;
+﻿using Secretary.Logging;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Yandex.Authentication;
@@ -11,19 +9,21 @@ namespace Secretary.Telegram;
 
 public class TokenRefresher
 {
+    public delegate Task AsyncUserDelegate(User user);
+    
+    public event AsyncUserDelegate OnUserInvalidToken;
+
     private readonly ILogger _logger = LogPoint.GetLogger<TokenRefresher>();
     
     private readonly IYandexAuthenticator _yandexAuthenticator;
     private readonly ITelegramClient _telegramClient;
-    private readonly Database _database;
+    private readonly IUserStorage _userStorage;
     private readonly CancellationToken _cancellationToken;
-
-    private IUserStorage UserStorage => _database.UserStorage;
     
-    public TokenRefresher(IYandexAuthenticator yandexAuthenticator, ITelegramClient telegramClient, Database database, CancellationToken cancellationToken)
+    public TokenRefresher(IYandexAuthenticator yandexAuthenticator, ITelegramClient telegramClient, IUserStorage userStorage, CancellationToken cancellationToken)
     {
         _cancellationToken = cancellationToken;
-        _database = database;
+        _userStorage = userStorage;
 
         _yandexAuthenticator = yandexAuthenticator;
         _telegramClient = telegramClient;
@@ -47,7 +47,7 @@ public class TokenRefresher
 
             _logger.Information($"Now UTC: {now}");
 
-            if ((now.Month % 3 == 0) && (now.Day == 21) && (now.Hour == 2))
+            if ((now.Month % 3 == 0) && (now.Day == 21) && (now.Hour == 4))
             {
                 _logger.Information("Run token refreshing");
                 await RefreshTokens();
@@ -68,13 +68,13 @@ public class TokenRefresher
 
     private async Task RefreshTokens()
     {
-        var count = await UserStorage.GetCount();
+        var count = await _userStorage.GetCount();
 
         const int step = 10;
 
         for (int i = 0; i < count; i += step)
         {
-            var users = await UserStorage.GetUsers(i, step);
+            var users = await _userStorage.GetUsers(i, step);
 
             await RefreshTokens(users);
         }
@@ -105,7 +105,7 @@ public class TokenRefresher
         }
     }
 
-    private async Task RefreshToken(User user)
+    public async Task RefreshToken(User user)
     {
         try
         {
@@ -114,11 +114,11 @@ public class TokenRefresher
             var tokenData = await _yandexAuthenticator.RefreshToken(user.RefreshToken!, _cancellationToken);
 
             user.RefreshToken = tokenData!.refresh_token;
-            user.AccessToken = tokenData!.access_token;
+            user.AccessToken = tokenData.access_token;
             user.TokenCreationTime = DateTime.UtcNow;
             user.TokenExpirationSeconds = tokenData!.expires_in;
 
-            await UserStorage.SetUser(user);
+            await _userStorage.UpdateUser(user);
 
             _logger.Debug($"Refreshed for user {user.ChatId}");
         }
@@ -126,9 +126,7 @@ public class TokenRefresher
         {
             if (e.Message == "Refresh token expired")
             {
-                await _database.UserStorage.RemoveTokens(user.ChatId);
-                await _telegramClient.SendMessage(user.ChatId, "У вас истек токен для отправки почты!\n\n" +
-                                                               $"Выполните команду /registermail для адреса {user.Email}");
+                await OnUserInvalidToken.Invoke(user);
             }
             
             throw;
