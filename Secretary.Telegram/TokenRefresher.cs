@@ -49,8 +49,6 @@ public class TokenRefresher
         {
             var now = DateTime.UtcNow;
 
-            _logger.Information($"Now UTC: {now}");
-
             LastDateCheck = now;
             
             if (ItsTimeToRefresh(NextRefreshDate, LastRefreshDate, now))

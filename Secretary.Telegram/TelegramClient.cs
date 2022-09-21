@@ -39,8 +39,6 @@ public class TelegramClient: ITelegramClient
         
         while (!_cancellationToken.IsCancellationRequested)
         {
-            LastCheckTime = DateTime.UtcNow;
-            
             await _botClient.ReceiveAsync(
                 updateHandler: HandleUpdateAsync,
                 pollingErrorHandler: HandlePollingErrorAsync,
@@ -51,6 +49,8 @@ public class TelegramClient: ITelegramClient
     
     Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
+        LastCheckTime = DateTime.UtcNow;
+
         var message = update.Message;
 
         if (message?.Text == null)
