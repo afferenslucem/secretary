@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Secretary.Cache.JsonConverters;
 using Secretary.Logging;
 using Serilog;
 using StackExchange.Redis;
@@ -33,7 +32,6 @@ public class RedisCacheService : ICacheService
 
             var json = JsonConvert.SerializeObject(value, new JsonSerializerSettings
             {
-                Converters = new List<JsonConverter>() { new DateOnlyJsonConverter() },
                 TypeNameHandling = TypeNameHandling.All,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
@@ -70,7 +68,6 @@ public class RedisCacheService : ICacheService
 
             return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings
             {
-                Converters = new List<JsonConverter>() { new DateOnlyJsonConverter() },
                 TypeNameHandling = TypeNameHandling.All,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });

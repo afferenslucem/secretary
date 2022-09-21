@@ -21,23 +21,16 @@ public class TelegramBot
     public static readonly string Version = "v2.7.0";
     
     public static readonly DateTime Uptime = DateTime.UtcNow;
-
-    private Config _config;
-    
-    private ILogger _logger = LogPoint.GetLogger<TelegramBot>();
     
     public CommandsListeningChain Chain;
-
-    private ISessionStorage _sessionStorage;
-
-    private Database _database;
-
-    private IYandexAuthenticator _yandexAuthenticator;
     
     private ICacheService _cacheService;
-
+    private ISessionStorage _sessionStorage;
+    private Database _database;
+    private ILogger _logger = LogPoint.GetLogger<TelegramBot>();
+    private IYandexAuthenticator _yandexAuthenticator;
     private IMailClient _mailClient;
-    public virtual ITelegramClient TelegramClient { get; set; }
+    private ITelegramClient _telegramClient { get; set; }
 
     private CancellationTokenSource _cancellationTokenSource = new();
 
@@ -46,28 +39,26 @@ public class TelegramBot
     public long ReceivedMessages { get; private set; } = 0;
     
     public TelegramBot (
-        Config config, 
         Database database,
         ICacheService redisCacheService,
-        ISessionStorage sessionStorage
+        ISessionStorage sessionStorage,
+        IYandexAuthenticator yandexAuthenticator,
+        IMailClient mailClient,
+        ITelegramClient telegramClient
     ) {
         _database = database;
-        _config = config;
         _cacheService = redisCacheService;
         _sessionStorage = sessionStorage;
+        _yandexAuthenticator = yandexAuthenticator;
+        _mailClient = mailClient;
+        _telegramClient = telegramClient;
     }
 
     public void Init()
     {
-        _yandexAuthenticator = new YandexAuthenticator(_config.MailConfig);
-        _mailClient = new MailClient();
-
         Chain = new CommandsListeningChain();
 
-
-        TelegramClient = new TelegramClient(_config.TelegramApiKey, _cancellationTokenSource.Token);
-
-        TelegramClient.OnMessage += WorkWithMessage;
+        _telegramClient.OnMessage += WorkWithMessage;
 
         _refresher = new TokenRefresher(
             _yandexAuthenticator, 
@@ -81,7 +72,7 @@ public class TelegramBot
     public async Task HandleUserTokenExpired(User user)
     {
         await _database.UserStorage.RemoveTokens(user.ChatId);
-        await TelegramClient.SendMessage(
+        await _telegramClient.SendMessage(
             user.ChatId, 
             "У вас истек токен для отправки почты!\n\n" +
                    $"Выполните команду /registermail для адреса {user.Email}"
@@ -100,7 +91,7 @@ public class TelegramBot
 
             var context = new CommandContext(
                 message.ChatId,
-                TelegramClient,
+                _telegramClient,
                 _sessionStorage,
                 _database.UserStorage,
                 _database.DocumentStorage,
@@ -135,12 +126,7 @@ public class TelegramBot
 
         _refresher.RunThread();
         
-        return TelegramClient.RunDriver();
-    }
-
-    public void Cancel()
-    {
-        this._cancellationTokenSource.Cancel();
+        return _telegramClient.RunDriver();
     }
 
     public void LogCommand(Command command, string message)
@@ -154,11 +140,11 @@ public class TelegramBot
     {
         if (e is NonCompleteUserException nonCompleteUserException)
         {
-            await new NonCompleteUserExceptionHandler().Handle(nonCompleteUserException, chatId, TelegramClient);
+            await new NonCompleteUserExceptionHandler().Handle(nonCompleteUserException, chatId, _telegramClient);
         }
         else
         {
-            await TelegramClient.SendMessage(chatId, "Произошла непредвиденная ошибка");
+            await _telegramClient.SendMessage(chatId, "Произошла непредвиденная ошибка");
         }
     }
 
@@ -168,7 +154,7 @@ public class TelegramBot
         
         healthData.BotHealthData.Version = Version;
         healthData.BotHealthData.DeployTime = Uptime;
-        healthData.BotHealthData.PingTime = TelegramClient.LastCheckTime;
+        healthData.BotHealthData.PingTime = _telegramClient.LastCheckTime;
         healthData.BotHealthData.ReceivedMessages = ReceivedMessages;
 
         healthData.RefresherHealthData.NextRefreshDate = _refresher.NextRefreshDate.ToDateTime(TimeOnly.MinValue);

@@ -33,8 +33,14 @@ public class TelegramBotTests
 
         _database.SetupGet(target => target.UserStorage).Returns(_userStorage.Object);
         
-        _bot = new TelegramBot(new Config(), _database.Object, null, _sessionStorage.Object);
-        _bot.TelegramClient = _client.Object;
+        _bot = new TelegramBot(
+            _database.Object, 
+            null!, 
+            _sessionStorage.Object,
+            null!,
+            null!,
+            _client.Object
+        );
         _bot.Chain = _chain.Object;
     }
 
