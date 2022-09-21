@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Secretary.Cache.JsonConverters;
 using Secretary.Logging;
 using Serilog;
 using StackExchange.Redis;
@@ -17,21 +18,29 @@ public class RedisCacheService : ICacheService
         _logger.Information("Created RedisCacheService");
     }
 
-    public async Task SaveEntity<T>(long key, T value, short lifetimeSec) where T : class
+    public async Task SaveEntity<T>(long key, T value, short? lifetimeSec) where T : class
+    {
+        await SaveEntity($"{typeof(T)}:{key}", value, lifetimeSec);
+    }
+
+    public async Task SaveEntity<T>(string key, T value, short? lifetimeSec) where T : class
     {
         try
         {
-            _logger.Debug($"Save entity {typeof(T).Name}:{key}");
+            _logger.Debug($"Save entity {key}");
             
             var db = _connectionMultiplexer.GetDatabase();
 
             var json = JsonConvert.SerializeObject(value, new JsonSerializerSettings
             {
+                Converters = new List<JsonConverter>() { new DateOnlyJsonConverter() },
                 TypeNameHandling = TypeNameHandling.All,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
 
-            await db.StringSetAsync(new RedisKey($"{typeof(T)}:{key}"), json, TimeSpan.FromSeconds(lifetimeSec));
+            var ttl = lifetimeSec != null ? TimeSpan.FromSeconds(lifetimeSec.Value) : (TimeSpan?) null;
+            
+            await db.StringSetAsync(new RedisKey(key), json, ttl);
         }
         catch (Exception e)
         {
@@ -42,13 +51,18 @@ public class RedisCacheService : ICacheService
 
     public async Task<T?> GetEntity<T>(long key) where T : class
     {
+        return await GetEntity<T>($"{typeof(T)}:{key}");
+    }
+
+    public async Task<T?> GetEntity<T>(string key) where T : class
+    {
         try
         {
-            _logger.Debug($"Ask entity {typeof(T).Name}:{key}");
+            _logger.Debug($"Ask entity {key}");
             
             var db = _connectionMultiplexer.GetDatabase();
 
-            var redisValue = await db.StringGetAsync(new RedisKey($"{typeof(T)}:{key}"));
+            var redisValue = await db.StringGetAsync(new RedisKey(key));
 
             if (redisValue.IsNull) return null;
 
@@ -56,6 +70,7 @@ public class RedisCacheService : ICacheService
 
             return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings
             {
+                Converters = new List<JsonConverter>() { new DateOnlyJsonConverter() },
                 TypeNameHandling = TypeNameHandling.All,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });

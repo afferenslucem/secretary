@@ -2,9 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { StatisticResolver } from './statistic.resolver';
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { HttpClient } from "@angular/common/http";
+import { HealthResolver } from "./health.resolver";
 
-describe('StatisticResolver', () => {
-  let resolver: StatisticResolver;
+describe('HealthResolver', () => {
+  let resolver: HealthResolver;
   let client: HttpClient;
 
   beforeEach(() => {
@@ -13,7 +14,7 @@ describe('StatisticResolver', () => {
         HttpClientTestingModule
       ],
     });
-    resolver = TestBed.inject(StatisticResolver);
+    resolver = TestBed.inject(HealthResolver);
     client = TestBed.inject(HttpClient);
   });
 
@@ -26,6 +27,6 @@ describe('StatisticResolver', () => {
 
     await resolver.resolve({} as any, {} as any);
 
-    expect(spy).toHaveBeenCalledOnceWith('/statistic')
+    expect(spy).toHaveBeenCalledOnceWith('/health')
   });
 });

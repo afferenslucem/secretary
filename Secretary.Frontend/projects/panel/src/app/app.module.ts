@@ -6,13 +6,15 @@ import { StatisticPageComponent } from "./pages/statistic-page/statistic-page.co
 import { StatisticResolver } from "./pages/statistic-page/resolvers/statistic.resolver";
 import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
 import { UrlInterceptor } from "./interceptors/url.interceptor";
+import { HealthResolver } from "./pages/statistic-page/resolvers/health.resolver";
 
 const routes: Routes = [
   {
     path: '',
     component: StatisticPageComponent,
     resolve: {
-      statistic: StatisticResolver
+      statistic: StatisticResolver,
+      health: HealthResolver,
     }
   }
 ]

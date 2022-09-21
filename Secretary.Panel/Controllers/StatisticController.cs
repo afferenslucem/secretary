@@ -12,7 +12,7 @@ public class StatisticController : ControllerBase
     public IEventLogStorage _eventLogStorage = new EventLogStorage();
     public IUserStorage _userStorage = new UserStorage();
 
-    [HttpGet(Name = "GetData")]
+    [HttpGet(Name = "GetStatisticData")]
     public async Task<Statistic> GetData()
     {
         var result = new Statistic();

@@ -20,6 +20,8 @@ public class TelegramClient: ITelegramClient
     
     private readonly CancellationToken _cancellationToken;
 
+    public DateTime LastCheckTime { get; set; }
+
     public TelegramClient(string token, CancellationToken cancellationToken)
     {
         _cancellationToken = cancellationToken;
@@ -37,6 +39,8 @@ public class TelegramClient: ITelegramClient
         
         while (!_cancellationToken.IsCancellationRequested)
         {
+            LastCheckTime = DateTime.UtcNow;
+            
             await _botClient.ReceiveAsync(
                 updateHandler: HandleUpdateAsync,
                 pollingErrorHandler: HandlePollingErrorAsync,

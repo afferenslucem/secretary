@@ -1,4 +1,4 @@
-﻿
+﻿using Secreatry.HealthCheck.Data;
 using Secretary.Cache;
 using Secretary.Configuration;
 using Secretary.Logging;
@@ -18,15 +18,15 @@ namespace Secretary.Telegram;
 
 public class TelegramBot
 {
-    public static readonly string Version = "v2.6.1";
+    public static readonly string Version = "v2.7.0";
     
-    public static readonly DateTime Uptime = DateTime.Now;
+    public static readonly DateTime Uptime = DateTime.UtcNow;
 
     private Config _config;
     
     private ILogger _logger = LogPoint.GetLogger<TelegramBot>();
     
-    private CommandsListeningChain _chain;
+    public CommandsListeningChain Chain;
 
     private ISessionStorage _sessionStorage;
 
@@ -37,32 +37,33 @@ public class TelegramBot
     private ICacheService _cacheService;
 
     private IMailClient _mailClient;
-
     public virtual ITelegramClient TelegramClient { get; set; }
 
     private CancellationTokenSource _cancellationTokenSource = new();
 
     private TokenRefresher _refresher;
+
+    public long ReceivedMessages { get; private set; } = 0;
     
-    public TelegramBot(
+    public TelegramBot (
         Config config, 
-        Database database
+        Database database,
+        ICacheService redisCacheService,
+        ISessionStorage sessionStorage
     ) {
         _database = database;
         _config = config;
+        _cacheService = redisCacheService;
+        _sessionStorage = sessionStorage;
     }
 
     public void Init()
     {
-        _cacheService = new RedisCacheService(_config.RedisHost);
-
-        _sessionStorage = new SessionStorage(_cacheService);
-
         _yandexAuthenticator = new YandexAuthenticator(_config.MailConfig);
-
-        _chain = new CommandsListeningChain();
-
         _mailClient = new MailClient();
+
+        Chain = new CommandsListeningChain();
+
 
         TelegramClient = new TelegramClient(_config.TelegramApiKey, _cancellationTokenSource.Token);
 
@@ -70,7 +71,6 @@ public class TelegramBot
 
         _refresher = new TokenRefresher(
             _yandexAuthenticator, 
-            TelegramClient, 
             _database.UserStorage, 
             _cancellationTokenSource.Token
         );
@@ -88,9 +88,11 @@ public class TelegramBot
             );
     }
 
-    private async Task WorkWithMessage(BotMessage message)
+    public async Task WorkWithMessage(BotMessage message)
     {
-        var command = _chain.Get(message.Text)!;
+        var command = Chain.Get(message.Text)!;
+
+        ReceivedMessages++;
         
         try
         {
@@ -154,5 +156,24 @@ public class TelegramBot
         {
             await new NonCompleteUserExceptionHandler().Handle(nonCompleteUserException, chatId, TelegramClient);
         }
+        else
+        {
+            await TelegramClient.SendMessage(chatId, "Произошла непредвиденная ошибка");
+        }
+    }
+
+    public HealthData GetHealthData()
+    {
+        var healthData = new HealthData();
+        
+        healthData.BotHealthData.Version = Version;
+        healthData.BotHealthData.DeployTime = Uptime;
+        healthData.BotHealthData.PingTime = TelegramClient.LastCheckTime;
+        healthData.BotHealthData.ReceivedMessages = ReceivedMessages;
+
+        healthData.RefresherHealthData.NextRefreshDate = _refresher.NextRefreshDate.ToDateTime(TimeOnly.MinValue);
+        healthData.RefresherHealthData.PingTime = _refresher.LastDateCheck;
+
+        return healthData;
     }
 }

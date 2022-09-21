@@ -7,6 +7,8 @@
   justify-content: space-between;
   align-items: start;
 
+  gap: 3rem;
+
   flex-wrap: wrap;
 
   padding-bottom: 3rem;
@@ -40,7 +42,7 @@
     grid-row-start: 2;
     grid-row-end: 3;
 
-    width: min(60vw, 400px)
+    width: min(50vw, 400px)
   }
   .statistic__count {
     grid-column-start: 2;

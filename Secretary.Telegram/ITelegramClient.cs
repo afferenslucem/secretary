@@ -5,6 +5,8 @@ public delegate Task MessageReceive(BotMessage message);
 public interface ITelegramClient
 {
     event MessageReceive OnMessage;
+    
+    DateTime LastCheckTime { get; }
 
     Task RunDriver();
     

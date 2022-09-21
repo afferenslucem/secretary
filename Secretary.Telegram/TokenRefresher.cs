@@ -16,17 +16,21 @@ public class TokenRefresher
     private readonly ILogger _logger = LogPoint.GetLogger<TokenRefresher>();
     
     private readonly IYandexAuthenticator _yandexAuthenticator;
-    private readonly ITelegramClient _telegramClient;
     private readonly IUserStorage _userStorage;
     private readonly CancellationToken _cancellationToken;
+
+    public bool ShouldSkipDelay { get; set; } = false;
     
-    public TokenRefresher(IYandexAuthenticator yandexAuthenticator, ITelegramClient telegramClient, IUserStorage userStorage, CancellationToken cancellationToken)
+    public DateOnly LastRefreshDate { get; set; }
+    public DateOnly NextRefreshDate => GetNextUpdateDate(DateTime.UtcNow);
+    public DateTime LastDateCheck { get; set; }
+    
+    public TokenRefresher(IYandexAuthenticator yandexAuthenticator, IUserStorage userStorage, CancellationToken cancellationToken)
     {
         _cancellationToken = cancellationToken;
         _userStorage = userStorage;
 
         _yandexAuthenticator = yandexAuthenticator;
-        _telegramClient = telegramClient;
     }
 
     public async Task RunThread()
@@ -35,11 +39,11 @@ public class TokenRefresher
 
         while (!_cancellationToken.IsCancellationRequested)
         {
-            await this.RefreshRoutine();
+            await this.Refresh();
         }
     }
 
-    private async Task RefreshRoutine()
+    public async Task Refresh()
     {
         try
         {
@@ -47,26 +51,27 @@ public class TokenRefresher
 
             _logger.Information($"Now UTC: {now}");
 
-            if ((now.Month % 3 == 0) && (now.Day == 21) && (now.Hour == 4))
+            LastDateCheck = now;
+            
+            if (ItsTimeToRefresh(NextRefreshDate, LastRefreshDate, now))
             {
                 _logger.Information("Run token refreshing");
-                await RefreshTokens();
                 
-                await Task.Delay(TimeSpan.FromDays(1), _cancellationToken);
-                _logger.Information("Tokens refreshed");
+                await RefreshTokensForAllUsers();
+
+                LastRefreshDate = NextRefreshDate;
             }
-            else
-            {
-                await Task.Delay(TimeSpan.FromMinutes(15), _cancellationToken);
-            }
+            
+            await Sleep(TimeSpan.FromMinutes(5), _cancellationToken);
         }
         catch (Exception e)
         {
             _logger.Error(e, "Could not refresh tokens");
+            await Sleep(TimeSpan.FromMinutes(5), _cancellationToken);
         }
     }
 
-    private async Task RefreshTokens()
+    public async Task RefreshTokensForAllUsers()
     {
         var count = await _userStorage.GetCount();
 
@@ -80,28 +85,20 @@ public class TokenRefresher
         }
     }
 
-    private async Task RefreshTokens(IEnumerable<User> users)
+    public async Task RefreshTokens(IEnumerable<User> users)
     {
         foreach (var user in users)
         {
-            try
+            if (user.RefreshToken == null)
             {
-                if (user.RefreshToken == null)
-                {
-                    _logger.Debug($"Skip refresh for user {user.ChatId}");
+                _logger.Debug($"Skip refresh for user {user.ChatId}");
 
-                    continue;
-                }
-                
-                await RefreshToken(user);
-                await Task.Delay(TimeSpan.FromSeconds(30), _cancellationToken);
+                continue;
             }
-            catch (Exception e)
-            {
-                await Task.Delay(TimeSpan.FromSeconds(30), _cancellationToken);
-                
-                _logger.Error(e, $"Could not refresh token for user {user.ChatId}");
-            }
+            
+            await RefreshToken(user);
+
+            await Sleep(TimeSpan.FromSeconds(30), _cancellationToken);
         }
     }
 
@@ -127,9 +124,54 @@ public class TokenRefresher
             if (e.Message == "Refresh token expired")
             {
                 await OnUserInvalidToken.Invoke(user);
+                _logger.Warning($"{user.ChatId} has expired token");
+                
+                return;
             }
             
-            throw;
+            _logger.Warning(e, $"Could not update token for {user.ChatId}");
         }
+        catch (Exception e)
+        {
+            _logger.Warning(e, $"Could not update token for {user.ChatId}");
+        }
+    }
+
+    public Task Sleep(TimeSpan span, CancellationToken cancellationToken)
+    {
+        if (ShouldSkipDelay)
+        {
+            return Task.CompletedTask;;
+        }
+        
+        return Task.Delay(span, cancellationToken);
+    }
+
+    public bool ItsTimeToRefresh(DateOnly nextDate, DateOnly prevDate, DateTime now)
+    {
+        if (nextDate == prevDate) return false;
+        
+        if (nextDate == DateOnly.FromDateTime(now) && now.Hour == 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+    
+    public DateOnly GetNextUpdateDate(DateTime now)
+    {
+        var monthDiff = now.Month % 3;
+
+        var nextDate = now.AddMonths(monthDiff);
+        
+        var result = new DateOnly(nextDate.Year, nextDate.Month, 1);
+
+        if (result < DateOnly.FromDateTime(now))
+        {
+            result = result.AddMonths(3);
+        }
+
+        return result;
     }
 }

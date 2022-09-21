@@ -3,6 +3,70 @@
     <h1>Secretary</h1>
   </div>
 
+  <div class="health">
+    <div class="row">
+      <div class="col-6">
+        <h2>Бот</h2>
+
+        <div class="line">
+          <div class="line__header">
+            Version
+          </div>
+          <div class="line__value">
+            {{ health.botHealthData.version }}
+          </div>
+        </div>
+
+        <div class="line">
+          <div class="line__header">
+            Uptime
+          </div>
+          <div class="line__value">
+            {{ health.botHealthData.deployTime | date: 'yyyy-MM-dd HH:mm' }}
+          </div>
+        </div>
+
+        <div class="line">
+          <div class="line__header">
+            Ping
+          </div>
+          <div class="line__value">
+            {{ health.botHealthData.pingTime | date: 'yyyy-MM-dd HH:mm' }}
+          </div>
+        </div>
+
+        <div class="line">
+          <div class="line__header">
+            Обр. сообщений
+          </div>
+          <div class="line__value">
+            {{ health.botHealthData.receivedMessages }}
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <h2>Token Refresher</h2>
+        <div class="line">
+          <div class="line__header">
+            Ping
+          </div>
+          <div class="line__value">
+            {{ health.refresherHealthData.pingTime | date: 'yyyy-MM-dd HH:mm' }}
+          </div>
+        </div>
+
+        <div class="line">
+          <div class="line__header">
+            След. Проверка
+          </div>
+          <div class="line__value">
+            {{ health.refresherHealthData.nextRefreshDate | date: 'yyyy-MM-dd' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="statistic-tape">
     <div class="statistic">
       <div class="statistic__header">

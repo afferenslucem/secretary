@@ -1,8 +1,9 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, ActivatedRouteSnapshot } from "@angular/router";
-import { Statistic } from "./models/i-statistic";
+import { Statistic } from "./models/statistic";
 import { Chart, registerables  } from "chart.js";
+import { Health } from "./models/health";
 
 Chart.register(...registerables);
 
@@ -14,7 +15,8 @@ Chart.register(...registerables);
   styleUrls: ['./statistic-page.component.scss']
 })
 export class StatisticPageComponent implements OnInit {
-  public statistic: Statistic
+  public statistic: Statistic;
+  public health: Health;
 
   @ViewChild('documentsChart', {static: true})
   public documentsChartCanvas!: ElementRef<HTMLCanvasElement>;
@@ -25,6 +27,7 @@ export class StatisticPageComponent implements OnInit {
 
   constructor(private activatedRoute: ActivatedRoute) {
     this.statistic = activatedRoute.snapshot.data['statistic'];
+    this.health = activatedRoute.snapshot.data['health'];
   }
 
   public ngOnInit(): void {

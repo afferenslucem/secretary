@@ -15,27 +15,27 @@ public class CommandsListeningChain
 
     public CommandsListeningChain()
     {
-        this._commandsChain.Add(StartCommand.Key, new CommandFactory<StartCommand>());
-        this._commandsChain.Add(RegisterUserCommand.Key, new CommandFactory<RegisterUserCommand>());
-        this._commandsChain.Add(RegisterMailCommand.Key, new CommandFactory<RegisterMailCommand>());
-        this._commandsChain.Add(TimeOffCommand.Key, new CommandFactory<TimeOffCommand>());
-        this._commandsChain.Add(VacationCommand.Key, new CommandFactory<VacationCommand>());
-        this._commandsChain.Add(DistantCommand.Key, new CommandFactory<DistantCommand>());
-        this._commandsChain.Add(CancelCommand.Key, new CommandFactory<CancelCommand>());
-        this._commandsChain.Add(MeCommand.Key, new CommandFactory<MeCommand>());
-        this._commandsChain.Add(SetEmailsCommand.Key, new CommandFactory<SetEmailsCommand>());
-        this._commandsChain.Add(VersionCommand.Key, new CommandFactory<VersionCommand>());
-        this._commandsChain.Add(UptimeCommand.Key, new CommandFactory<UptimeCommand>());
-        this._commandsChain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
+        _commandsChain.Add(StartCommand.Key, new CommandFactory<StartCommand>());
+        _commandsChain.Add(RegisterUserCommand.Key, new CommandFactory<RegisterUserCommand>());
+        _commandsChain.Add(RegisterMailCommand.Key, new CommandFactory<RegisterMailCommand>());
+        _commandsChain.Add(TimeOffCommand.Key, new CommandFactory<TimeOffCommand>());
+        _commandsChain.Add(VacationCommand.Key, new CommandFactory<VacationCommand>());
+        _commandsChain.Add(DistantCommand.Key, new CommandFactory<DistantCommand>());
+        _commandsChain.Add(CancelCommand.Key, new CommandFactory<CancelCommand>());
+        _commandsChain.Add(MeCommand.Key, new CommandFactory<MeCommand>());
+        _commandsChain.Add(SetEmailsCommand.Key, new CommandFactory<SetEmailsCommand>());
+        _commandsChain.Add(VersionCommand.Key, new CommandFactory<VersionCommand>());
+        _commandsChain.Add(UptimeCommand.Key, new CommandFactory<UptimeCommand>());
+        _commandsChain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
     }
 
     private void Add(string key, ICommandFactory commandFactory)
     {
-        this._commandsChain.Add(key, commandFactory);
+        _commandsChain.Add(key, commandFactory);
     }
 
-    public Command? Get(string key)
+    public virtual Command? Get(string key)
     {
-        return this._commandsChain.Get(key);
+        return _commandsChain.Get(key);
     }
 }

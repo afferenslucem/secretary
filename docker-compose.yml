@@ -46,6 +46,7 @@ services:
 
     depends_on:
       - database
+      - redis
 
   panel-frontend:
     build: 

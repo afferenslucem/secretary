@@ -1,5 +1,4 @@
-﻿using Secretary.Telegram;
-using Secretary.Telegram.Exceptions;
+﻿using Secretary.Telegram.Exceptions;
 
 namespace Secretary.Telegram.Commands.ExceptionHandlers;
 
