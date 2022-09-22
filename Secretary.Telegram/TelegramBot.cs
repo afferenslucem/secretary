@@ -31,11 +31,6 @@ public class TelegramBot
     private IYandexAuthenticator _yandexAuthenticator;
     private IMailClient _mailClient;
     private ITelegramClient _telegramClient { get; set; }
-
-    private CancellationTokenSource _cancellationTokenSource = new();
-
-    private TokenRefresher _refresher;
-
     public long ReceivedMessages { get; private set; } = 0;
     
     public TelegramBot (
@@ -59,24 +54,6 @@ public class TelegramBot
         Chain = new CommandsListeningChain();
 
         _telegramClient.OnMessage += WorkWithMessage;
-
-        _refresher = new TokenRefresher(
-            _yandexAuthenticator, 
-            _database.UserStorage, 
-            _cancellationTokenSource.Token
-        );
-
-        _refresher.OnUserInvalidToken += HandleUserTokenExpired;
-    }
-
-    public async Task HandleUserTokenExpired(User user)
-    {
-        await _database.UserStorage.RemoveTokens(user.ChatId);
-        await _telegramClient.SendMessage(
-            user.ChatId, 
-            "У вас истек токен для отправки почты!\n\n" +
-                   $"Выполните команду /registermail для адреса {user.Email}"
-            );
     }
 
     public async Task WorkWithMessage(BotMessage message)
@@ -123,8 +100,6 @@ public class TelegramBot
     {
         _logger.Information($"Version: {Version}");
         _logger.Information($"Uptime: {Uptime}");
-
-        _refresher.RunThread();
         
         return _telegramClient.RunDriver();
     }
@@ -148,17 +123,14 @@ public class TelegramBot
         }
     }
 
-    public HealthData GetHealthData()
+    public BotHealthData GetHealthData()
     {
-        var healthData = new HealthData();
+        var healthData = new BotHealthData();
         
-        healthData.BotHealthData.Version = Version;
-        healthData.BotHealthData.DeployTime = Uptime;
-        healthData.BotHealthData.PingTime = _telegramClient.LastCheckTime;
-        healthData.BotHealthData.ReceivedMessages = ReceivedMessages;
-
-        healthData.RefresherHealthData.NextRefreshDate = _refresher.NextRefreshDate.ToDateTime(TimeOnly.MinValue);
-        healthData.RefresherHealthData.PingTime = _refresher.LastDateCheck;
+        healthData.Version = Version;
+        healthData.DeployTime = Uptime;
+        healthData.PingTime = _telegramClient.LastCheckTime;
+        healthData.ReceivedMessages = ReceivedMessages;
 
         return healthData;
     }

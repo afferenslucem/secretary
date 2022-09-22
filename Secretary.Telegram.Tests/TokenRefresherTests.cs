@@ -10,6 +10,7 @@ public class TokenRefresherTests
 {
     private Mock<IUserStorage> _userStorage = null!;
     private Mock<IYandexAuthenticator> _yandexAuthenticator = null!;
+    private Mock<ITelegramClient> _telegramClient = null!;
     
     public TokenRefresher _refresher = null!;
 
@@ -18,39 +19,15 @@ public class TokenRefresherTests
     {
         _yandexAuthenticator = new Mock<IYandexAuthenticator>();
         _userStorage = new Mock<IUserStorage>();
+        _telegramClient = new Mock<ITelegramClient>();
         
         _refresher = new TokenRefresher(
             _yandexAuthenticator.Object, 
             _userStorage.Object, 
-            CancellationToken.None
+            _telegramClient.Object
         );
 
         _refresher.ShouldSkipDelay = true;
-    }
-
-    [Test]
-    public async Task ShouldFireTokenExpired()
-    {
-        var fired = false;
-
-        _refresher.OnUserInvalidToken += (User user) =>
-        {
-            fired = true; return Task.CompletedTask; 
-        };
-
-        var user = new User();
-
-        _yandexAuthenticator
-            .Setup(
-                target => target.RefreshToken(
-                    It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()
-                )
-            ).Throws(new YandexAuthenticationException("Refresh token expired"));
-
-        await _refresher.RefreshToken(user);
-        
-        Assert.That(fired, Is.True);
     }
 
     [Test]
@@ -190,5 +167,27 @@ public class TokenRefresherTests
         var result = _refresher.GetNextUpdateDate(now);
         
         Assert.That(result, Is.EqualTo(new DateOnly(2022, 9, 1)));
+    }
+    
+
+    [Test]
+    public async Task ShouldHandleInvalidToken()
+    {
+        var user = new User()
+        {
+            ChatId = 2517,
+            Email = "a.pushkin@infinnity.ru"
+        };
+
+        _yandexAuthenticator
+            .Setup(target => target.RefreshToken(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new YandexAuthenticationException("Refresh token expired"));
+
+        await _refresher.RefreshToken(user);
+        
+        _userStorage.Verify(target => target.RemoveTokens(2517));
+        _telegramClient.Verify(target => target.SendMessage(2517, 
+            "У вас истек токен для отправки почты!\n\n" +
+            $"Выполните команду /registermail для адреса a.pushkin@infinnity.ru"));
     }
 }

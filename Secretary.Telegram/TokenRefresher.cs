@@ -1,4 +1,5 @@
-﻿using Secretary.Logging;
+﻿using Secreatry.HealthCheck.Data;
+using Secretary.Logging;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Yandex.Authentication;
@@ -11,13 +12,12 @@ public class TokenRefresher
 {
     public delegate Task AsyncUserDelegate(User user);
     
-    public event AsyncUserDelegate OnUserInvalidToken;
-
     private readonly ILogger _logger = LogPoint.GetLogger<TokenRefresher>();
     
     private readonly IYandexAuthenticator _yandexAuthenticator;
     private readonly IUserStorage _userStorage;
-    private readonly CancellationToken _cancellationToken;
+    private readonly ITelegramClient _telegramClient;
+    private readonly CancellationTokenSource _cancellationTokenSource;
 
     public bool ShouldSkipDelay { get; set; } = false;
     
@@ -25,11 +25,14 @@ public class TokenRefresher
     public DateOnly NextRefreshDate => GetNextUpdateDate(DateTime.UtcNow);
     public DateTime LastDateCheck { get; set; }
     
-    public TokenRefresher(IYandexAuthenticator yandexAuthenticator, IUserStorage userStorage, CancellationToken cancellationToken)
-    {
-        _cancellationToken = cancellationToken;
+    public TokenRefresher(
+        IYandexAuthenticator yandexAuthenticator, 
+        IUserStorage userStorage,
+        ITelegramClient telegramClient
+    ) {
+        _cancellationTokenSource = new CancellationTokenSource();
         _userStorage = userStorage;
-
+        _telegramClient = telegramClient;
         _yandexAuthenticator = yandexAuthenticator;
     }
 
@@ -37,7 +40,7 @@ public class TokenRefresher
     {
         _logger.Information("Run refresh token thread");
 
-        while (!_cancellationToken.IsCancellationRequested)
+        while (!_cancellationTokenSource.IsCancellationRequested)
         {
             await this.Refresh();
         }
@@ -60,12 +63,12 @@ public class TokenRefresher
                 LastRefreshDate = NextRefreshDate;
             }
             
-            await Sleep(TimeSpan.FromMinutes(5), _cancellationToken);
+            await Sleep(TimeSpan.FromMinutes(5), _cancellationTokenSource.Token);
         }
         catch (Exception e)
         {
             _logger.Error(e, "Could not refresh tokens");
-            await Sleep(TimeSpan.FromMinutes(5), _cancellationToken);
+            await Sleep(TimeSpan.FromMinutes(5), _cancellationTokenSource.Token);
         }
     }
 
@@ -96,7 +99,7 @@ public class TokenRefresher
             
             await RefreshToken(user);
 
-            await Sleep(TimeSpan.FromSeconds(30), _cancellationToken);
+            await Sleep(TimeSpan.FromSeconds(30), _cancellationTokenSource.Token);
         }
     }
 
@@ -106,7 +109,7 @@ public class TokenRefresher
         {
             _logger.Debug($"Run refresh for user {user.ChatId}");
 
-            var tokenData = await _yandexAuthenticator.RefreshToken(user.RefreshToken!, _cancellationToken);
+            var tokenData = await _yandexAuthenticator.RefreshToken(user.RefreshToken!, _cancellationTokenSource.Token);
 
             user.RefreshToken = tokenData!.refresh_token;
             user.AccessToken = tokenData.access_token;
@@ -121,7 +124,12 @@ public class TokenRefresher
         {
             if (e.Message == "Refresh token expired")
             {
-                await OnUserInvalidToken.Invoke(user);
+                await _userStorage.RemoveTokens(user.ChatId);
+                await _telegramClient.SendMessage(
+                    user.ChatId, 
+                    "У вас истек токен для отправки почты!\n\n" +
+                    $"Выполните команду /registermail для адреса {user.Email}"
+                );
                 _logger.Warning($"{user.ChatId} has expired token");
                 
                 return;
@@ -169,6 +177,16 @@ public class TokenRefresher
         {
             result = result.AddMonths(3);
         }
+
+        return result;
+    }
+
+    public RefresherHealthData GetHealthData()
+    {
+        var result = new RefresherHealthData();
+
+        result.PingTime = LastDateCheck;
+        result.NextRefreshDate = NextRefreshDate.ToDateTime(TimeOnly.MinValue);
 
         return result;
     }

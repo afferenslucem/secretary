@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Secreatry.HealthCheck;
+using Secreatry.HealthCheck.Data;
 using Secretary.Cache;
 using Secretary.Configuration;
 using Secretary.Documents;
@@ -23,6 +24,7 @@ internal class Program
     public static IYandexAuthenticator YandexAuthenticator = null!;
     public static IMailClient MailClient = null!;
     public static ITelegramClient TelegramClient = null!;
+    public static TokenRefresher Refresher = null!;
 
     public static CancellationTokenSource CancellationTokenSource = new ();
 
@@ -49,8 +51,16 @@ internal class Program
             TelegramClient
         );
         
+        Refresher = new TokenRefresher(
+            YandexAuthenticator, 
+            Database.UserStorage, 
+            TelegramClient
+        );
+        
+        
         TelegramBot.Init();
         
+        _ = Refresher.RunThread();
         _ = TelegramBot.Listen();
         
         await RunHealthChecker();
@@ -58,11 +68,14 @@ internal class Program
 
     private static async Task RunHealthChecker()
     {
-        while (true)
+        while (!CancellationTokenSource.IsCancellationRequested)
         {
-            var cache = TelegramBot.GetHealthData();
+            var data = new HealthData();
 
-            await HealthCheckService.SaveData(cache);
+            data.BotHealthData = TelegramBot.GetHealthData();
+            data.RefresherHealthData = Refresher.GetHealthData();
+
+            await HealthCheckService.SaveData(data);
 
             await Task.Delay(TimeSpan.FromMinutes(1));
         }

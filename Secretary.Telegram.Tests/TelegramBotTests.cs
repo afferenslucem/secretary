@@ -45,23 +45,6 @@ public class TelegramBotTests
     }
 
     [Test]
-    public async Task ShouldHandleInvalidToken()
-    {
-        var user = new User()
-        {
-            ChatId = 2517,
-            Email = "a.pushkin@infinnity.ru"
-        };
-
-        await _bot.HandleUserTokenExpired(user);
-        
-        _userStorage.Verify(target => target.RemoveTokens(2517));
-        _client.Verify(target => target.SendMessage(2517, 
-            "У вас истек токен для отправки почты!\n\n" +
-            $"Выполните команду /registermail для адреса a.pushkin@infinnity.ru"));
-    }
-
-    [Test]
     public async Task ShouldGetCommandOnMessage()
     {
         _chain.Setup(target => target.Get(It.IsAny<string>())).Returns(new EmptyCommand());
