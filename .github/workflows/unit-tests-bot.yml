@@ -32,6 +32,27 @@ jobs:
 
     - name: Test
       run: dotnet test Secretary.Documents.Tests --no-build --verbosity normal
+      
+  calendar-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore Secretary.WorkingCalendar.Tests
+
+    - name: Copy Config For WorkingCalendar Tests
+      run: cp test-configs/config.json Secretary.WorkingCalendar.Tests/bin/Debug/net6.0/config.json
+
+    - name: Test
+      run: dotnet test Secretary.WorkingCalendar.Tests --no-build --verbosity normal
 
   yandex-tests:
     runs-on: ubuntu-latest
