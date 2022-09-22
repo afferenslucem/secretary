@@ -4,7 +4,7 @@ using Secretary.WorkingCalendar.Models;
 
 namespace Secretary.WorkingCalendar;
 
-public class CalendarReader
+public class CalendarReader: ICalendarReader
 {
     public Calendar Read(int year)
     {

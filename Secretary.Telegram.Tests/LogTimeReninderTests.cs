@@ -1,6 +1,8 @@
 using Moq;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
+using Secretary.WorkingCalendar;
+using Secretary.WorkingCalendar.Models;
 using Secretary.Yandex.Authentication;
 using Secretary.Yandex.Exceptions;
 
@@ -73,6 +75,15 @@ public class LogTimeReminderTests
         var nextDate = new DateOnly(2022, 9, 1);
         var lastDate = new DateOnly(2022, 6, 1);
         var now = new DateTime(2022, 9, 1, 8, 32, 0);
+        
+        var reader = new Mock<ICalendarReader>();
+        var calendar = new Mock<Calendar>();
+
+        reader.Setup(target => target.Read(It.IsAny<int>())).Returns(calendar.Object);
+        calendar.Setup(target => target.IsLastWorkingDayBefore(It.IsAny<DateOnly>(), It.IsAny<DateOnly>()))
+            .Returns(true);
+        
+        _reminder.CalendarReader = reader.Object;
 
         var result = _reminder.ItsTimeToNotify(nextDate, lastDate, now);
         
@@ -109,6 +120,15 @@ public class LogTimeReminderTests
         var nextDate = new DateOnly(2022, 9, 1);
         var lastDate = new DateOnly(2022, 6, 1);
         var now = new DateTime(2022, 9, 1, 9, 0, 0);
+
+        var reader = new Mock<ICalendarReader>();
+        var calendar = new Mock<Calendar>();
+
+        reader.Setup(target => target.Read(It.IsAny<int>())).Returns(calendar.Object);
+        calendar.Setup(target => target.IsLastWorkingDayBefore(It.IsAny<DateOnly>(), It.IsAny<DateOnly>()))
+            .Returns(true);
+        
+        _reminder.CalendarReader = reader.Object;
 
         var result = _reminder.ItsTimeToNotify(nextDate, lastDate, now);
         

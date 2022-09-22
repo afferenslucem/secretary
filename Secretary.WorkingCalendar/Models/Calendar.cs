@@ -24,7 +24,7 @@ public class Calendar
         return Year.ToString();
     }
 
-    public bool IsLastWorkingDayBefore(DateOnly now, DateOnly lastDate)
+    public virtual bool IsLastWorkingDayBefore(DateOnly now, DateOnly lastDate)
     {
         var nowDT = now.ToDateTime(TimeOnly.MinValue);
         var lastDT = lastDate.ToDateTime(TimeOnly.MinValue);

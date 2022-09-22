@@ -2,6 +2,7 @@
 using Secretary.Logging;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
+using Secretary.WorkingCalendar;
 using Serilog;
 
 namespace Secretary.Telegram;
@@ -18,6 +19,8 @@ public class LogTimeReminder
     
     public DateOnly LastNotifyDate { get; set; }
     public DateOnly NextNotifyDate => GetNextNotifyDate(DateTime.UtcNow);
+
+    public ICalendarReader CalendarReader;
 
     public bool ShouldSkipDelay { get; set; } = false;
     
@@ -96,7 +99,10 @@ public class LogTimeReminder
     {
         if (nextDate == prevDate) return false;
         
-        if (nextDate == DateOnly.FromDateTime(now) && now.Hour == 8)
+        var calendar = CalendarReader.Read(now.Year);
+        var isLastDate = calendar.IsLastWorkingDayBefore(DateOnly.FromDateTime(now), nextDate);
+        
+        if (isLastDate && now.Hour == 8)
         {
             return true;
         }
