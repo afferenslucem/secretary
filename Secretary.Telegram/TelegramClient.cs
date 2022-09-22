@@ -1,6 +1,7 @@
 using Secretary.Logging;
 using Serilog;
 using Telegram.Bot;
+using Telegram.Bot.Args;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -36,6 +37,8 @@ public class TelegramClient: ITelegramClient
         {
             AllowedUpdates = new [] { UpdateType.Message }
         };
+
+        _botClient.OnApiResponseReceived += SaveLifeTime;
         
         while (!_cancellationToken.IsCancellationRequested)
         {
@@ -123,5 +126,14 @@ public class TelegramClient: ITelegramClient
     public async Task SendSticker(long chatId, string stickerId)
     {
         await _botClient.SendStickerAsync(chatId, new InputOnlineFile(stickerId));
+    }
+
+    private ValueTask SaveLifeTime(ITelegramBotClient client, ApiResponseEventArgs e, CancellationToken token)
+    {
+        this.LastCheckTime = DateTime.UtcNow;
+        
+        _logger.Debug("Received answer");
+        
+        return ValueTask.CompletedTask;
     }
 }

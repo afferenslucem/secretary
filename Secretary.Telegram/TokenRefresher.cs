@@ -1,4 +1,5 @@
 ﻿using Secreatry.HealthCheck.Data;
+using Secretary.HealthCheck.Data;
 using Secretary.Logging;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
@@ -10,8 +11,6 @@ namespace Secretary.Telegram;
 
 public class TokenRefresher
 {
-    public delegate Task AsyncUserDelegate(User user);
-    
     private readonly ILogger _logger = LogPoint.GetLogger<TokenRefresher>();
     
     private readonly IYandexAuthenticator _yandexAuthenticator;
@@ -74,29 +73,10 @@ public class TokenRefresher
 
     public async Task RefreshTokensForAllUsers()
     {
-        var count = await _userStorage.GetCount();
+        var users = await _userStorage.GetUsers(user => user.RefreshToken != null);
 
-        const int step = 10;
-
-        for (int i = 0; i < count; i += step)
-        {
-            var users = await _userStorage.GetUsers(i, step);
-
-            await RefreshTokens(users);
-        }
-    }
-
-    public async Task RefreshTokens(IEnumerable<User> users)
-    {
         foreach (var user in users)
         {
-            if (user.RefreshToken == null)
-            {
-                _logger.Debug($"Skip refresh for user {user.ChatId}");
-
-                continue;
-            }
-            
             await RefreshToken(user);
 
             await Sleep(TimeSpan.FromSeconds(30), _cancellationTokenSource.Token);

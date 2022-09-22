@@ -1,7 +1,7 @@
 using Moq;
 using Secreatry.HealthCheck;
-using Secreatry.HealthCheck.Data;
 using Secretary.Cache;
+using Secretary.HealthCheck.Data;
 
 namespace Secretary.HealthCheck.Tests;
 

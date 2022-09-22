@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Moq;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
@@ -66,13 +67,15 @@ public class TokenRefresherTests
     [Test]
     public async Task ShouldSkipUpdateTokensForUsersWithoutRefresh()
     {
-        var user = new User();
         var user2 = new User()
         {
             RefreshToken = "refresh_token"
         };
+
+        _userStorage.Setup(target => target.GetUsers(user => user.RefreshToken != null))
+            .ReturnsAsync(new[] {  user2 });
         
-        await _refresher.RefreshTokens(new [] { user, user2 });
+        await _refresher.RefreshTokensForAllUsers();
         
         _yandexAuthenticator.Verify(
             target => target.RefreshToken(
@@ -85,19 +88,6 @@ public class TokenRefresherTests
             target => target.RefreshToken(
                 "refresh_token", 
                 It.IsAny<CancellationToken>())
-        );
-    }
-
-    [Test]
-    public async Task ShouldRefreshForAllUsers()
-    {
-        _userStorage.Setup(target => target.GetCount()).ReturnsAsync(25);
-
-        await _refresher.RefreshTokensForAllUsers();
-        
-        _userStorage.Verify(
-            target => target.GetUsers(It.IsAny<int>(), It.IsAny<int>()), 
-            Times.Exactly(3)
         );
     }
 

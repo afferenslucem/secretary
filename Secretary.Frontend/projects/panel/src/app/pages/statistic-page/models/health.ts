@@ -9,4 +9,8 @@ export interface Health {
     pingTime: string;
     nextRefreshDate: string;
   }
+  reminderHealthData: {
+    pingTime: string;
+    nextNotifyDate: string;
+  }
 }

@@ -18,6 +18,7 @@ describe('StatisticPageComponent', () => {
     const health: Health = {
       botHealthData: { version: '0', deployTime: '', pingTime: '', receivedMessages: 0},
       refresherHealthData: { pingTime: '', nextRefreshDate: '' },
+      reminderHealthData: { pingTime: '', nextNotifyDate: '' },
     }
 
     await TestBed.configureTestingModule({

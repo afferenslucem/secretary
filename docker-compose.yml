@@ -26,6 +26,7 @@ services:
       - "./config.prod.json:/app/config.json"
       - "./data:/data"
       - "./templates:/templates"
+      - "./calendars:/calendars"
       - "/var/log/secretary/bot:/logs"
       - "/tmp/secretary:/tmp"
 

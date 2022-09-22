@@ -24,8 +24,7 @@ public class CommandsListeningChain
         _commandsChain.Add(CancelCommand.Key, new CommandFactory<CancelCommand>());
         _commandsChain.Add(MeCommand.Key, new CommandFactory<MeCommand>());
         _commandsChain.Add(SetEmailsCommand.Key, new CommandFactory<SetEmailsCommand>());
-        _commandsChain.Add(VersionCommand.Key, new CommandFactory<VersionCommand>());
-        _commandsChain.Add(UptimeCommand.Key, new CommandFactory<UptimeCommand>());
+        _commandsChain.Add(RemindLogTimeCommand.Key, new CommandFactory<RemindLogTimeCommand>());
         _commandsChain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
     }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using Secretary.Logging;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
@@ -76,6 +77,13 @@ public class UserStorage: Storage, IUserStorage
         return await context.Users.CountAsync();
     }
 
+    public async Task<int> GetCount(Expression<Func<User, bool>> predicate)
+    {
+        await using var context = GetContext();
+
+        return await context.Users.CountAsync(predicate);
+    }
+
     public async Task<int> GetCountWithDocuments()
     {
         await using var context = GetContext();
@@ -91,5 +99,23 @@ public class UserStorage: Storage, IUserStorage
         await using var context = GetContext();
         
         return await context.Users.Skip(from).Take(length).ToArrayAsync();
+    }
+
+    public async Task<User[]> GetUsers(Expression<Func<User, bool>> predicate)
+    {
+        await using var context = GetContext();
+        
+        return await context.Users.Where(predicate).ToArrayAsync();
+    }
+
+    public async Task<User[]> GetUsers(int from, int length, Expression<Func<User, bool>> predicate)
+    {
+        await using var context = GetContext();
+        
+        return await context.Users
+            .Where(predicate)
+            .OrderBy(user => user.ChatId)
+            .Skip(from).Take(length)
+            .ToArrayAsync();
     }
 }

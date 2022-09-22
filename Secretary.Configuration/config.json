@@ -8,5 +8,6 @@
   },
   "DbConnectionString": "",
   "TemplatesPath": "",
+  "CalendarsPath": "",
   "RedisHost": ""
 }

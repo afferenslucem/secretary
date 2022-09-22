@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Secreatry.HealthCheck;
-using Secreatry.HealthCheck.Data;
 using Secretary.Cache;
 using Secretary.Configuration;
 using Secretary.Documents;
+using Secretary.HealthCheck;
+using Secretary.HealthCheck.Data;
 using Secretary.Storage;
 using Secretary.Telegram;
 using Secretary.Telegram.Sessions;
+using Secretary.WorkingCalendar;
 using Secretary.Yandex.Authentication;
 using Secretary.Yandex.Mail;
 
@@ -23,13 +24,17 @@ internal class Program
     public static HealthCheckService HealthCheckService = null!;
     public static IYandexAuthenticator YandexAuthenticator = null!;
     public static IMailClient MailClient = null!;
+    
     public static ITelegramClient TelegramClient = null!;
     public static TokenRefresher Refresher = null!;
+    public static LogTimeReminder Reminder = null!;
 
     public static CancellationTokenSource CancellationTokenSource = new ();
 
     private static async Task Main(string[] args)
     {
+        var calendar = new CalendarReader().Read(2022);
+        
         DocumentTemplatesStorage.Initialize(Config.Instance.TemplatesPath);
 
         Database = new Database();
@@ -57,10 +62,16 @@ internal class Program
             TelegramClient
         );
         
+        Reminder = new LogTimeReminder(
+            Database.UserStorage, 
+            TelegramClient
+        );
+        
         
         TelegramBot.Init();
         
         _ = Refresher.RunThread();
+        _ = Reminder.RunThread();
         _ = TelegramBot.Listen();
         
         await RunHealthChecker();
@@ -74,6 +85,7 @@ internal class Program
 
             data.BotHealthData = TelegramBot.GetHealthData();
             data.RefresherHealthData = Refresher.GetHealthData();
+            data.ReminderHealthData = Reminder.GetHealthData();
 
             await HealthCheckService.SaveData(data);
 

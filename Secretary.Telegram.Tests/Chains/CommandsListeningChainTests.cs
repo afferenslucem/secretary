@@ -52,14 +52,6 @@ public class CommandsListeningChainTests
     }
 
     [Test]
-    public void ShouldReturnUptimeCommand()
-    {
-        var result = _chain.Get("/uptime");
-        
-        Assert.IsInstanceOf<UptimeCommand>(result);
-    }
-
-    [Test]
     public void ShouldReturnTimeOffCommand()
     {
         var result = _chain.Get(TimeOffCommand.Key);
@@ -100,7 +92,7 @@ public class CommandsListeningChainTests
     }
 
     [Test]
-    public void ShouldDistantCommand()
+    public void ShouldReturnDistantCommand()
     {
         var result = _chain.Get(DistantCommand.Key);
         
@@ -108,10 +100,10 @@ public class CommandsListeningChainTests
     }
 
     [Test]
-    public void ShouldReturnVersionCommand()
+    public void ShouldReturnRemindLogTimeCommand()
     {
-        var result = _chain.Get(VersionCommand.Key);
+        var result = _chain.Get(RemindLogTimeCommand.Key);
         
-        Assert.IsInstanceOf<VersionCommand>(result);
+        Assert.IsInstanceOf<RemindLogTimeCommand>(result);
     }
 }

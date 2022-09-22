@@ -1,11 +1,11 @@
-<div class="container">
-  <div class="mb-5">
+<div class="container pt-2">
+  <div class="mb-4">
     <h1>Secretary</h1>
   </div>
 
-  <div class="health">
-    <div class="row">
-      <div class="col-6">
+  <div class="health mb-5">
+    <div class="row gap-3">
+      <div class="col-12 col-md-3">
         <h2>Бот</h2>
 
         <div class="line">
@@ -44,7 +44,7 @@
           </div>
         </div>
       </div>
-      <div class="col-6">
+      <div class="col-12 col-md-3">
         <h2>Token Refresher</h2>
         <div class="line">
           <div class="line__header">
@@ -61,6 +61,26 @@
           </div>
           <div class="line__value">
             {{ health.refresherHealthData.nextRefreshDate | date: 'yyyy-MM-dd' }}
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <h2>Log Reminder</h2>
+        <div class="line">
+          <div class="line__header">
+            Ping
+          </div>
+          <div class="line__value">
+            {{ health.reminderHealthData.pingTime | date: 'yyyy-MM-dd HH:mm' }}
+          </div>
+        </div>
+
+        <div class="line">
+          <div class="line__header">
+            След. Проверка
+          </div>
+          <div class="line__value">
+            {{ health.reminderHealthData.nextNotifyDate | date: 'yyyy-MM-dd' }}
           </div>
         </div>
       </div>

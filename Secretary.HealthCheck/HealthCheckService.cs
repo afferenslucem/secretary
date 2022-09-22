@@ -1,7 +1,7 @@
-using Secreatry.HealthCheck.Data;
 using Secretary.Cache;
+using Secretary.HealthCheck.Data;
 
-namespace Secreatry.HealthCheck;
+namespace Secretary.HealthCheck;
 
 public class HealthCheckService
 {

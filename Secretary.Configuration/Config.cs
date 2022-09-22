@@ -23,6 +23,7 @@ public class Config
     public string DbConnectionString { get; init; } = null!;
 
     public string TemplatesPath { get; init; } = null!;
+    public string CalendarsPath { get; init; } = null!;
 
     public string RedisHost { get; init; } = null!;
 

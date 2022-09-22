@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Secretary.Storage.Models
@@ -27,8 +28,13 @@ namespace Secretary.Storage.Models
 
         public int? TokenExpirationSeconds { get; set; }
 
+        [DefaultValue(false)]
+        public bool RemindLogTime { get; set; }
+        
         public IEnumerable<Document> Documents = null;
 
+        
         public IEnumerable<EventLog> Events = null;
+        
     }
 }

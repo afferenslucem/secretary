@@ -18,7 +18,6 @@ builder.Services.AddCors(options =>
                     "http://localhost:4200",
                     "http://localhost:4301", 
                     "http://localhost:30080", 
-                    "http://localhost:38080", 
                     "https://secretary.hrodvitnir.pw"
                 );
             })

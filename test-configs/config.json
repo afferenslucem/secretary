@@ -6,5 +6,6 @@
       "AllowedSenderDomains": ["infinnity.ru"]
     },
     "DbPath": "",
-    "TemplatesPath": "../../../../templates"
+    "TemplatesPath": "../../../../templates",
+    "CalendarsPath": "../../../../calendars"
   }

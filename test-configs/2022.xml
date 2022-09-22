@@ -1,0 +1,10 @@
+<calendar year="2022" lang="ru" date="2022.05.08">
+    <holidays>
+        <holiday id="1" title="Новогодние каникулы"/>
+    </holidays>
+    <days>
+        <day d="01.08" t="1" h="1"/>
+        <day d="02.22" t="2"/>
+        <day d="03.07" t="1" f="03.05"/>
+    </days>
+</calendar>

@@ -1,7 +1,7 @@
 namespace Secretary.HealthCheck.Data;
 
-public class RefresherHealthData
+public class ReminderHealthData
 {
     public DateTime PingTime { get; set; }
-    public DateTime NextRefreshDate { get; set; }
+    public DateTime NextNotifyDate { get; set; }
 }

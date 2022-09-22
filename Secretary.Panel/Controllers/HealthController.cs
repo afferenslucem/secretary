@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Secreatry.HealthCheck;
-using Secreatry.HealthCheck.Data;
 using Secretary.Cache;
 using Secretary.Configuration;
+using Secretary.HealthCheck;
+using Secretary.HealthCheck.Data;
 
 namespace Secretary.Panel.Controllers;
 
