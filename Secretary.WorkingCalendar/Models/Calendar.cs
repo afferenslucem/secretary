@@ -26,6 +26,13 @@ public class Calendar
 
     public virtual bool IsLastWorkingDayBefore(DateOnly now, DateOnly lastDate)
     {
+        var lastDay = GetLastWorkingDayBefore(now, lastDate);
+        
+        return lastDay == now;
+    }
+
+    public virtual DateOnly GetLastWorkingDayBefore(DateOnly now, DateOnly lastDate)
+    {
         var nowDT = now.ToDateTime(TimeOnly.MinValue);
         var lastDT = lastDate.ToDateTime(TimeOnly.MinValue);
         
@@ -35,14 +42,9 @@ public class Calendar
             .Select(date => FindOrCreate(date))
             .ToArray();
 
-        var lastDay = days.LastOrDefault(day => day.IsWorkingDay());
+        var lastDay = days.Last(day => day.IsWorkingDay());
 
-        if (lastDay == null)
-        {
-            return false;
-        }
-        
-        return lastDay.FullDate == now;
+        return lastDay.FullDate;
     }
 
     public Day FindOrCreate(DateOnly date)

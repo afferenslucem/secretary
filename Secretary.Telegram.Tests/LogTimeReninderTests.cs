@@ -13,11 +13,19 @@ public class LogTimeReminderTests
     private Mock<IUserStorage> _userStorage = null!;
     private Mock<ITelegramClient> _telegramClient = null!;
     
+    private Mock<ICalendarReader> _reader;
+    private Mock<Calendar> _calendar;
+    
     public LogTimeReminder _reminder = null!;
 
     [SetUp]
     public void Setup()
     {
+        _reader = new Mock<ICalendarReader>();
+        _calendar = new Mock<Calendar>();
+        
+        _reader.Setup(target => target.Read(It.IsAny<int>())).Returns(_calendar.Object);
+        
         _userStorage = new Mock<IUserStorage>();
         _telegramClient = new Mock<ITelegramClient>();
         
@@ -26,13 +34,27 @@ public class LogTimeReminderTests
             _telegramClient.Object
         );
 
+        _reminder.CalendarReader = _reader.Object;
+
         _reminder.ShouldSkipDelay = true;
     }
 
     [Test]
-    public void NextDateShouldReturn15For1()
+    public void NextDateShouldUse15For1()
     {
+        _calendar
+            .Setup(
+                target => target.GetLastWorkingDayBefore(
+                    It.IsAny<DateOnly>(), 
+                    It.IsAny<DateOnly>()
+                )
+            )
+            .Returns(new DateOnly(2022, 7, 15));
+        
         var result = _reminder.GetNextNotifyDate(new DateTime(2022, 7, 1));
+        
+        _calendar.Verify(
+            target => target.GetLastWorkingDayBefore(new DateOnly(2022, 7, 1), new DateOnly(2022, 7, 15)));
         
         Assert.That(result, Is.EqualTo(new DateOnly(2022, 7, 15)));
     }
@@ -40,23 +62,59 @@ public class LogTimeReminderTests
     [Test]
     public void NextDateShouldReturn15For15()
     {
+        _calendar
+            .Setup(
+                target => target.GetLastWorkingDayBefore(
+                    It.IsAny<DateOnly>(), 
+                    It.IsAny<DateOnly>()
+                )
+            )
+            .Returns(new DateOnly(2022, 7, 15));
+        
         var result = _reminder.GetNextNotifyDate(new DateTime(2022, 7, 15));
         
+        _calendar.Verify(
+            target => target.GetLastWorkingDayBefore(new DateOnly(2022, 7, 15), new DateOnly(2022, 7, 15)));
+
         Assert.That(result, Is.EqualTo(new DateOnly(2022, 7, 15)));
     }
 
     [Test]
     public void NextDateShouldReturn31For16July()
     {
+        _calendar
+            .Setup(
+                target => target.GetLastWorkingDayBefore(
+                    It.IsAny<DateOnly>(), 
+                    It.IsAny<DateOnly>()
+                )
+            )
+            .Returns(new DateOnly(2022, 7, 31));
+        
         var result = _reminder.GetNextNotifyDate(new DateTime(2022, 7, 16));
         
+        _calendar.Verify(
+            target => target.GetLastWorkingDayBefore(new DateOnly(2022, 7, 16), new DateOnly(2022, 7, 31)));
+
         Assert.That(result, Is.EqualTo(new DateOnly(2022, 7, 31)));
     }
 
     [Test]
     public void NextDateShouldReturn28For16February2022()
     {
+        _calendar
+            .Setup(
+                target => target.GetLastWorkingDayBefore(
+                    It.IsAny<DateOnly>(), 
+                    It.IsAny<DateOnly>()
+                )
+            )
+            .Returns(new DateOnly(2022, 2, 28));
+        
         var result = _reminder.GetNextNotifyDate(new DateTime(2022, 2, 16));
+        
+        _calendar.Verify(
+            target => target.GetLastWorkingDayBefore(new DateOnly(2022, 2, 16), new DateOnly(2022, 2, 28)));
         
         Assert.That(result, Is.EqualTo(new DateOnly(2022, 2, 28)));
     }
@@ -64,7 +122,19 @@ public class LogTimeReminderTests
     [Test]
     public void NextDateShouldReturn28For16February2024()
     {
+        _calendar
+            .Setup(
+                target => target.GetLastWorkingDayBefore(
+                    It.IsAny<DateOnly>(), 
+                    It.IsAny<DateOnly>()
+                )
+            )
+            .Returns(new DateOnly(2024, 2, 29));
+        
         var result = _reminder.GetNextNotifyDate(new DateTime(2024, 2, 16));
+        
+        _calendar.Verify(
+            target => target.GetLastWorkingDayBefore(new DateOnly(2024, 2, 16), new DateOnly(2024, 2, 29)));
         
         Assert.That(result, Is.EqualTo(new DateOnly(2024, 2, 29)));
     }
@@ -75,15 +145,6 @@ public class LogTimeReminderTests
         var nextDate = new DateOnly(2022, 9, 1);
         var lastDate = new DateOnly(2022, 6, 1);
         var now = new DateTime(2022, 9, 1, 8, 32, 0);
-        
-        var reader = new Mock<ICalendarReader>();
-        var calendar = new Mock<Calendar>();
-
-        reader.Setup(target => target.Read(It.IsAny<int>())).Returns(calendar.Object);
-        calendar.Setup(target => target.IsLastWorkingDayBefore(It.IsAny<DateOnly>(), It.IsAny<DateOnly>()))
-            .Returns(true);
-        
-        _reminder.CalendarReader = reader.Object;
 
         var result = _reminder.ItsTimeToNotify(nextDate, lastDate, now);
         
@@ -120,15 +181,6 @@ public class LogTimeReminderTests
         var nextDate = new DateOnly(2022, 9, 1);
         var lastDate = new DateOnly(2022, 6, 1);
         var now = new DateTime(2022, 9, 1, 9, 0, 0);
-
-        var reader = new Mock<ICalendarReader>();
-        var calendar = new Mock<Calendar>();
-
-        reader.Setup(target => target.Read(It.IsAny<int>())).Returns(calendar.Object);
-        calendar.Setup(target => target.IsLastWorkingDayBefore(It.IsAny<DateOnly>(), It.IsAny<DateOnly>()))
-            .Returns(true);
-        
-        _reminder.CalendarReader = reader.Object;
 
         var result = _reminder.ItsTimeToNotify(nextDate, lastDate, now);
         

@@ -99,10 +99,7 @@ public class LogTimeReminder
     {
         if (nextDate == prevDate) return false;
         
-        var calendar = CalendarReader.Read(now.Year);
-        var isLastDate = calendar.IsLastWorkingDayBefore(DateOnly.FromDateTime(now), nextDate);
-        
-        if (isLastDate && now.Hour == 8)
+        if (nextDate == DateOnly.FromDateTime(now) && now.Hour == 8)
         {
             return true;
         }
@@ -112,14 +109,23 @@ public class LogTimeReminder
 
     public DateOnly GetNextNotifyDate(DateTime now)
     {
+        DateOnly temp;
+        
         if (now.Day > 15)
         {
             var lastDay = DateTime.DaysInMonth(now.Year, now.Month);
 
-            return new DateOnly(now.Year, now.Month, lastDay);
+            temp = new DateOnly(now.Year, now.Month, lastDay);
+        }
+        else
+        {
+            temp = new DateOnly(now.Year, now.Month, 15);
         }
         
-        return new DateOnly(now.Year, now.Month, 15);
+        
+        var calendar = CalendarReader.Read(now.Year);
+
+        return calendar.GetLastWorkingDayBefore(DateOnly.FromDateTime(now), temp);
     }
     
     public Task Sleep(TimeSpan span, CancellationToken cancellationToken)
