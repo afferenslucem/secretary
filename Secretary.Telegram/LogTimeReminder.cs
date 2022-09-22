@@ -27,10 +27,12 @@ public class LogTimeReminder
     public LogTimeReminder(
         IUserStorage userStorage,
         ITelegramClient telegramClient
-    ) {
+    )
+    {
         _cancellationTokenSource = new CancellationTokenSource();
         _userStorage = userStorage;
         _telegramClient = telegramClient;
+        CalendarReader = new CalendarReader();
     }
 
     public async Task RunThread()
