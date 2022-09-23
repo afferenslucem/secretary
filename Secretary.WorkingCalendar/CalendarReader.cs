@@ -8,8 +8,6 @@ public class CalendarReader: ICalendarReader
 {
     public Calendar Read(int year)
     {
-        Console.WriteLine("Reading with Stream");
-        
         XmlSerializer serializer =
             new XmlSerializer(typeof(Calendar));
 
