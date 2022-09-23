@@ -120,6 +120,28 @@ public class LogTimeReminderTests
     }
 
     [Test]
+    public void NextDateShouldReturn15ForNextDay30September2022()
+    {
+        _calendar
+            .Setup(
+                target => target.GetLastWorkingDayBefore(
+                    It.IsAny<DateOnly>(), 
+                    It.IsAny<DateOnly>()
+                )
+            )
+            .Returns(new DateOnly(2022, 10, 15));
+
+        var now = new DateTime(2022, 9, 30).AddDays(1);
+        
+        var result = _reminder.GetNextNotifyDate(now);
+        
+        _calendar.Verify(
+            target => target.GetLastWorkingDayBefore(new DateOnly(2022, 10, 1), new DateOnly(2022, 10, 15)));
+        
+        Assert.That(result, Is.EqualTo(new DateOnly(2022, 10, 15)));
+    }
+
+    [Test]
     public void NextDateShouldReturn28For16February2024()
     {
         _calendar

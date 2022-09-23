@@ -62,10 +62,10 @@ public class LogTimeReminder
                 await RefreshTokensForAllUsers();
 
                 LastNotifyDate = NextNotifyDate;
-                NextNotifyDate = GetNextNotifyDate(DateTime.UtcNow);
+                NextNotifyDate = GetNextNotifyDate(now.AddDays(1));
             }
             
-            await Sleep(TimeSpan.FromMinutes(5), _cancellationTokenSource.Token);
+            await Sleep(TimeSpan.FromMinutes(1), _cancellationTokenSource.Token);
         }
         catch (Exception e)
         {
@@ -131,7 +131,7 @@ public class LogTimeReminder
 
         var result = calendar.GetLastWorkingDayBefore(DateOnly.FromDateTime(now), temp);
         
-        _logger.Debug($"Next date to refresh {result}");
+        _logger.Information($"Next date to refresh {result}");
 
         return result;
     }
