@@ -129,7 +129,11 @@ public class LogTimeReminder
         
         var calendar = CalendarReader.Read(now.Year);
 
-        return calendar.GetLastWorkingDayBefore(DateOnly.FromDateTime(now), temp);
+        var result = calendar.GetLastWorkingDayBefore(DateOnly.FromDateTime(now), temp);
+        
+        _logger.Debug($"Next date to refresh {result}");
+
+        return result;
     }
     
     public Task Sleep(TimeSpan span, CancellationToken cancellationToken)
