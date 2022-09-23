@@ -33,8 +33,6 @@ internal class Program
 
     private static async Task Main(string[] args)
     {
-        var calendar = new CalendarReader().Read(2022);
-        
         DocumentTemplatesStorage.Initialize(Config.Instance.TemplatesPath);
 
         Database = new Database();
