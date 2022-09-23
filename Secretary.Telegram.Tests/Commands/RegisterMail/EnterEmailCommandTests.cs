@@ -62,7 +62,7 @@ public class EnterEmailCommandTests
         
         await this._command.OnMessage();
         
-        this._cacheService.Verify(target => target.SaveEntity(2517,  new RegisterMailCache("a.pushkin@infinnity.ru"), It.IsAny<short>()));
+        this._cacheService.Verify(target => target.SaveEntity(2517,  new RegisterMailCache("a.pushkin@infinnity.ru"), It.IsAny<int>()));
     }
         
     [Test]

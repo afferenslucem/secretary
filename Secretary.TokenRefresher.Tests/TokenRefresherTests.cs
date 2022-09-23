@@ -1,11 +1,11 @@
-using System.Linq.Expressions;
 using Moq;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
+using Secretary.Telegram;
 using Secretary.Yandex.Authentication;
 using Secretary.Yandex.Exceptions;
 
-namespace Secretary.Telegram.Tests;
+namespace Secretary.TokenRefresher.Tests;
 
 public class TokenRefresherTests
 {

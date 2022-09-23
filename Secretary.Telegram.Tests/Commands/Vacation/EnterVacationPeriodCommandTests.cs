@@ -65,7 +65,7 @@ public class EnterVacationPeriodCommandTests
         await _command.OnMessage();
         
         _cacheService.Verify(target => target.SaveEntity(2517, new TimeOffCache() { Period =
-            new DatePeriodParser().Parse("с 16.08.2022 до 29.08.2022")}, It.IsAny<short>()), Times.Once);
+            new DatePeriodParser().Parse("с 16.08.2022 до 29.08.2022")}, It.IsAny<int>()), Times.Once);
     }
     
     [Test]

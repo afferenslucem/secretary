@@ -1,12 +1,11 @@
 using Moq;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
+using Secretary.Telegram;
 using Secretary.WorkingCalendar;
 using Secretary.WorkingCalendar.Models;
-using Secretary.Yandex.Authentication;
-using Secretary.Yandex.Exceptions;
 
-namespace Secretary.Telegram.Tests;
+namespace Secretary.LogTimeReminder.Tests;
 
 public class LogTimeReminderTests
 {

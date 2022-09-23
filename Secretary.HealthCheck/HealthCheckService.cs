@@ -12,13 +12,27 @@ public class HealthCheckService
         _cacheService = cacheService;
     }
 
-    public Task SaveData(HealthData data)
+    public Task SaveData<T>(T data) where T: class
     {
-        return _cacheService.SaveEntity(typeof(HealthData).Name, data, null);
+        return _cacheService.SaveEntity(typeof(T).Name, data, 7 * 24 * 60 * 60);
     }
 
-    public Task<HealthData?> GetData()
+    public Task<T?> GetData<T>() where T: class
     {
-        return _cacheService.GetEntity<HealthData>(typeof(HealthData).Name);
+        return _cacheService.GetEntity<T>(typeof(T).Name);
+    }
+
+    public async Task<HealthData> GetFullData()
+    {
+        var botHealthData = await GetData<BotHealthData>();
+        var reminderHealthData = await GetData<ReminderHealthData>();
+        var refresherHealthData = await GetData<RefresherHealthData>();
+
+        return new HealthData()
+        {
+            BotHealthData = botHealthData,
+            RefresherHealthData = refresherHealthData,
+            ReminderHealthData = reminderHealthData
+        };
     }
 }

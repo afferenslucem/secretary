@@ -20,6 +20,8 @@ on:
 env:
   REGISTRY: ghcr.io
   BOT_IMAGE_NAME: secretary
+  REFRESHER_IMAGE_NAME: refresher
+  REMINDER_IMAGE_NAME: reminder
   FRONTEND_IMAGE_NAME: panel-frontend
   BACKEND_IMAGE_NAME: panel-backend
 
@@ -56,13 +58,73 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build image
-        run: docker build . --file Secretary.Console/dockerfile --tag $BOT_IMAGE_NAME
+        run: docker build . --file Secretary.TelegramBot/dockerfile --tag $BOT_IMAGE_NAME
 
       - name: Tag image
         run: docker tag $BOT_IMAGE_NAME ghcr.io/${{ github.actor }}/$BOT_IMAGE_NAME:latest
 
       - name: Push client image
         run: docker push ghcr.io/${{ github.actor }}/$BOT_IMAGE_NAME:latest
+
+  build-and-push-reminder:
+    needs: [run-tests-bot, ]
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image
+        run: docker build . --file Secretary.LogTimeReminder/dockerfile --tag $REMINDER_IMAGE_NAME
+
+      - name: Tag image
+        run: docker tag $REMINDER_IMAGE_NAME ghcr.io/${{ github.actor }}/$REMINDER_IMAGE_NAME:latest
+
+      - name: Push client image
+        run: docker push ghcr.io/${{ github.actor }}/$REMINDER_IMAGE_NAME:latest
+
+  build-and-push-refresher:
+    needs: [run-tests-bot]
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image
+        run: docker build . --file Secretary.TokenRefresher/dockerfile --tag $REFRESHER_IMAGE_NAME
+
+      - name: Tag image
+        run: docker tag $REFRESHER_IMAGE_NAME ghcr.io/${{ github.actor }}/$REFRESHER_IMAGE_NAME:latest
+
+      - name: Push client image
+        run: docker push ghcr.io/${{ github.actor }}/$REFRESHER_IMAGE_NAME:latest
 
   build-and-push-frontend:
     needs: [run-tests-panel-frontend]

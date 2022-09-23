@@ -72,7 +72,7 @@ public class EnterWorkingOffCommandTests
                     Reason = "Поеду заниматься ремонтом",
                     WorkingOff = "Отгул обязуюсь отработать",
                 }, 
-                It.IsAny<short>()), 
+                It.IsAny<int>()), 
             Times.Once
         );
     }

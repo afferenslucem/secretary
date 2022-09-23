@@ -20,19 +20,42 @@ services:
   bot:
     build: 
       context: .
-      dockerfile: ./Secretary.Console/dockerfile
+      dockerfile: ./Secretary.TelegramBot/dockerfile
     
     volumes:
       - "./config.prod.json:/app/config.json"
-      - "./data:/data"
       - "./templates:/templates"
-      - "./calendars:/calendars"
       - "/var/log/secretary/bot:/logs"
       - "/tmp/secretary:/tmp"
 
     depends_on:
       - redis
       - database
+      
+  reminder:
+    build: 
+      context: .
+      dockerfile: ./Secretary.LogTimeReminder/dockerfile
+    
+    volumes:
+      - "./config.prod.json:/app/config.json"
+      - "./calendars:/calendars"
+      - "/var/log/secretary/reminder:/logs"
+
+    depends_on:
+      - bot
+      
+  refresher:
+    build: 
+      context: .
+      dockerfile: ./Secretary.TokenRefresher/dockerfile
+    
+    volumes:
+      - "./config.prod.json:/app/config.json"
+      - "/var/log/secretary/refresher:/logs"
+
+    depends_on:
+      - bot
 
   panel-backend:
     build: 

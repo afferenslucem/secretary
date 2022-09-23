@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using Secreatry.HealthCheck;
 using Secretary.Cache;
 using Secretary.Configuration;
-using Secretary.HealthCheck;
 using Secretary.HealthCheck.Data;
+using Secretary.HealthCheck;
 
 namespace Secretary.Panel.Controllers;
 
@@ -11,7 +10,7 @@ namespace Secretary.Panel.Controllers;
 [Route("[controller]")]
 public class HealthController : ControllerBase
 {
-    public HealthCheckService HealthCheckService;
+    public readonly HealthCheckService HealthCheckService;
 
     public HealthController()
     {
@@ -22,7 +21,7 @@ public class HealthController : ControllerBase
     [HttpGet(Name = "GetHealthData")]
     public async Task<HealthData> GetData()
     {
-        var result = await HealthCheckService.GetData();
+        var result = await HealthCheckService.GetFullData();
 
         return result;
     }

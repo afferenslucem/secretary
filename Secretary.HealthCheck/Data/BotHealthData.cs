@@ -1,4 +1,4 @@
-namespace Secreatry.HealthCheck.Data;
+namespace Secretary.HealthCheck.Data;
 
 public class BotHealthData
 {

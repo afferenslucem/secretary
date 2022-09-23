@@ -1,6 +1,6 @@
-﻿using Secreatry.HealthCheck.Data;
-using Secretary.Cache;
+﻿using Secretary.Cache;
 using Secretary.Configuration;
+using Secretary.HealthCheck.Data;
 using Secretary.Logging;
 using Secretary.Storage;
 using Secretary.Storage.Models;

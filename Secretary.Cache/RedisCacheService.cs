@@ -17,12 +17,12 @@ public class RedisCacheService : ICacheService
         _logger.Information("Created RedisCacheService");
     }
 
-    public async Task SaveEntity<T>(long key, T value, short? lifetimeSec) where T : class
+    public async Task SaveEntity<T>(long key, T value, int? lifetimeSec) where T : class
     {
         await SaveEntity($"{typeof(T)}:{key}", value, lifetimeSec);
     }
 
-    public async Task SaveEntity<T>(string key, T value, short? lifetimeSec) where T : class
+    public async Task SaveEntity<T>(string key, T value, int? lifetimeSec) where T : class
     {
         try
         {

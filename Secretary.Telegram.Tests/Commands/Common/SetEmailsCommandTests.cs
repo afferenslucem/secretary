@@ -159,7 +159,7 @@ public class SetEmailsCommandTests
         {
             Period = new DatePeriodParser().Parse("04.09.2022"),
             Emails = expectedEmails,
-        }, It.IsAny<short>()), Times.Once);
+        }, It.IsAny<int>()), Times.Once);
         
         Assert.That(step, Is.EqualTo(1));
     }

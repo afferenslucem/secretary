@@ -17,28 +17,28 @@ public class EnterJobTitleCommandTests
     [SetUp]
     public void Setup()
     {
-        this._client = new Mock<ITelegramClient>();
+        _client = new Mock<ITelegramClient>();
 
-        this._command = new EnterJobTitleCommand();
+        _command = new EnterJobTitleCommand();
         
-        this._cacheService = new Mock<ICacheService>();
+        _cacheService = new Mock<ICacheService>();
 
-        this._context = new CommandContext()
+        _context = new CommandContext()
         { 
             ChatId = 2517, 
-            TelegramClient = this._client.Object, 
+            TelegramClient = _client.Object, 
             CacheService = _cacheService.Object,
         };
         
-        this._command.Context = _context;
+        _command.Context = _context;
     }
     
     [Test]
     public async Task ShouldSendExampleMessage()
     {
-        await this._command.Execute();
+        await _command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Введите вашу должность в именительном падеже.\n" +
+        _client.Verify(target => target.SendMessage(2517, "Введите вашу должность в именительном падеже.\n" +
                                                                "Так она будут указана в подписи письма.\n" +
                                                                @"Например: С уважением, <i>поэт</i> Александр Пушкин"));
     }
@@ -56,9 +56,9 @@ public class EnterJobTitleCommandTests
 
         _context.Message = "поэт";
         
-        await this._command.OnMessage();
+        await _command.OnMessage();
         
-        this._cacheService.Verify(target => target.SaveEntity(
+        _cacheService.Verify(target => target.SaveEntity(
                 2517,
                 new RegisterUserCache()
                 {
@@ -66,7 +66,7 @@ public class EnterJobTitleCommandTests
                     NameGenitive = "Пушкина Александра Сергеевича",
                     JobTitle = "поэт"
                 },
-                It.IsAny<short>()
+                It.IsAny<int>()
             ),
             Times.Once
         );

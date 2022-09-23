@@ -1,13 +1,13 @@
-﻿using Secreatry.HealthCheck.Data;
-using Secretary.HealthCheck.Data;
+﻿using Secretary.HealthCheck.Data;
 using Secretary.Logging;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
+using Secretary.Telegram;
 using Secretary.Yandex.Authentication;
 using Secretary.Yandex.Exceptions;
 using Serilog;
 
-namespace Secretary.Telegram;
+namespace Secretary.TokenRefresher;
 
 public class TokenRefresher
 {

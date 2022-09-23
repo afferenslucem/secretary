@@ -58,7 +58,7 @@ public class EnterNameCommandTests
                 {
                     Name = "Александр Пушкин"
                 },
-                It.IsAny<short>()
+                It.IsAny<int>()
             ),
             Times.Once
         );

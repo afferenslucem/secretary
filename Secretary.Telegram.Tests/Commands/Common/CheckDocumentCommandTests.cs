@@ -62,7 +62,7 @@ public class CheckDocumentCommandTests
             target => target.SaveEntity(
                 2517, 
                 _cache.Object,
-                It.IsAny<short>()
+                It.IsAny<int>()
             )
         );
     }

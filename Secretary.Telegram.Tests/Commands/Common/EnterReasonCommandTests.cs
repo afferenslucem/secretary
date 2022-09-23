@@ -61,7 +61,7 @@ public class EnterReasonCommandTests
             {
                 Period = new DatePeriodParser().Parse("05.09.2022"), 
                 Reason = "Поеду заниматься ремонтом"
-            }, It.IsAny<short>()), Times.Once);
+            }, It.IsAny<int>()), Times.Once);
     }
     
     

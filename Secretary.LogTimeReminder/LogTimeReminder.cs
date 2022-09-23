@@ -2,10 +2,11 @@
 using Secretary.Logging;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
+using Secretary.Telegram;
 using Secretary.WorkingCalendar;
 using Serilog;
 
-namespace Secretary.Telegram;
+namespace Secretary.LogTimeReminder;
 
 public class LogTimeReminder
 {

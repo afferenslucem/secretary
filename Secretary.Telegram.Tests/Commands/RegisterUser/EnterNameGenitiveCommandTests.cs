@@ -66,7 +66,7 @@ public class EnterNameGenitiveCommandTests
                     Name = "Александр Пушкин",
                     NameGenitive = "Пушкина Александра Сергеевича"
                 },
-                It.IsAny<short>()
+                It.IsAny<int>()
             ),
             Times.Once
         );

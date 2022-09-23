@@ -68,7 +68,7 @@ public class EnterDistantPeriodCommandTests
         await this._command.OnMessage();
         
         _cacheService.Verify(target => target.SaveEntity(2517, new DistantCache() { Period =
-            new DatePeriodParser().Parse("16.08.2022 c 13:00 до 17:00")}, It.IsAny<short>()), Times.Once);
+            new DatePeriodParser().Parse("16.08.2022 c 13:00 до 17:00")}, It.IsAny<int>()), Times.Once);
     }
     
     [Test]
