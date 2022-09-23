@@ -34,7 +34,7 @@ public class Day
             return false;
         }
 
-        if (Type == 3)
+        if (Type == 3 || Type == 2)
         {
             return true;
         }

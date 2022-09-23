@@ -29,11 +29,24 @@ public class DayTests
     }
     
     [Test]
-    public void IsSaturdayType3WorkingDay()
+    public void IsWeekendType3WorkingDay()
     {
         var day = new Day();
 
         day.Type = 3;
+        day.FullDate = new DateOnly(2022, 9, 24);
+
+        var result = day.IsWorkingDay();
+        
+        Assert.That(result, Is.True);
+    }
+    
+    [Test]
+    public void IsWeekendType2WorkingDay()
+    {
+        var day = new Day();
+
+        day.Type = 2;
         day.FullDate = new DateOnly(2022, 9, 24);
 
         var result = day.IsWorkingDay();

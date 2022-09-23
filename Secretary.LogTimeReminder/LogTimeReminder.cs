@@ -4,6 +4,7 @@ using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram;
 using Secretary.WorkingCalendar;
+using Secretary.WorkingCalendar.Models;
 using Serilog;
 
 namespace Secretary.LogTimeReminder;
@@ -60,7 +61,7 @@ public class LogTimeReminder
             {
                 _logger.Information("Run token refreshing");
                 
-                await RefreshTokensForAllUsers();
+                await NotifyAllUsers();
 
                 LastNotifyDate = NextNotifyDate;
                 NextNotifyDate = GetNextNotifyDate(now.AddDays(1));
@@ -75,7 +76,7 @@ public class LogTimeReminder
         }
     }
     
-    public async Task RefreshTokensForAllUsers()
+    public async Task NotifyAllUsers()
     {
         var users = await _userStorage.GetUsers(user => user.RemindLogTime);
 
@@ -115,24 +116,31 @@ public class LogTimeReminder
 
     public DateOnly GetNextNotifyDate(DateTime now)
     {
-        DateOnly temp;
+        DateOnly bound;
         
         if (now.Day > 15)
         {
             var lastDay = DateTime.DaysInMonth(now.Year, now.Month);
 
-            temp = new DateOnly(now.Year, now.Month, lastDay);
+            bound = new DateOnly(now.Year, now.Month, lastDay);
         }
         else
         {
-            temp = new DateOnly(now.Year, now.Month, 15);
+            bound = new DateOnly(now.Year, now.Month, 15);
         }
-        
-        var calendar = CalendarReader.Read(now.Year);
 
-        var result = calendar.GetLastWorkingDayBefore(DateOnly.FromDateTime(now), temp);
+        var result = GetLastWorkingDayBefore(now, bound);
         
-        _logger.Information($"Next date to refresh {result}");
+        _logger.Information($"Next date to notify {result}");
+        
+        return result;
+    }
+
+    public DateOnly GetLastWorkingDayBefore(DateTime startBound, DateOnly bound)
+    {
+        var calendar = CalendarReader.Read(startBound.Year);
+
+        var result = calendar.GetLastWorkingDayBefore(DateOnly.FromDateTime(startBound), bound);
 
         return result;
     }

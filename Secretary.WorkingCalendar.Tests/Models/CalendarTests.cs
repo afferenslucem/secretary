@@ -86,7 +86,7 @@ public class CalendarTests
     {
         var calendar = new Calendar()
         {
-            Days = new Day[]
+            Days = new []
             {
                 new Day() { FullDate = new DateOnly(2023, 9, 15), Type = 1}
             }
