@@ -18,7 +18,7 @@ public class LogTimeReminder
     public DateTime LastDateCheck { get; set; }
     
     public DateOnly LastNotifyDate { get; set; }
-    public DateOnly NextNotifyDate => GetNextNotifyDate(DateTime.UtcNow);
+    public DateOnly NextNotifyDate { get; set; }
 
     public ICalendarReader CalendarReader;
 
@@ -39,6 +39,8 @@ public class LogTimeReminder
     {
         _logger.Information("Run refresh token thread");
 
+        NextNotifyDate = GetNextNotifyDate(DateTime.UtcNow);
+        
         while (!_cancellationTokenSource.IsCancellationRequested)
         {
             await this.Notify();
@@ -60,6 +62,7 @@ public class LogTimeReminder
                 await RefreshTokensForAllUsers();
 
                 LastNotifyDate = NextNotifyDate;
+                NextNotifyDate = GetNextNotifyDate(DateTime.UtcNow);
             }
             
             await Sleep(TimeSpan.FromMinutes(5), _cancellationTokenSource.Token);
@@ -123,7 +126,6 @@ public class LogTimeReminder
         {
             temp = new DateOnly(now.Year, now.Month, 15);
         }
-        
         
         var calendar = CalendarReader.Read(now.Year);
 
