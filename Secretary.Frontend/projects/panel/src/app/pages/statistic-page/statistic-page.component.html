@@ -48,6 +48,24 @@
         <h2>Token Refresher</h2>
         <div class="line">
           <div class="line__header">
+            Version
+          </div>
+          <div class="line__value">
+            {{ health.refresherHealthData.version }}
+          </div>
+        </div>
+
+        <div class="line">
+          <div class="line__header">
+            Uptime
+          </div>
+          <div class="line__value">
+            {{ health.refresherHealthData.deployTime | date: 'yyyy-MM-dd HH:mm' }}
+          </div>
+        </div>
+
+        <div class="line">
+          <div class="line__header">
             Ping
           </div>
           <div class="line__value">
@@ -68,6 +86,23 @@
         <h2>Log Reminder</h2>
         <div class="line">
           <div class="line__header">
+            Version
+          </div>
+          <div class="line__value">
+            {{ health.reminderHealthData.version }}
+          </div>
+        </div>
+
+        <div class="line">
+          <div class="line__header">
+            Uptime
+          </div>
+          <div class="line__value">
+            {{ health.reminderHealthData.deployTime | date: 'yyyy-MM-dd HH:mm' }}
+          </div>
+        </div>
+        <div class="line">
+          <div class="line__header">
             Ping
           </div>
           <div class="line__value">
@@ -77,7 +112,7 @@
 
         <div class="line">
           <div class="line__header">
-            След. Проверка
+            След. Уведомление
           </div>
           <div class="line__value">
             {{ health.reminderHealthData.nextNotifyDate | date: 'yyyy-MM-dd' }}

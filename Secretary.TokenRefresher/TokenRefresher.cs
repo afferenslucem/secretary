@@ -11,6 +11,9 @@ namespace Secretary.TokenRefresher;
 
 public class TokenRefresher
 {
+    public static string Version = "v1.0.0";
+    public static DateTime Uptime = DateTime.UtcNow;
+    
     private readonly ILogger _logger = LogPoint.GetLogger<TokenRefresher>();
     
     private readonly IYandexAuthenticator _yandexAuthenticator;
@@ -29,6 +32,9 @@ public class TokenRefresher
         IUserStorage userStorage,
         ITelegramClient telegramClient
     ) {
+        _logger.Information($"Version: {Version}");
+        _logger.Information($"Uptime : {Uptime}");
+        
         _cancellationTokenSource = new CancellationTokenSource();
         _userStorage = userStorage;
         _telegramClient = telegramClient;
@@ -38,6 +44,8 @@ public class TokenRefresher
     public async Task RunThread()
     {
         _logger.Information("Run refresh token thread");
+        
+        Uptime = DateTime.UtcNow;
 
         while (!_cancellationTokenSource.IsCancellationRequested)
         {
@@ -167,6 +175,8 @@ public class TokenRefresher
 
         result.PingTime = LastDateCheck;
         result.NextRefreshDate = NextRefreshDate.ToDateTime(TimeOnly.MinValue);
+        result.DeployTime = Uptime;
+        result.Version = Version;
 
         return result;
     }

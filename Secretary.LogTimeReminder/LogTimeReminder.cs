@@ -11,14 +11,16 @@ namespace Secretary.LogTimeReminder;
 
 public class LogTimeReminder
 {
+    public static string Version = "v1.0.0";
+    public static DateTime Uptime = DateTime.UtcNow;
+    
     private readonly ILogger _logger = LogPoint.GetLogger<LogTimeReminder>();
     
     private readonly IUserStorage _userStorage;
     private readonly ITelegramClient _telegramClient;
     private readonly CancellationTokenSource _cancellationTokenSource;
     
-    public DateTime LastDateCheck { get; set; }
-    
+    public DateTime LastAliveCheckTime { get; set; }
     public DateOnly LastNotifyDate { get; set; }
     public DateOnly NextNotifyDate { get; set; }
 
@@ -31,6 +33,9 @@ public class LogTimeReminder
         ITelegramClient telegramClient
     )
     {
+        _logger.Information($"Version: {Version}");
+        _logger.Information($"Uptime : {Uptime}");
+        
         _cancellationTokenSource = new CancellationTokenSource();
         _userStorage = userStorage;
         _telegramClient = telegramClient;
@@ -39,7 +44,9 @@ public class LogTimeReminder
 
     public async Task RunThread()
     {
-        _logger.Information("Run refresh token thread");
+        _logger.Information("Run notify thread");
+        
+        Uptime = DateTime.UtcNow;
 
         NextNotifyDate = GetNextNotifyDate(DateTime.UtcNow);
         
@@ -55,7 +62,7 @@ public class LogTimeReminder
         {
             var now = DateTime.UtcNow;
 
-            LastDateCheck = now;
+            LastAliveCheckTime = now;
             
             if (ItsTimeToNotify(NextNotifyDate, LastNotifyDate, now))
             {
@@ -139,8 +146,10 @@ public class LogTimeReminder
     public DateOnly GetLastWorkingDayBefore(DateTime startBound, DateOnly bound)
     {
         var calendar = CalendarReader.Read(startBound.Year);
+        _logger.Debug($"Read calendar {calendar.Year}");
 
         var result = calendar.GetLastWorkingDayBefore(DateOnly.FromDateTime(startBound), bound);
+        
 
         return result;
     }
@@ -159,8 +168,10 @@ public class LogTimeReminder
     {
         var result = new ReminderHealthData();
 
-        result.PingTime = LastDateCheck;
+        result.PingTime = LastAliveCheckTime;
         result.NextNotifyDate = NextNotifyDate.ToDateTime(TimeOnly.MinValue);
+        result.DeployTime = Uptime;
+        result.Version = Version;
 
         return result;
     }

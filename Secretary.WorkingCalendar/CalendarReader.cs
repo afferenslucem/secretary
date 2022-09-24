@@ -18,9 +18,11 @@ public class CalendarReader: ICalendarReader
             new XmlSerializer(typeof(Calendar));
 
         var path = $@"{Config.Instance.CalendarsPath}/{year}.xml";
-
+        
+        _logger.Debug($"Reading file {path}");
         using Stream reader = new FileStream(path, FileMode.Open);
         
+        _logger.Debug($"Deserializing {path}");
         var result = (Calendar)serializer.Deserialize(reader);
 
         result!.Initialize();

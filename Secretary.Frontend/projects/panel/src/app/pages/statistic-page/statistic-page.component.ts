@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, ActivatedRouteSnapshot } from "@angular/router";
+import { ActivatedRoute } from "@angular/router";
 import { Statistic } from "./models/statistic";
 import { Chart, registerables  } from "chart.js";
 import { Health } from "./models/health";
@@ -58,7 +58,7 @@ export class StatisticPageComponent implements OnInit {
     this.documentsChart = new Chart(this.userChartCanvas.nativeElement, {
       type: 'pie',
       data: {
-        labels: ['С документами', 'Без документов>'],
+        labels: ['С документами', 'Без документов'],
         datasets: [{
           backgroundColor: ['#6290C8', '#376996'],
           borderColor: '#1D3461',
