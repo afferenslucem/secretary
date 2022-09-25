@@ -23,7 +23,7 @@ public class StatisticController : ControllerBase
         return result;
     }
 
-    [NonAction]
+    [HttpGet("documents", Name = "GetDocumentsStatisticData")]
     public async Task<DocumentStatistic> GetDocumentStatistic()
     {
         var data = await _eventLogStorage.GetDocumentStatistic("/timeoff", "/distant", "/vacation");
@@ -47,13 +47,15 @@ public class StatisticController : ControllerBase
         return result;
     }
 
-    [NonAction]
+    [HttpGet("users", Name = "GetUsersStatisticData")]
     public async Task<UserStatistic> GetUserStatistic()
     {
         var result = new UserStatistic()
         {
             TotalUsers = await _userStorage.GetCount(),
             UserWithDocuments = await _userStorage.GetCountWithDocuments(),
+            UserWithValidTokens = await _userStorage.GetCount(user => user.RefreshToken != null),
+            UserWithNotifications = await _userStorage.GetCount(user => user.RemindLogTime),
         };
 
         return result;

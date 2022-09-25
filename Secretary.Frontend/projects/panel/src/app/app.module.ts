@@ -3,17 +3,19 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { RouterModule, RouterOutlet, Routes } from "@angular/router";
 import { StatisticPageComponent } from "./pages/statistic-page/statistic-page.component";
-import { StatisticResolver } from "./pages/statistic-page/resolvers/statistic.resolver";
 import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
 import { UrlInterceptor } from "./interceptors/url.interceptor";
 import { HealthResolver } from "./pages/statistic-page/resolvers/health.resolver";
+import { DocumentsChartResolver } from './modules/statistic/resolvers/documents-chart.resolver';
+import { UsersStatisticResolver } from './modules/statistic/resolvers/users-statistic.resolver';
 
 const routes: Routes = [
   {
     path: '',
     component: StatisticPageComponent,
     resolve: {
-      statistic: StatisticResolver,
+      documentsChartData: DocumentsChartResolver,
+      usersStatistic: UsersStatisticResolver,
       health: HealthResolver,
     }
   }

@@ -1,0 +1,24 @@
+<div class="header">
+  Оформленные заявления
+</div>
+<div class="chart">
+  <canvas #chart></canvas>
+</div>
+<div class="count">
+  <div class="line" *ngFor="let row of data">
+    <div class="line__header">
+      {{ row.displayName }}
+    </div>
+    <div class="line__value">
+      {{ row.count }}
+    </div>
+  </div>
+  <div class="line total">
+    <div class="line__header">
+      Всего
+    </div>
+    <div class="line__value">
+      {{ totalCount }}
+    </div>
+  </div>
+</div>

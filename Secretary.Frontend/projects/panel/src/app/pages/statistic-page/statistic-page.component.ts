@@ -1,74 +1,30 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from "@angular/router";
-import { Statistic } from "./models/statistic";
-import { Chart, registerables  } from "chart.js";
+import { Chart, registerables } from "chart.js";
 import { Health } from "./models/health";
+import { StatisticModule } from '../../modules/statistic/statistic.module';
+import { StatisticRow } from '../../modules/statistic/models/statistic-row';
+import { UsersStatistic } from '../../modules/statistic/models/users-statistic';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-statistic-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, StatisticModule],
   templateUrl: './statistic-page.component.html',
-  styleUrls: ['./statistic-page.component.scss']
+  styleUrls: ['./statistic-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StatisticPageComponent implements OnInit {
-  public statistic: Statistic;
+export class StatisticPageComponent {
+  public documentsChartData: StatisticRow[];
+  public usersStatistic: UsersStatistic;
   public health: Health;
 
-  @ViewChild('documentsChart', {static: true})
-  public documentsChartCanvas!: ElementRef<HTMLCanvasElement>;
-  private documentsChart!: Chart;
-
-  @ViewChild('userChart', {static: true})
-  public userChartCanvas!: ElementRef<HTMLCanvasElement>;
-
   constructor(private activatedRoute: ActivatedRoute) {
-    this.statistic = activatedRoute.snapshot.data['statistic'];
+    this.documentsChartData = activatedRoute.snapshot.data['documentsChartData'];
+    this.usersStatistic = activatedRoute.snapshot.data['usersStatistic'];
     this.health = activatedRoute.snapshot.data['health'];
-  }
-
-  public ngOnInit(): void {
-    this.createDocumentsChart();
-    this.createUserChart();
-  }
-
-  private createDocumentsChart(): void {
-    this.documentsChart = new Chart(this.documentsChartCanvas.nativeElement, {
-      type: 'pie',
-      data: {
-        labels: ['Отгул', 'Отпуск', 'Удаленка'],
-        datasets: [{
-          backgroundColor: ['#ADEEE3', '#86DEB7', '#63B995'],
-          borderColor: '#08605F',
-          borderWidth: 1,
-          data: [
-            this.statistic.documentStatistic.timeOffCount,
-            this.statistic.documentStatistic.vacationCount,
-            this.statistic.documentStatistic.distantCount,
-          ],
-        }]
-      }
-    });
-  }
-
-  private createUserChart(): void {
-    this.documentsChart = new Chart(this.userChartCanvas.nativeElement, {
-      type: 'pie',
-      data: {
-        labels: ['С документами', 'Без документов'],
-        datasets: [{
-          backgroundColor: ['#6290C8', '#376996'],
-          borderColor: '#1D3461',
-          borderWidth: 1,
-          data: [
-            this.statistic.userStatistic.userWithDocuments,
-            this.statistic.userStatistic.totalUsers - this.statistic.userStatistic.userWithDocuments,
-          ],
-        }]
-      }
-    });
   }
 }

@@ -1,2 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~bootstrap/dist/css/bootstrap.css";
+
+.line {
+  display: flex;
+  justify-content: space-between;
+
+  > * {
+    display: inline-block;
+  }
+
+  &__value {
+    text-align: right;
+  }
+
+  &.total {
+    font-weight: bold;
+
+    border-top: 1px solid black;
+  }
+}

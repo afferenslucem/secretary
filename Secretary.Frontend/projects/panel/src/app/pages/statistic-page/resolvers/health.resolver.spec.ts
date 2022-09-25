@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { StatisticResolver } from './statistic.resolver';
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { HttpClient } from "@angular/common/http";
 import { HealthResolver } from "./health.resolver";
