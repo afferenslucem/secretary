@@ -4,6 +4,8 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 using MimeKit.Text;
+using MimeKit.Utils;
+using Secretary.Yandex.Exceptions;
 
 namespace Secretary.Yandex.Mail;
 
@@ -12,8 +14,22 @@ public class MailClient: IMailClient
     public async Task SendMail(SecretaryMailMessage messageConfig)
     {
         using var message = await SendEmail(messageConfig);
-
-        await PutToSent(message, messageConfig);
+        
+        try
+        {
+            await PutToSent(message, messageConfig);
+        }
+        catch (YandexApiException e)
+        {
+            if (e.Message == "Could not move message to sent")
+            {
+                await ForwardMessage(message, messageConfig);
+            }
+            else
+            {
+                throw;
+            }
+        }
     }
 
     private async Task<MimeMessage> SendEmail(SecretaryMailMessage messageConfig)
@@ -65,18 +81,45 @@ public class MailClient: IMailClient
     
     private async Task PutToSent(MimeMessage message, SecretaryMailMessage messageConfig)
     {
-        using var imap = new ImapClient ();
+        try
+        {
+            using var imap = new ImapClient();
 
-        await imap.ConnectAsync ("imap.yandex.ru", 993, true);
-        
+            await imap.ConnectAsync("imap.yandex.ru", 993, true);
+
+            var oauth2 = new SaslMechanismOAuth2(messageConfig.Sender.Address, messageConfig.Token);
+            await imap.AuthenticateAsync(oauth2);
+
+            var personal = imap.GetFolder(imap.PersonalNamespaces[0]);
+            var sent = await personal.GetSubfolderAsync("Sent");
+
+            await sent.AppendAsync(message, MessageFlags.Seen);
+
+            await imap.DisconnectAsync(true).ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            throw new YandexApiException("Could not move message to sent", e);
+        }
+    }
+
+    private async Task ForwardMessage(MimeMessage message, SecretaryMailMessage messageConfig)
+    {
+        using var client = new SmtpClient();
+        await client.ConnectAsync("smtp.yandex.ru", 465, true);
         var oauth2 = new SaslMechanismOAuth2(messageConfig.Sender.Address, messageConfig.Token);
-        await imap.AuthenticateAsync(oauth2);
+        await client.AuthenticateAsync(oauth2);
 
-        var personal = imap.GetFolder (imap.PersonalNamespaces[0]);
-        var sent = await personal.GetSubfolderAsync("Sent");
+        var sender = messageConfig.Sender;
+        var senderAddress = new MailboxAddress(sender.DisplayName, sender.Address);
+        
+        message.ResentFrom.Add (senderAddress);
+        message.ResentTo.Add (senderAddress);
+        message.ResentMessageId = MimeUtils.GenerateMessageId ();
+        message.ResentDate = DateTimeOffset.Now;
+        
+        await client.SendAsync(message);
 
-        await sent.AppendAsync(message, MessageFlags.Seen);
-
-        await imap.DisconnectAsync (true).ConfigureAwait (false);
+        await client.DisconnectAsync(true);
     }
 }
