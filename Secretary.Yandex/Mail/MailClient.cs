@@ -5,16 +5,22 @@ using MailKit.Security;
 using MimeKit;
 using MimeKit.Text;
 using MimeKit.Utils;
+using Secretary.Logging;
 using Secretary.Yandex.Exceptions;
+using Serilog;
 
 namespace Secretary.Yandex.Mail;
 
 public class MailClient: IMailClient
 {
+    private ILogger _logger = LogPoint.GetLogger<MailClient>();
+    
     public async Task SendMail(SecretaryMailMessage messageConfig)
     {
+        _logger.Debug("Sending message");
+
         using var message = await SendEmail(messageConfig);
-        
+
         try
         {
             await PutToSent(message, messageConfig);
@@ -23,12 +29,19 @@ public class MailClient: IMailClient
         {
             if (e.Message == "Could not move message to sent")
             {
+                _logger.Error(e, "Could not put message to Sent");
                 await ForwardMessage(message, messageConfig);
             }
             else
             {
+                _logger.Error(e, "Error during sending message");
                 throw;
             }
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "Error during sending message");
+            throw;
         }
     }
 

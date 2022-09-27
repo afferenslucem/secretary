@@ -63,7 +63,12 @@ public class TimeOffCommandTests
         
         _command.Context = _context;
         
-        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { JobTitleGenitive = "", AccessToken = ""});
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(
+            new User() { 
+                Name = "Александр Пушкин",
+                Email = "a.pushkin@infinnity.ru"
+            }
+        );
         
         DocumentTemplatesStorage.Initialize(Config.Instance.TemplatesPath);
     }
@@ -85,9 +90,9 @@ public class TimeOffCommandTests
     {
         _sessionStorage.Setup(obj => obj.SaveSession(It.IsAny<long>(), It.IsAny<Session>()));
 
-        await this._command.Execute();
+        await _command.Execute();
         
-        this._sessionStorage.Verify(target => target.SaveSession(2517, It.Is<Session>(session => session.ChatId == 2517 && session.LastCommand == _command)));
+        _sessionStorage.Verify(target => target.SaveSession(2517, It.Is<Session>(session => session.ChatId == 2517 && session.LastCommand == _command)));
     }
     
     [Test]
@@ -135,7 +140,7 @@ public class TimeOffCommandTests
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync((User?)null);
         
-        Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
+        Assert.ThrowsAsync<NonCompleteUserException>(() => _command.Execute());
     }
 
     [Test]
@@ -145,7 +150,7 @@ public class TimeOffCommandTests
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { JobTitleGenitive = ""});
         
-        Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
+        Assert.ThrowsAsync<NonCompleteUserException>(() => _command.Execute());
     }
 
     [Test]
@@ -155,7 +160,7 @@ public class TimeOffCommandTests
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { AccessToken = ""});
         
-        Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
+        Assert.ThrowsAsync<NonCompleteUserException>(() => _command.Execute());
     }
     
     [Test]
@@ -170,18 +175,18 @@ public class TimeOffCommandTests
 
         
         _context.Message = "/timeoff";
-        await this._command.Execute();
+        await _command.Execute();
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         
         _context.Message = "30.08.2022";
-        await this._command.OnMessage();
+        await _command.OnMessage();
         
         _context.Message = "Нужно помыть хомячка";
-        await this._command.OnMessage();
+        await _command.OnMessage();
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User());
         _context.Message = "Отработаю на следующей неделе";
-        await this._command.OnMessage();
+        await _command.OnMessage();
         _client.Verify(target => target.SendDocument(2517, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
         _documentStorage
@@ -191,10 +196,10 @@ public class TimeOffCommandTests
             .Setup(target => target.GetForDocument(It.IsAny<long>()))
             .ReturnsAsync(new [] { new Email("a.pushkin@infinnity.ru") });
         _context.Message = "Да";
-        await this._command.OnMessage();
+        await _command.OnMessage();
         
         _context.Message = "Повторить";
-        await this._command.OnMessage();
+        await _command.OnMessage();
         _mailClient.Verify(target => target.SendMail(It.IsAny<SecretaryMailMessage>()), Times.Once);
     }
     
@@ -209,17 +214,23 @@ public class TimeOffCommandTests
         });
 
         _context.Message = "/timeoff";
-        await this._command.Execute();
+        await _command.Execute();
         
         _context.Message = "30.08.2022";
-        await this._command.OnMessage();
+        await _command.OnMessage();
         
         _context.Message = "Нужно помыть хомячка";
-        await this._command.OnMessage();
-
-        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User());
+        await _command.OnMessage();
+        
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(
+            new User() { 
+                Name = "Александр Пушкин",
+                Email = "a.pushkin@infinnity.ru"
+            }
+        );
+        
         _context.Message = "Отработаю на следующей неделе";
-        await this._command.OnMessage();
+        await _command.OnMessage();
         _client.Verify(target => target.SendDocument(2517, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
         _documentStorage
@@ -229,13 +240,13 @@ public class TimeOffCommandTests
             .Setup(target => target.GetForDocument(It.IsAny<long>()))
             .ReturnsAsync(new [] { new Email("a.pushkin@infinnity.ru") });
         _context.Message = "Да";
-        await this._command.OnMessage();
+        await _command.OnMessage();
 
         _context.Message = "a.pushkin@infinnity.ru";
-        await this._command.OnMessage();
+        await _command.OnMessage();
 
         _context.Message = "верно";
-        await this._command.OnMessage();
+        await _command.OnMessage();
         
         _mailClient.Verify(target => target.SendMail(It.IsAny<SecretaryMailMessage>()), Times.Once);
     }
@@ -249,20 +260,25 @@ public class TimeOffCommandTests
             WorkingOff = "Отаботаю",
             Reason = "Ну надо",
         });
-
         
         _context.Message = "/timeoff";
-        await this._command.Execute();
+        await _command.Execute();
         
         _context.Message = "30.08.2022";
-        await this._command.OnMessage();
+        await _command.OnMessage();
         
         _context.Message = "Нужно помыть хомячка";
-        await this._command.OnMessage();
-
-        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User());
+        await _command.OnMessage();
+        
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(
+            new User() { 
+                Name = "Александр Пушкин",
+                Email = "a.pushkin@infinnity.ru"
+            }
+        );
+        
         _context.Message = "Отработаю на следующей неделе";
-        await this._command.OnMessage();
+        await _command.OnMessage();
         _client.Verify(target => target.SendDocument(2517, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
         _documentStorage
@@ -272,19 +288,19 @@ public class TimeOffCommandTests
             .Setup(target => target.GetForDocument(It.IsAny<long>()))
             .ReturnsAsync(new [] { new Email("a.pushkin@infinnity.ru") });
         _context.Message = "Да";
-        await this._command.OnMessage();
+        await _command.OnMessage();
 
         _context.Message = "a.pushkin@infinnity.ru";
-        await this._command.OnMessage();
+        await _command.OnMessage();
 
         _context.Message = "не верно";
-        await this._command.OnMessage();
+        await _command.OnMessage();
         
         _context.Message = "a.pushkin@infinnity.ru";
-        await this._command.OnMessage();
+        await _command.OnMessage();
 
         _context.Message = "верно";
-        await this._command.OnMessage();
+        await _command.OnMessage();
         
         _mailClient.Verify(target => target.SendMail(It.IsAny<SecretaryMailMessage>()), Times.Once);
     }
@@ -301,17 +317,17 @@ public class TimeOffCommandTests
 
         
         _context.Message = "/timeoff";
-        await this._command.Execute();
+        await _command.Execute();
         
         _context.Message = "30.08.2022";
-        await this._command.OnMessage();
+        await _command.OnMessage();
         
         _context.Message = "Нужно помыть хомячка";
-        await this._command.OnMessage();
+        await _command.OnMessage();
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User());
         _context.Message = "Отработаю на следующей неделе";
-        await this._command.OnMessage();
+        await _command.OnMessage();
         _client.Verify(target => target.SendDocument(2517, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
 
         _documentStorage
@@ -324,7 +340,7 @@ public class TimeOffCommandTests
         _context.Message = "Нет";
         
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
-        await this._command.OnMessage();
+        await _command.OnMessage();
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Once);
     }
 

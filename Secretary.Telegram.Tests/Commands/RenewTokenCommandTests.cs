@@ -1,9 +1,7 @@
 ﻿using Moq;
-using Secretary.Cache;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
-using Secretary.Telegram.Commands.Caches;
 using Secretary.Telegram.Exceptions;
 using Secretary.Telegram.Sessions;
 using Secretary.Yandex.Authentication;
@@ -31,8 +29,8 @@ public class RenewTokenCommandTests
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User()
         {
-            JobTitleGenitive = "",
-            AccessToken = ""
+            Name = "Александр Пушкин",
+            Email = "a.pushkin@infinnity.ru"
         });
 
         _context = new CommandContext()
@@ -106,8 +104,7 @@ public class RenewTokenCommandTests
         {
             ChatId = 2517,
             Name = "Александр Пушкин",
-            AccessToken = "",
-            JobTitleGenitive = "",
+            Email = "a.pushkin@infinnity.ru",
         };
 
         _userStorage.Setup(obj => obj.GetUser(It.IsAny<long>())).ReturnsAsync(oldUser);

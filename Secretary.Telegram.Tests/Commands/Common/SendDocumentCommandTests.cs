@@ -191,7 +191,7 @@ public class SendDocumentCommandTests
         _client.Verify(target => target.SendMessage(
             2517, 
             "Проблема с токеном!\n\n" +
-            "Выполните команду /registermail"
+            "Выполните команду /renewtoken"
         ));
         
         _userStorage.Verify(target => target.RemoveTokens(2517));
@@ -226,7 +226,7 @@ public class SendDocumentCommandTests
         _client.Verify(target => target.SendMessage(
             2517, 
             "Вы отправляете письмо с токеном не принадлежащим ящику <code>a.pushkin@infinnity.ru</code>\n\n" +
-            $"Выполните команду /registermail"
+            $"Выполните команду /renewtoken"
         ));
         
         _userStorage.Verify(target => target.RemoveTokens(2517));

@@ -39,9 +39,13 @@ public class EnterVacationPeriodCommandTests
         };
         
         _command.Context = _context;
-
-        _userStorage.Setup(target => target.GetUser(It.IsAny<long>()))
-            .ReturnsAsync(new User() { JobTitleGenitive = "", AccessToken = "" });
+        
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(
+            new User() { 
+                Name = "Александр Пушкин",
+                Email = "a.pushkin@infinnity.ru"
+            }
+        );
     }
     
     [Test]

@@ -45,10 +45,14 @@ public class SetEmailsCommandTests
             DocumentStorage = _documentService.Object,
         };
         
-        this._command.Context = _context;
+        _command.Context = _context;
         
-        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(new User() { JobTitleGenitive = "", AccessToken = ""});
-
+        _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(
+            new User() { 
+                Name = "Александр Пушкин",
+                Email = "a.pushkin@infinnity.ru"
+            }
+        );
     }
     
     [Test]
@@ -103,6 +107,6 @@ public class SetEmailsCommandTests
 
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync((User?)null);
         
-        Assert.ThrowsAsync<NonCompleteUserException>(() => this._command.Execute());
+        Assert.ThrowsAsync<NonCompleteUserException>(() => _command.Execute());
     }
 }
