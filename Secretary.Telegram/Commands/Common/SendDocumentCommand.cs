@@ -46,7 +46,7 @@ public class SendDocumentCommand<T> : Command
     public SecretaryMailMessage GetMailMessage(User user, IEnumerable<Email> emails, T cache)
     {
         var sender = new SecretaryMailAddress(user.Email!, user.Name!);
-        var receivers = emails.Select(item => item.ToMailAddress()).Append(sender);
+        var receivers = emails.Select(item => item.ToMailAddress());
 
         DocumentContext documentContext = DocumentContextProvider.GetContext(cache.DocumentKey);
         
