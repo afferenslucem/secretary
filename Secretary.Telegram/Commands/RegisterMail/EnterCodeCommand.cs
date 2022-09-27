@@ -34,7 +34,7 @@ public class EnterCodeCommand: Command
             if (tokenData != null)
             {
                 await this.SetTokens(tokenData);
-                await TelegramClient.SendMessage("Ура, вы успешно зарегистрировали почту");
+                await TelegramClient.SendMessage("Ура, токен для почты получен!");
                 _logger.Information($"{ChatId}: handled tokens");
             }
         }
@@ -45,6 +45,11 @@ public class EnterCodeCommand: Command
             await this.TelegramClient.SendMessage(
                 "При запросе токена для авторизации произошла ошибка:(\n" +
                 "Попробуйте через пару минут, если не сработает, то обратитесь по вот этому адресу @hrodveetnir");
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "Unhandled exception");
+            throw;
         }
         finally
         {
@@ -70,7 +75,7 @@ public class EnterCodeCommand: Command
         return await this.AskRegistration(client, data, startTime);
     }
 
-    private async Task SetTokens(TokenData data)
+    protected virtual async Task SetTokens(TokenData data)
     {
         var cache = await CacheService.GetEntity<RegisterMailCache>();
         if (cache == null) throw new InternalException();

@@ -84,6 +84,14 @@ public class CommandsListeningChainTests
     }
 
     [Test]
+    public void ShouldReturnRenewTokenCommand()
+    {
+        var result = _chain.Get(RenewTokenCommand.Key);
+        
+        Assert.IsInstanceOf<RenewTokenCommand>(result);
+    }
+
+    [Test]
     public void ShouldReturnMeCommand()
     {
         var result = _chain.Get(MeCommand.Key);
