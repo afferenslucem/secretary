@@ -12,6 +12,7 @@ using Secretary.Telegram.Commands.Vacation;
 using Secretary.Telegram.Sessions;
 using Secretary.Telegram.Utils;
 using Secretary.Yandex.Mail;
+using Secretary.Yandex.Mail.Data;
 
 namespace Secretary.Telegram.Tests.Commands.Vacation;
 
@@ -23,7 +24,7 @@ public class VacationCommandTests
     private Mock<IDocumentStorage> _documentStorage = null!;
     private Mock<IEmailStorage> _emailStorage = null!;
     private Mock<IEventLogStorage> _eventLogStorage = null!;
-    private Mock<IMailClient> _mailClient = null!;
+    private Mock<IMailSender> _mailSender = null!;
     private Mock<ICacheService> _cacheService = null!;
     private Mock<IFileManager> _fileManager = null!;
 
@@ -41,7 +42,7 @@ public class VacationCommandTests
         _documentStorage = new Mock<IDocumentStorage>();
         _eventLogStorage = new Mock<IEventLogStorage>();
         _emailStorage = new Mock<IEmailStorage>();
-        _mailClient = new Mock<IMailClient>();
+        _mailSender = new Mock<IMailSender>();
         _cacheService = new Mock<ICacheService>();
         _fileManager = new Mock<IFileManager>();
 
@@ -56,7 +57,7 @@ public class VacationCommandTests
                 DocumentStorage = _documentStorage.Object,
                 EmailStorage = _emailStorage.Object,
                 EventLogStorage = _eventLogStorage.Object,
-                MailClient = _mailClient.Object,
+                MailSender = _mailSender.Object,
                 CacheService = _cacheService.Object,
             };
         
@@ -183,7 +184,7 @@ public class VacationCommandTests
         _context.Message = "верно";
         await this._command.OnMessage();
         
-        _mailClient.Verify(target => target.SendMail(It.IsAny<SecretaryMailMessage>()), Times.Once);
+        _mailSender.Verify(target => target.SendMail(It.IsAny<MailMessage>()), Times.Once);
     }
 
     [Test]

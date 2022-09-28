@@ -7,55 +7,93 @@ using MimeKit.Text;
 using MimeKit.Utils;
 using Secretary.Logging;
 using Secretary.Yandex.Exceptions;
+using Secretary.Yandex.Mail.Data;
 using Serilog;
 
 namespace Secretary.Yandex.Mail;
 
 public class MailClient: IMailClient
 {
+    private string _user;
+    private string _token;
+
     private ILogger _logger = LogPoint.GetLogger<MailClient>();
+
+    private ISmtpClient _smtpClient;
+    private IImapClient _imapClient;
+
+    public MailClient()
+    {
+        _smtpClient = new SmtpClient();
+        _imapClient = new ImapClient();
+    }
+
+    public MailClient(ISmtpClient smtpClient, IImapClient imapClient)
+    {
+        _smtpClient = smtpClient;
+        _imapClient = imapClient;
+    }
     
-    public async Task SendMail(SecretaryMailMessage messageConfig)
+    public async Task Connect(string user, string token)
+    {
+        _user = user;
+        _token = token;
+        
+        await Task.WhenAll(this.ConnectToSMTP(), this.ConnectToIMAP());
+    }
+
+    private async Task ConnectToSMTP()
+    {
+        var host = "smtp.yandex.ru";
+        var port = 465;
+        
+        _logger.Debug($"Connecting to {host}:{port}");
+
+        await _smtpClient.ConnectAsync(host, port, true);
+        
+        _logger.Debug($"Authenticating at {host} like {_user}");
+        var oauth2 = new SaslMechanismOAuth2(_user, _token);
+
+        await _smtpClient.AuthenticateAsync(oauth2);
+        
+        _logger.Debug($"Authenticated at {host}");
+    }
+
+    private async Task ConnectToIMAP()
+    {
+        var host = "imap.yandex.ru";
+        var port = 993;
+        
+        _logger.Debug($"Connecting to {host}:{port}");
+
+        await _imapClient.ConnectAsync(host, port, true);
+        
+        _logger.Debug($"Authenticating at {host} like {_user}");
+        var oauth2 = new SaslMechanismOAuth2(_user, _token);
+
+        await _imapClient.AuthenticateAsync(oauth2);
+        
+        _logger.Debug($"Authenticated at {host}");
+    }
+    
+    public async Task Disconnect()
+    {
+        _logger.Debug("Disconnecting");
+        await Task.WhenAll(_imapClient.DisconnectAsync(true), _smtpClient.DisconnectAsync(true));
+    }
+
+    public async Task SendMail(MailMessage messageConfig)
     {
         _logger.Debug("Sending message");
 
         using var message = await SendEmail(messageConfig);
-
-        try
-        {
-            await PutToSent(message, messageConfig);
-        }
-        catch (YandexApiException e)
-        {
-            if (e.Message == "Could not move message to sent")
-            {
-                _logger.Error(e, "Could not put message to Sent");
-                await ForwardMessage(message, messageConfig);
-            }
-            else
-            {
-                _logger.Error(e, "Error during sending message");
-                throw;
-            }
-        }
-        catch (Exception e)
-        {
-            _logger.Error(e, "Error during sending message");
-            throw;
-        }
+        await PutToSent(message, messageConfig);
     }
 
-    private async Task<MimeMessage> SendEmail(SecretaryMailMessage messageConfig)
+    private async Task<MimeMessage> SendEmail(MailMessage messageConfig)
     {
-        using var client = new SmtpClient();
-        
-        await client.ConnectAsync("smtp.yandex.ru", 465, true);
-        
-        var oauth2 = new SaslMechanismOAuth2(messageConfig.Sender.Address, messageConfig.Token);
-        await client.AuthenticateAsync(oauth2);
-
         var receivers = messageConfig.Receivers
-            .Select(item => new MailboxAddress(item.DisplayName ?? item.Address, item.Address))
+            .Select(item => item.ToMailkitAddress())
             .ToArray();
 
         var html = new TextPart(TextFormat.Html);
@@ -78,37 +116,28 @@ public class MailClient: IMailClient
             multipart.Add(attachment);
         }
         
-        var message = new MimeMessage(
+        var result = new MimeMessage(
             new [] { new MailboxAddress(messageConfig.Sender.DisplayName, messageConfig.Sender.Address) },
             receivers,
             messageConfig.Theme,
             multipart
         );
         
-        await client.SendAsync(message);
+        await _smtpClient.SendAsync(result);
 
-        await client.DisconnectAsync(true);
-
-        return message;
+        return result;
     }
     
-    private async Task PutToSent(MimeMessage message, SecretaryMailMessage messageConfig)
+    private async Task PutToSent(MimeMessage message, MailMessage messageConfig)
     {
         try
         {
-            using var imap = new ImapClient();
-
-            await imap.ConnectAsync("imap.yandex.ru", 993, true);
-
-            var oauth2 = new SaslMechanismOAuth2(messageConfig.Sender.Address, messageConfig.Token);
-            await imap.AuthenticateAsync(oauth2);
-
-            var personal = imap.GetFolder(imap.PersonalNamespaces[0]);
+            var personal = _imapClient.GetFolder(_imapClient.PersonalNamespaces[0]);
             var sent = await personal.GetSubfolderAsync("Sent");
 
             await sent.AppendAsync(message, MessageFlags.Seen);
 
-            await imap.DisconnectAsync(true).ConfigureAwait(false);
+            await _imapClient.DisconnectAsync(true).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -116,23 +145,21 @@ public class MailClient: IMailClient
         }
     }
 
-    private async Task ForwardMessage(MimeMessage message, SecretaryMailMessage messageConfig)
+    private async Task ForwardMessage(MimeMessage message, MailMessage messageConfig)
     {
-        using var client = new SmtpClient();
-        await client.ConnectAsync("smtp.yandex.ru", 465, true);
-        var oauth2 = new SaslMechanismOAuth2(messageConfig.Sender.Address, messageConfig.Token);
-        await client.AuthenticateAsync(oauth2);
-
-        var sender = messageConfig.Sender;
-        var senderAddress = new MailboxAddress(sender.DisplayName, sender.Address);
+        var sender = messageConfig.Sender.ToMailkitAddress();
         
-        message.ResentFrom.Add (senderAddress);
-        message.ResentTo.Add (senderAddress);
+        message.ResentFrom.Add (sender);
+        message.ResentTo.Add (sender);
         message.ResentMessageId = MimeUtils.GenerateMessageId ();
         message.ResentDate = DateTimeOffset.Now;
         
-        await client.SendAsync(message);
+        await _smtpClient.SendAsync(message);
+    }
 
-        await client.DisconnectAsync(true);
+    public void Dispose()
+    {
+        _smtpClient.Dispose();
+        _imapClient.Dispose();
     }
 }

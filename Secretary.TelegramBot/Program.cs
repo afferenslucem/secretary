@@ -21,7 +21,7 @@ internal class Program
     private static ISessionStorage _sessionStorage = null!;
     private static HealthCheckService _healthCheckService = null!;
     private static IYandexAuthenticator _yandexAuthenticator = null!;
-    private static IMailClient _mailClient = null!;
+    private static IMailSender _mailSender = null!;
 
     private static ITelegramClient _telegramClient = null!;
     private static readonly CancellationTokenSource CancellationTokenSource = new ();
@@ -37,7 +37,7 @@ internal class Program
         _healthCheckService = new HealthCheckService(_cacheService);
         _sessionStorage = new SessionStorage(_cacheService);
         _yandexAuthenticator = new YandexAuthenticator(Config.Instance.MailConfig);
-        _mailClient = new MailClient();
+        _mailSender = new MailSender();
         _telegramClient = new TelegramClient(Config.Instance.TelegramApiKey, CancellationTokenSource.Token);
 
         _telegramBot = new Telegram.TelegramBot(
@@ -45,10 +45,9 @@ internal class Program
             _cacheService, 
             _sessionStorage, 
             _yandexAuthenticator,
-            _mailClient,
+            _mailSender,
             _telegramClient
         );
-        
         
         _telegramBot.Init();
         

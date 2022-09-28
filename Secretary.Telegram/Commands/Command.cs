@@ -21,7 +21,7 @@ public abstract class Command
     protected DocumentStorageWrapper DocumentStorage => new (Context.DocumentStorage, Context.ChatId);
     protected IEmailStorage EmailStorage => Context.EmailStorage;
     protected IYandexAuthenticator YandexAuthenticator => Context.YandexAuthenticator;
-    protected IMailClient MailClient => Context.MailClient;
+    protected IMailSender MailSender => Context.MailSender;
     protected CacheServiceWrapper CacheService => new (Context.CacheService, Context.ChatId);
     protected StatisticService StatisticService => new (Context.EventLogStorage);
 

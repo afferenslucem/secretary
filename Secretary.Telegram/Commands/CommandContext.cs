@@ -25,7 +25,7 @@ public class CommandContext
     
     public IEmailStorage EmailStorage = null!;
 
-    public IMailClient MailClient = null!;
+    public IMailSender MailSender = null!;
 
     public IEventLogStorage EventLogStorage = null!;
     
@@ -42,7 +42,7 @@ public class CommandContext
         IEmailStorage emailStorage,
         IEventLogStorage eventLogStorage,
         IYandexAuthenticator yandexAuthenticator, 
-        IMailClient mailClient, 
+        IMailSender mailSender, 
         ICacheService cacheService,
         string message)
     {
@@ -53,7 +53,7 @@ public class CommandContext
         DocumentStorage = documentStorage;
         EmailStorage = emailStorage;
         YandexAuthenticator = yandexAuthenticator;
-        MailClient = mailClient;
+        MailSender = mailSender;
         EventLogStorage = eventLogStorage;
         CacheService = cacheService;
         Message = message;

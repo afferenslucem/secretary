@@ -14,6 +14,7 @@ using Secretary.Telegram.Exceptions;
 using Secretary.Telegram.Sessions;
 using Secretary.Telegram.Utils;
 using Secretary.Yandex.Mail;
+using Secretary.Yandex.Mail.Data;
 
 namespace Secretary.Telegram.Tests.Commands.Distant;
 
@@ -25,7 +26,7 @@ public class DistantCommandTests
     private Mock<IDocumentStorage> _documentStorage = null!;
     private Mock<IEmailStorage> _emailStorage = null!;
     private Mock<IEventLogStorage> _eventLogStorage = null!;
-    private Mock<IMailClient> _mailClient = null!;
+    private Mock<IMailSender> _mailSender = null!;
     private Mock<ICacheService> _cacheService = null!;
     private Mock<IFileManager> _fileManager = null!;
 
@@ -41,7 +42,7 @@ public class DistantCommandTests
         _documentStorage = new Mock<IDocumentStorage>();
         _emailStorage = new Mock<IEmailStorage>();
         _eventLogStorage = new Mock<IEventLogStorage>();
-        _mailClient = new Mock<IMailClient>();
+        _mailSender = new Mock<IMailSender>();
         _cacheService = new Mock<ICacheService>();
         _fileManager = new Mock<IFileManager>();
 
@@ -57,7 +58,7 @@ public class DistantCommandTests
                 DocumentStorage = _documentStorage.Object,
                 EmailStorage = _emailStorage.Object,
                 EventLogStorage = _eventLogStorage.Object,
-                MailClient = _mailClient.Object,
+                MailSender = _mailSender.Object,
                 CacheService = _cacheService.Object,
             };
         
@@ -196,7 +197,7 @@ public class DistantCommandTests
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
         _context.Message = "Повторить";
         await _command.OnMessage();
-        _mailClient.Verify(target => target.SendMail(It.IsAny<SecretaryMailMessage>()), Times.Once);
+        _mailSender.Verify(target => target.SendMail(It.IsAny<MailMessage>()), Times.Once);
     }
     
     [Test]
@@ -233,7 +234,7 @@ public class DistantCommandTests
         _context.Message = "верно";
         await _command.OnMessage();
         
-        _mailClient.Verify(target => target.SendMail(It.IsAny<SecretaryMailMessage>()), Times.Once);
+        _mailSender.Verify(target => target.SendMail(It.IsAny<MailMessage>()), Times.Once);
     }
     
     [Test]
@@ -277,7 +278,7 @@ public class DistantCommandTests
         _context.Message = "верно";
         await _command.OnMessage();
         
-        _mailClient.Verify(target => target.SendMail(It.IsAny<SecretaryMailMessage>()), Times.Once);
+        _mailSender.Verify(target => target.SendMail(It.IsAny<MailMessage>()), Times.Once);
     }
     
     [Test]

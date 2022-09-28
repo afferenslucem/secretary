@@ -1,6 +1,11 @@
-﻿namespace Secretary.Yandex.Mail;
+﻿using Secretary.Yandex.Mail.Data;
 
-public interface IMailClient
+namespace Secretary.Yandex.Mail;
+
+public interface IMailClient: IDisposable
 {
-    public Task SendMail(SecretaryMailMessage message);
+    public Task SendMail(MailMessage message);
+    Task Connect(string user, string token);
+
+    Task Disconnect();
 }

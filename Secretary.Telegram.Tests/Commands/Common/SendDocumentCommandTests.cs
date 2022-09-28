@@ -14,13 +14,14 @@ using Secretary.Telegram.Models;
 using Secretary.Telegram.Sessions;
 using Secretary.Telegram.Utils;
 using Secretary.Yandex.Mail;
+using Secretary.Yandex.Mail.Data;
 
 namespace Secretary.Telegram.Tests.Commands.Common;
 
 public class SendDocumentCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
-    private Mock<IMailClient> _mailClient = null!;
+    private Mock<IMailSender> _mailSender = null!;
     private Mock<ICacheService> _cacheService = null!;
     private Mock<TimeOffCache> _cache = null!;
     
@@ -43,7 +44,7 @@ public class SendDocumentCommandTests
         _cache = new Mock<TimeOffCache>();
         _client = new Mock<ITelegramClient>();
         _userStorage = new Mock<IUserStorage>();
-        _mailClient = new Mock<IMailClient>();
+        _mailSender = new Mock<IMailSender>();
         _sessionStorage = new Mock<ISessionStorage>();
         _fileManager = new Mock<IFileManager>();
         
@@ -54,13 +55,13 @@ public class SendDocumentCommandTests
         _context = new CommandContext()
         { 
             ChatId = 2517, 
-            TelegramClient = this._client.Object, 
-            DocumentStorage = this._documentStorage.Object,
-            EmailStorage = this._emailStorage.Object,
-            UserStorage = this._userStorage.Object,
-            MailClient = this._mailClient.Object,
-            SessionStorage = this._sessionStorage.Object,
-            CacheService = this._cacheService.Object,
+            TelegramClient = _client.Object, 
+            DocumentStorage = _documentStorage.Object,
+            EmailStorage = _emailStorage.Object,
+            UserStorage = _userStorage.Object,
+            MailSender = _mailSender.Object,
+            SessionStorage = _sessionStorage.Object,
+            CacheService = _cacheService.Object,
         };
         
         _command.Context = _context;
@@ -109,32 +110,32 @@ public class SendDocumentCommandTests
 
         var expectedReceivers = new[]
         {
-            new SecretaryMailAddress("a.pushkin@infinnity.ru", "Александр Пушкин"),
-            new SecretaryMailAddress("s.esenin@infinnity.ru", "Сергей Есенин"),
-            new SecretaryMailAddress("v.mayakovskii@infinnity.ru", null!),
+            new MailAddress("a.pushkin@infinnity.ru", "Александр Пушкин"),
+            new MailAddress("s.esenin@infinnity.ru", "Сергей Есенин"),
+            new MailAddress("v.mayakovskii@infinnity.ru", null!),
         };
         
-        _mailClient
+        _mailSender
             .Verify(target => target.SendMail(
-                    It.Is<SecretaryMailMessage>(data => data.Receivers.SequenceEqual(expectedReceivers))
+                    It.Is<MailMessage>(data => data.Receivers.SequenceEqual(expectedReceivers))
                 )
             );
         
-        _mailClient
+        _mailSender
             .Verify(target => target.SendMail(
-                    It.Is<SecretaryMailMessage>(data => data.Sender.Equals(new SecretaryMailAddress("user@infinnity.ru", "Пользовалель Пользователев")))
+                    It.Is<MailMessage>(data => data.Sender.Equals(new MailAddress("user@infinnity.ru", "Пользовалель Пользователев")))
                 )
             );
         
-        _mailClient
+        _mailSender
             .Verify(target => target.SendMail(
-                    It.Is<SecretaryMailMessage>(data => data.Theme == "Пользовалель Пользователев [Отгул 28.08.2022]")
+                    It.Is<MailMessage>(data => data.Theme == "Пользовалель Пользователев [Отгул 28.08.2022]")
                 )
             );
         
-        _mailClient
+        _mailSender
             .Verify(target => target.SendMail(
-                    It.Is<SecretaryMailMessage>(data => 
+                    It.Is<MailMessage>(data => 
                         data.Attachments.Count() == 1 &&
                         data.Attachments.First().Path == "timeoff.docx" &&
                         data.Attachments.First().FileName == "Заявление на отгул.docx" &&
@@ -143,9 +144,9 @@ public class SendDocumentCommandTests
                 )
             );
         
-        _mailClient
+        _mailSender
             .Verify(target => target.SendMail(
-                It.Is<SecretaryMailMessage>(data => 
+                It.Is<MailMessage>(data => 
                     data.HtmlBody == "html"
                 )
             ));
@@ -160,7 +161,7 @@ public class SendDocumentCommandTests
     [Test]
     public async Task ShouldProtectIncorrectRights()
     {
-        _mailClient.Setup(target => target.SendMail(It.IsAny<SecretaryMailMessage>()))
+        _mailSender.Setup(target => target.SendMail(It.IsAny<MailMessage>()))
             .ThrowsAsync(new AuthenticationException("This user does not have access rights to this service"));
 
         _command.Context = _context;
@@ -182,7 +183,7 @@ public class SendDocumentCommandTests
     [Test]
     public async Task ShouldProtectIncorrectToken()
     {
-        _mailClient.Setup(target => target.SendMail(It.IsAny<SecretaryMailMessage>()))
+        _mailSender.Setup(target => target.SendMail(It.IsAny<MailMessage>()))
             .ThrowsAsync(new AuthenticationException("Invalid user or password"));
 
         _command.Context = _context;
@@ -190,7 +191,27 @@ public class SendDocumentCommandTests
         
         _client.Verify(target => target.SendMessage(
             2517, 
-            "Проблема с токеном!\n\n" +
+            "Невалидный токен!\n\n" +
+            "Выполните команду /renewtoken"
+        ));
+        
+        _userStorage.Verify(target => target.RemoveTokens(2517));
+        
+        _cacheService.Verify(target => target.DeleteEntity<TimeOffCache>(2517));
+    }
+
+    [Test]
+    public async Task ShouldProtectIncorrectPermissionScope()
+    {
+        _mailSender.Setup(target => target.SendMail(It.IsAny<MailMessage>()))
+            .ThrowsAsync(new AuthenticationException("Authentication failed"));
+
+        _command.Context = _context;
+        await _command.SendMail(null!);
+        
+        _client.Verify(target => target.SendMessage(
+            2517, 
+            "Невалидный токен!\n\n" +
             "Выполните команду /renewtoken"
         ));
         
@@ -209,13 +230,13 @@ public class SendDocumentCommandTests
             "Sender address rejected: not owned by auth user"
             );
         
-        _mailClient.Setup(target => target.SendMail(It.IsAny<SecretaryMailMessage>()))
+        _mailSender.Setup(target => target.SendMail(It.IsAny<MailMessage>()))
             .ThrowsAsync(exception);
 
         _command.Context = _context;
-        await _command.SendMail(new SecretaryMailMessage()
+        await _command.SendMail(new MailMessage()
         {
-            Sender = new SecretaryMailAddress("", "")
+            Sender = new MailAddress("", "")
         });
         
         _client.Verify(target => target.SendSticker(

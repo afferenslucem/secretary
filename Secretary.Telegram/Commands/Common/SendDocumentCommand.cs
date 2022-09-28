@@ -9,6 +9,7 @@ using Secretary.Telegram.Commands.Caches.Interfaces;
 using Secretary.Telegram.Documents;
 using Secretary.Telegram.Exceptions;
 using Secretary.Yandex.Mail;
+using Secretary.Yandex.Mail.Data;
 using Serilog;
 
 namespace Secretary.Telegram.Commands.Common;
@@ -43,20 +44,20 @@ public class SendDocumentCommand<T> : Command
         DeleteDocument(cache.FilePath!);
     }
 
-    public SecretaryMailMessage GetMailMessage(User user, IEnumerable<Email> emails, T cache)
+    public MailMessage GetMailMessage(User user, IEnumerable<Email> emails, T cache)
     {
         var receivers = emails.Select(item => item.ToMailAddress());
 
         DocumentContext documentContext = DocumentContextProvider.GetContext(cache.DocumentKey);
         
-        var result = new SecretaryMailMessage()
+        var result = new MailMessage()
         {
             Token = user.AccessToken!,
             Attachments = new[]
             {
-                new SecretaryAttachment(cache.FilePath!, documentContext.DisplayName, new ContentType("application", "msword"))
+                new MessageAttachment(cache.FilePath!, documentContext.DisplayName, new ContentType("application", "msword"))
             },
-            Sender = new SecretaryMailAddress(user.Email!, user.Name!),
+            Sender = new MailAddress(user.Email!, user.Name!),
             Receivers = receivers,
             Theme = $"{user.Name} [{documentContext.MailTheme} {cache.Period!.DayPeriod}]",
             HtmlBody = cache.CreateMail(user)
@@ -65,11 +66,11 @@ public class SendDocumentCommand<T> : Command
         return result;
     }
 
-    public async Task SendMail(SecretaryMailMessage message)
+    public async Task SendMail(MailMessage message)
     {
         try
         {
-            await MailClient.SendMail(message);
+            await MailSender.SendMail(message);
 
             await TelegramClient.SendMessage("Заяление отправлено");
 
@@ -92,10 +93,10 @@ public class SendDocumentCommand<T> : Command
                 return;
             }
             
-            if (e.Message.Contains("Invalid user or password"))
+            if (e.Message.Contains("Invalid user or password") || e.Message.Contains("Authentication failed"))
             {
                 await TelegramClient.SendMessage(
-                    "Проблема с токеном!\n\n" +
+                    "Невалидный токен!\n\n" +
                     "Выполните команду /renewtoken"
                 );
 

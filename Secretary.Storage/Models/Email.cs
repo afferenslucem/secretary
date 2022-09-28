@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Secretary.Yandex.Mail;
+using Secretary.Yandex.Mail.Data;
 
 namespace Secretary.Storage.Models
 {
@@ -46,9 +47,9 @@ namespace Secretary.Storage.Models
             return HashCode.Combine(DocumentId, Address, DisplayName);
         }
 
-        public SecretaryMailAddress ToMailAddress()
+        public MailAddress ToMailAddress()
         {
-            return new SecretaryMailAddress(this.Address, this.DisplayName);
+            return new MailAddress(this.Address, this.DisplayName);
         }
     }
 }

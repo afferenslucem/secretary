@@ -27,7 +27,7 @@ public class TelegramBot
     private Database _database;
     private ILogger _logger = LogPoint.GetLogger<TelegramBot>();
     private IYandexAuthenticator _yandexAuthenticator;
-    private IMailClient _mailClient;
+    private IMailSender _mailSender;
     private readonly ITelegramClient _telegramClient;
     public long ReceivedMessages { get; private set; }
     
@@ -36,14 +36,14 @@ public class TelegramBot
         ICacheService redisCacheService,
         ISessionStorage sessionStorage,
         IYandexAuthenticator yandexAuthenticator,
-        IMailClient mailClient,
+        IMailSender mailSender,
         ITelegramClient telegramClient
     ) {
         _database = database;
         _cacheService = redisCacheService;
         _sessionStorage = sessionStorage;
         _yandexAuthenticator = yandexAuthenticator;
-        _mailClient = mailClient;
+        _mailSender = mailSender;
         _telegramClient = telegramClient;
     }
 
@@ -73,7 +73,7 @@ public class TelegramBot
                 _database.EmailStorage,
                 _database.EventLogStorage,
                 _yandexAuthenticator,
-                _mailClient,
+                _mailSender,
                 _cacheService,
                 message.Text
             );

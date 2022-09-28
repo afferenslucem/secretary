@@ -1,10 +1,10 @@
 ﻿using MimeKit;
 
-namespace Secretary.Yandex.Mail;
+namespace Secretary.Yandex.Mail.Data;
 
-public class SecretaryAttachment
+public class MessageAttachment
 {
-    public SecretaryAttachment(string path, string fileName, ContentType contentType)
+    public MessageAttachment(string path, string fileName, ContentType contentType)
     {
         Path = path;
         FileName = fileName;

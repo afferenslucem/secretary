@@ -1,17 +1,26 @@
-﻿namespace Secretary.Yandex.Mail;
+﻿using MimeKit;
 
-public class SecretaryMailAddress: IEquatable<SecretaryMailAddress>
+namespace Secretary.Yandex.Mail.Data;
+
+public class MailAddress: IEquatable<MailAddress>
 {
     public readonly string Address;
-    public readonly string? DisplayName;
-    
-    public SecretaryMailAddress(string address, string? displayName)
+
+    private readonly string? _displayName;
+    public string DisplayName => _displayName ?? Address;
+
+    public MailAddress(string address, string? displayName)
     {
         Address = address;
-        DisplayName = displayName;
+        _displayName = displayName;
     }
 
-    public bool Equals(SecretaryMailAddress? other)
+    public MailboxAddress ToMailkitAddress()
+    {
+        return new MailboxAddress(DisplayName, Address);
+    }
+
+    public bool Equals(MailAddress? other)
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
@@ -23,7 +32,7 @@ public class SecretaryMailAddress: IEquatable<SecretaryMailAddress>
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != this.GetType()) return false;
-        return Equals((SecretaryMailAddress)obj);
+        return Equals((MailAddress)obj);
     }
 
     public override int GetHashCode()
