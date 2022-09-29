@@ -1,8 +1,11 @@
+using MailKit;
 using MailKit.Net.Imap;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using MimeKit;
 using Moq;
 using Secretary.Yandex.Mail;
+using Secretary.Yandex.Mail.Data;
 
 namespace Secretary.Yandex.Tests;
 

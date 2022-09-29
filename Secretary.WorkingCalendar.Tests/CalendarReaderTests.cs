@@ -2,7 +2,7 @@ namespace Secretary.WorkingCalendar.Tests;
 
 public class CalendarReaderTests
 {
-    private CalendarReader _reader = null;
+    private CalendarReader _reader = null!;
     
     [SetUp]
     public void Setup()

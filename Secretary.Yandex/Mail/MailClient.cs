@@ -87,7 +87,7 @@ public class MailClient: IMailClient
         _logger.Debug("Sending message");
 
         using var message = await SendEmail(messageConfig);
-        await PutToSent(message, messageConfig);
+        await PutToSent(message);
     }
 
     private async Task<MimeMessage> SendEmail(MailMessage messageConfig)
@@ -128,21 +128,14 @@ public class MailClient: IMailClient
         return result;
     }
     
-    private async Task PutToSent(MimeMessage message, MailMessage messageConfig)
+    private async Task PutToSent(MimeMessage message)
     {
-        try
-        {
-            var personal = _imapClient.GetFolder(_imapClient.PersonalNamespaces[0]);
-            var sent = await personal.GetSubfolderAsync("Sent");
+        var personal = _imapClient.GetFolder(_imapClient.PersonalNamespaces[0]);
+        var sent = await personal.GetSubfolderAsync("Sent");
 
-            await sent.AppendAsync(message, MessageFlags.Seen);
+        await sent.AppendAsync(message, MessageFlags.Seen);
 
-            await _imapClient.DisconnectAsync(true).ConfigureAwait(false);
-        }
-        catch (Exception e)
-        {
-            throw new YandexApiException("Could not move message to sent", e);
-        }
+        await _imapClient.DisconnectAsync(true).ConfigureAwait(false);
     }
 
     private async Task ForwardMessage(MimeMessage message, MailMessage messageConfig)

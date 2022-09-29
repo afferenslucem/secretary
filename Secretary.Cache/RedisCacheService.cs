@@ -27,7 +27,7 @@ public class RedisCacheService : ICacheService
         try
         {
             _logger.Debug($"Save entity {key}");
-            
+
             var db = _connectionMultiplexer.GetDatabase();
 
             var json = JsonConvert.SerializeObject(value, new JsonSerializerSettings
@@ -36,8 +36,8 @@ public class RedisCacheService : ICacheService
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
 
-            var ttl = lifetimeSec != null ? TimeSpan.FromSeconds(lifetimeSec.Value) : (TimeSpan?) null;
-            
+            var ttl = lifetimeSec != null ? TimeSpan.FromSeconds(lifetimeSec.Value) : (TimeSpan?)null;
+
             await db.StringSetAsync(new RedisKey(key), json, ttl);
         }
         catch (Exception e)
@@ -57,7 +57,7 @@ public class RedisCacheService : ICacheService
         try
         {
             _logger.Debug($"Ask entity {key}");
-            
+
             var db = _connectionMultiplexer.GetDatabase();
 
             var redisValue = await db.StringGetAsync(new RedisKey(key));
@@ -84,7 +84,7 @@ public class RedisCacheService : ICacheService
         try
         {
             _logger.Debug($"Delete entity {typeof(T).Name}:{key}");
-            
+
             var db = _connectionMultiplexer.GetDatabase();
 
             await db.KeyDeleteAsync(new RedisKey($"{typeof(T)}:{key}"));
