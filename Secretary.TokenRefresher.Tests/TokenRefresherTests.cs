@@ -145,13 +145,13 @@ public class TokenRefresherTests
     [Test]
     public void ShouldReturnHealthData()
     {
-        _refresher.LastDateCheck = DateTime.Now.AddMinutes(-1);
+        _refresher.LastActivityDateCheck = DateTime.Now.AddMinutes(-1);
 
         var result = _refresher.GetHealthData();
         
         Assert.That(result.Version, Is.EqualTo(TokenRefresher.Version));
         Assert.That(result.DeployTime, Is.EqualTo(TokenRefresher.Uptime));
-        Assert.That(result.PingTime, Is.EqualTo(_refresher.LastDateCheck));
+        Assert.That(result.PingTime, Is.EqualTo(_refresher.LastActivityDateCheck));
         Assert.That(result.NextRefreshDate == _refresher.NextRefreshDate, Is.True);
     }
 }

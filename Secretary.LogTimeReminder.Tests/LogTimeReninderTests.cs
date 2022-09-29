@@ -128,4 +128,18 @@ public class LogTimeReminderTests
         _telegramClient.Verify(target => target.SendMessage(2517, "Не забудьте залоггировать время!"));
         _telegramClient.Verify(target => target.SendMessage(2518, "Не забудьте залоггировать время!"));
     }
+    
+    
+    [Test]
+    public void ShouldReturnHealthData()
+    {
+        _reminder.LastAliveCheckTime = DateTime.Now.AddMinutes(-1);
+
+        var result = _reminder.GetHealthData();
+        
+        Assert.That(result.Version, Is.EqualTo(LogTimeReminder.Version));
+        Assert.That(result.DeployTime, Is.EqualTo(LogTimeReminder.Uptime));
+        Assert.That(result.PingTime, Is.EqualTo(_reminder.LastAliveCheckTime));
+        Assert.That(result.NextNotifyDate == _reminder.NextNotifyDate, Is.True);
+    }
 }

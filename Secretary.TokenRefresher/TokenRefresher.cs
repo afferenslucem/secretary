@@ -26,7 +26,7 @@ public class TokenRefresher
 
     private TimeWaiter _timeWaiter;
     public DateTime NextRefreshDate => _timeWaiter.TargetDate;
-    public DateTime LastDateCheck { get; set; }
+    public DateTime LastActivityDateCheck { get; set; }
     
     public TokenRefresher(
         IYandexAuthenticator yandexAuthenticator, 
@@ -65,7 +65,7 @@ public class TokenRefresher
         {
             _logger.Debug("Check time");
             
-            LastDateCheck = DateTime.UtcNow;
+            LastActivityDateCheck = DateTime.UtcNow;
             
             _timeWaiter.Check();
             
@@ -171,7 +171,7 @@ public class TokenRefresher
     {
         var result = new RefresherHealthData();
 
-        result.PingTime = LastDateCheck;
+        result.PingTime = LastActivityDateCheck;
         result.NextRefreshDate = NextRefreshDate;
         result.DeployTime = Uptime;
         result.Version = Version;
