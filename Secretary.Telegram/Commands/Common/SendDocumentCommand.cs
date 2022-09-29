@@ -28,20 +28,27 @@ public class SendDocumentCommand<T> : Command
 
     public override async Task Execute()
     {
-        var cache = await CacheService.GetEntity<T>();
+        try
+        {
+            var cache = await CacheService.GetEntity<T>();
 
-        if (cache == null) throw new InternalException();
-        
-        var document = await DocumentStorage.GetOrCreateDocument(cache.DocumentKey);
-        var user = await UserStorage.GetUser();
+            if (cache == null) throw new InternalException();
 
-        IEnumerable<Email> emails = await EmailStorage.GetForDocument(document.Id);
+            var document = await DocumentStorage.GetOrCreateDocument(cache.DocumentKey);
+            var user = await UserStorage.GetUser();
 
-        var message = GetMailMessage(user!, emails, cache);
+            IEnumerable<Email> emails = await EmailStorage.GetForDocument(document.Id);
 
-        await SendMail(message);
-        
-        DeleteDocument(cache.FilePath!);
+            var message = GetMailMessage(user!, emails, cache);
+
+            await SendMail(message);
+
+            DeleteDocument(cache.FilePath!);
+        }
+        finally
+        {
+            await DeleteCache();
+        }
     }
 
     public MailMessage GetMailMessage(User user, IEnumerable<Email> emails, T cache)
@@ -125,14 +132,15 @@ public class SendDocumentCommand<T> : Command
             
             throw;
         }
-        finally
-        {
-            await CacheService.DeleteEntity<TimeOffCache>();
-        }
     }
 
     private void DeleteDocument(string filename)
     {
         FileManager.DeleteFile(filename);
+    }
+
+    public async Task DeleteCache()
+    {
+        await CacheService.DeleteEntity<T>();
     }
 }

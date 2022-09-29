@@ -6,7 +6,6 @@ using MimeKit;
 using MimeKit.Text;
 using MimeKit.Utils;
 using Secretary.Logging;
-using Secretary.Yandex.Exceptions;
 using Secretary.Yandex.Mail.Data;
 using Serilog;
 
@@ -14,10 +13,10 @@ namespace Secretary.Yandex.Mail;
 
 public class MailClient: IMailClient
 {
+    private ILogger _logger = LogPoint.GetLogger<MailClient>();
+    
     private string _user;
     private string _token;
-
-    private ILogger _logger = LogPoint.GetLogger<MailClient>();
 
     private ISmtpClient _smtpClient;
     private IImapClient _imapClient;

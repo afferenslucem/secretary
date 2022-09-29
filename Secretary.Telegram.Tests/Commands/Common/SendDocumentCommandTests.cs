@@ -176,8 +176,6 @@ public class SendDocumentCommandTests
             "и разрешите отправку по OAuth-токену с сервера imap.\n" +
             "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке"
         ));
-        
-        _cacheService.Verify(target => target.DeleteEntity<TimeOffCache>(2517));
     }
 
     [Test]
@@ -187,6 +185,7 @@ public class SendDocumentCommandTests
             .ThrowsAsync(new AuthenticationException("Invalid user or password"));
 
         _command.Context = _context;
+        
         await _command.SendMail(null!);
         
         _client.Verify(target => target.SendMessage(
@@ -196,8 +195,6 @@ public class SendDocumentCommandTests
         ));
         
         _userStorage.Verify(target => target.RemoveTokens(2517));
-        
-        _cacheService.Verify(target => target.DeleteEntity<TimeOffCache>(2517));
     }
 
     [Test]
@@ -216,8 +213,6 @@ public class SendDocumentCommandTests
         ));
         
         _userStorage.Verify(target => target.RemoveTokens(2517));
-        
-        _cacheService.Verify(target => target.DeleteEntity<TimeOffCache>(2517));
     }
 
     [Test]
@@ -251,8 +246,6 @@ public class SendDocumentCommandTests
         ));
         
         _userStorage.Verify(target => target.RemoveTokens(2517));
-        
-        _cacheService.Verify(target => target.DeleteEntity<TimeOffCache>(2517));
     }
 
     [Test]
@@ -273,5 +266,27 @@ public class SendDocumentCommandTests
         var result = _command.GetMailMessage(user, new Email[0], _cache.Object);
         
         Assert.That(result.Theme, Is.EqualTo("Name [Отгул 08.09.2022 — 12.09.2022]"));
+    }
+
+    [Test]
+    public async Task ShouldDeleteTimeOffSession()
+    {
+        var command = new SendDocumentCommand<TimeOffCache>();
+        command.Context = _context;
+
+        await command.DeleteCache();
+        
+        _cacheService.Verify(target => target.DeleteEntity<TimeOffCache>(2517));
+    }
+
+    [Test]
+    public async Task ShouldDeleteVacationCacheSession()
+    {
+        var command = new SendDocumentCommand<VacationCache>();
+        command.Context = _context;
+        
+        await command.DeleteCache();
+        
+        _cacheService.Verify(target => target.DeleteEntity<VacationCache>(2517));
     }
 }
