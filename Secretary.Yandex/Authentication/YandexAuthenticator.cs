@@ -20,54 +20,7 @@ public class YandexAuthenticator: IYandexAuthenticator
     }
 
     
-    public Task<AuthenticationData?> GetAuthenticationCode(CancellationToken cancellationToken)
-    {
-        return Retry(
-            () => this.SendAuthenticationCodeRequest(cancellationToken),
-            cancellationToken
-        );
-    }
-
-    public Task<TokenData?> CheckToken(AuthenticationData data, CancellationToken cancellationToken)
-    {
-        return Retry(
-            () => this.SendCheckTokenRequest(data, cancellationToken),
-            cancellationToken
-        );
-    }
-
-    public Task<TokenData?> RefreshToken(string refreshToken, CancellationToken cancellationToken)
-    {
-        return Retry(
-            () => this.SendRefreshTokenRequest(refreshToken, cancellationToken),
-            cancellationToken
-        );
-    }
-
-    private async Task<T> Retry<T>(Func<Task<T>> action, CancellationToken cancellationToken)
-    {
-        try
-        {
-            return await action();
-        }
-        catch (YandexAuthenticationException e)
-        {
-            if (e.Message == "Refresh token expired")
-            {
-                throw;
-            }
-            
-            await Task.Delay(10000, cancellationToken);
-            return await action();
-        }
-        catch (Exception)
-        {
-            await Task.Delay(10000, cancellationToken);
-            return await action();
-        }
-    }
-
-    private async Task<AuthenticationData?> SendAuthenticationCodeRequest(CancellationToken cancellationToken)
+    public async Task<AuthenticationData?> GetAuthenticationCode(CancellationToken cancellationToken)
     {
         try
         {
@@ -75,11 +28,13 @@ public class YandexAuthenticator: IYandexAuthenticator
 
             request.Content = new StringContent($"client_id={_mailConfig.ClientId}");
 
+            _logger.Debug("Send GetAuthenticationCode");
             var response = await _httpClient.SendAsync(request, cancellationToken);
 
-            var responseStream = await response.Content.ReadAsStringAsync();
-
-            var result = JsonSerializer.Deserialize<AuthenticationData>(responseStream);
+            var responseData = await response.Content.ReadAsStringAsync(cancellationToken);
+            _logger.Debug($"Got response: {responseData}");
+            
+            var result = JsonSerializer.Deserialize<AuthenticationData>(responseData);
 
             return result;
         }
@@ -89,8 +44,8 @@ public class YandexAuthenticator: IYandexAuthenticator
             throw new YandexAuthenticationException("Could not get auth data", e);
         }
     }
-    
-    private async Task<TokenData?> SendCheckTokenRequest(AuthenticationData data, CancellationToken cancellationToken)
+
+    public async Task<TokenData?> CheckToken(AuthenticationData data, CancellationToken cancellationToken)
     {
         try
         {
@@ -100,9 +55,11 @@ public class YandexAuthenticator: IYandexAuthenticator
                 new StringContent(
                     $"grant_type=device_code&code={data.device_code}&client_id={_mailConfig.ClientId}&client_secret={_mailConfig.ClientSecret}");
 
+            _logger.Debug("Send CheckToken");
             var response = await _httpClient.SendAsync(request, cancellationToken);
 
-            var responseData = await response.Content.ReadAsStringAsync();
+            var responseData = await response.Content.ReadAsStringAsync(cancellationToken);
+            _logger.Debug($"Got response: {responseData}");
 
             var result = JsonSerializer.Deserialize<TokenData>(responseData);
 
@@ -115,8 +72,8 @@ public class YandexAuthenticator: IYandexAuthenticator
             throw new YandexAuthenticationException("Could not get token", e);
         }
     }
-    
-    private async Task<TokenData?> SendRefreshTokenRequest(string refreshToken, CancellationToken cancellationToken)
+
+    public async Task<TokenData?> RefreshToken(string refreshToken, CancellationToken cancellationToken)
     {
         try
         {
@@ -126,9 +83,11 @@ public class YandexAuthenticator: IYandexAuthenticator
                 new StringContent(
                     $"grant_type=refresh_token&refresh_token={refreshToken}&client_id={_mailConfig.ClientId}&client_secret={_mailConfig.ClientSecret}");
 
+            _logger.Debug("Send RefreshToken");
             var response = await _httpClient.SendAsync(request, cancellationToken);
             
-            var responseData = await response.Content.ReadAsStringAsync();
+            var responseData = await response.Content.ReadAsStringAsync(cancellationToken);
+            _logger.Debug($"Got response: {responseData}");
             
             if (response.StatusCode == HttpStatusCode.BadRequest && responseData.Contains("expired_token"))
             {
@@ -150,7 +109,7 @@ public class YandexAuthenticator: IYandexAuthenticator
             throw new YandexAuthenticationException("Could not refresh token", e);
         }
     }
-
+    
     public bool IsUserDomainAllowed(string email)
     {
         return _mailConfig.AllowedSenderDomains.Any(domain => email.EndsWith($"@{domain}"));
