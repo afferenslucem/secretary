@@ -128,11 +128,13 @@ public class LogTimeReminder
             bound = new DateOnly(now.Year, now.Month, 15);
         }
 
-        var result = GetLastWorkingDayBefore(now, bound);
+        var lastWorkingDay = GetLastWorkingDayBefore(now, bound);
+
+        var result = lastWorkingDay.ToDateTime(new TimeOnly(8, 00)).ToUniversalTime();
         
         _logger.Information($"Next date to notify {result}");
         
-        return result.ToDateTime(new TimeOnly(8, 00)).ToUniversalTime();
+        return result;
     }
 
     public DateOnly GetLastWorkingDayBefore(DateTime startBound, DateOnly bound)
