@@ -1,5 +1,6 @@
 ﻿using Secretary.HealthCheck.Data;
 using Secretary.Logging;
+using Secretary.Scheduler;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram;
@@ -11,7 +12,7 @@ namespace Secretary.TokenRefresher;
 
 public class TokenRefresher
 {
-    public static string Version = "v1.0.0";
+    public static string Version = "v1.1.0";
     public static DateTime Uptime = DateTime.UtcNow;
     
     private readonly ILogger _logger = LogPoint.GetLogger<TokenRefresher>();
@@ -21,10 +22,10 @@ public class TokenRefresher
     private readonly ITelegramClient _telegramClient;
     private readonly CancellationTokenSource _cancellationTokenSource;
 
-    public bool ShouldSkipDelay { get; set; } = false;
-    
-    public DateOnly LastRefreshDate { get; set; }
-    public DateOnly NextRefreshDate => GetNextUpdateDate(DateTime.UtcNow);
+    public bool ShouldSkipDelay { get; set; }
+
+    private TimeWaiter _timeWaiter;
+    public DateTime NextRefreshDate => _timeWaiter.TargetDate;
     public DateTime LastDateCheck { get; set; }
     
     public TokenRefresher(
@@ -39,44 +40,51 @@ public class TokenRefresher
         _userStorage = userStorage;
         _telegramClient = telegramClient;
         _yandexAuthenticator = yandexAuthenticator;
+        
+        _timeWaiter = new TimeWaiter()
+        {
+            TargetDate = GetNextUpdateDate(DateTime.UtcNow)
+        };
+
+        _timeWaiter.OnTime += Routine;
     }
 
     public async Task RunThread()
     {
         _logger.Information("Run refresh token thread");
-        
-        Uptime = DateTime.UtcNow;
 
         while (!_cancellationTokenSource.IsCancellationRequested)
         {
-            await this.Refresh();
+            await CheckTimer();
         }
     }
 
-    public async Task Refresh()
+    public async Task CheckTimer()
     {
         try
         {
-            var now = DateTime.UtcNow;
-
-            LastDateCheck = now;
+            _logger.Debug("Check time");
             
-            if (ItsTimeToRefresh(NextRefreshDate, LastRefreshDate, now))
-            {
-                _logger.Information("Run token refreshing");
-                
-                await RefreshTokensForAllUsers();
-
-                LastRefreshDate = NextRefreshDate;
-            }
+            LastDateCheck = DateTime.UtcNow;
             
-            await Sleep(TimeSpan.FromMinutes(5), _cancellationTokenSource.Token);
+            _timeWaiter.Check();
+            
+            await Sleep(TimeSpan.FromMinutes(1), _cancellationTokenSource.Token);
         }
         catch (Exception e)
         {
             _logger.Error(e, "Could not refresh tokens");
             await Sleep(TimeSpan.FromMinutes(5), _cancellationTokenSource.Token);
         }
+    }
+
+    public async Task Routine()
+    {
+        _logger.Information("Run token refreshing");
+                
+        await RefreshTokensForAllUsers();
+
+        _timeWaiter.TargetDate = GetNextUpdateDate(DateTime.UtcNow.AddDays(1));
     }
 
     public async Task RefreshTokensForAllUsers()
@@ -87,7 +95,7 @@ public class TokenRefresher
         {
             await RefreshToken(user);
 
-            await Sleep(TimeSpan.FromSeconds(30), _cancellationTokenSource.Token);
+            await Sleep(TimeSpan.FromSeconds(10), _cancellationTokenSource.Token);
         }
     }
 
@@ -140,32 +148,22 @@ public class TokenRefresher
         
         return Task.Delay(span, cancellationToken);
     }
-
-    public bool ItsTimeToRefresh(DateOnly nextDate, DateOnly prevDate, DateTime now)
-    {
-        if (nextDate == prevDate) return false;
-        
-        if (nextDate == DateOnly.FromDateTime(now) && now.Hour == 0)
-        {
-            return true;
-        }
-
-        return false;
-    }
     
-    public DateOnly GetNextUpdateDate(DateTime now)
+    public DateTime GetNextUpdateDate(DateTime now)
     {
         var monthDiff = now.Month % 3;
 
         var nextDate = now.AddMonths(monthDiff);
         
-        var result = new DateOnly(nextDate.Year, nextDate.Month, 1);
+        var result = new DateTime(nextDate.Year, nextDate.Month, 1);
 
-        if (result < DateOnly.FromDateTime(now))
+        if (result < now)
         {
             result = result.AddMonths(3);
         }
 
+        _logger.Information($"Next refresh date: {result}");
+        
         return result;
     }
 
@@ -174,7 +172,7 @@ public class TokenRefresher
         var result = new RefresherHealthData();
 
         result.PingTime = LastDateCheck;
-        result.NextRefreshDate = NextRefreshDate.ToDateTime(TimeOnly.MinValue);
+        result.NextRefreshDate = NextRefreshDate;
         result.DeployTime = Uptime;
         result.Version = Version;
 

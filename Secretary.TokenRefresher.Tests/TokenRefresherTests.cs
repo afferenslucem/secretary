@@ -92,61 +92,13 @@ public class TokenRefresherTests
     }
 
     [Test]
-    public void ShouldReturnTrueForNextDate()
-    {
-        var nextDate = new DateOnly(2022, 9, 1);
-        var lastDate = new DateOnly(2022, 6, 1);
-        var now = new DateTime(2022, 9, 1, 0, 0, 0);
-
-        var result = _refresher.ItsTimeToRefresh(nextDate, lastDate, now);
-        
-        Assert.That(result, Is.True);
-    }
-
-    [Test]
-    public void ShouldReturnFalseForNextDateEqPrevDate()
-    {
-        var nextDate = new DateOnly(2022, 9, 1);
-        var lastDate = new DateOnly(2022, 9, 1);
-        var now = new DateTime(2022, 9, 1, 0, 0, 0);
-
-        var result = _refresher.ItsTimeToRefresh(nextDate, lastDate, now);
-        
-        Assert.That(result, Is.False);
-    }
-
-    [Test]
-    public void ShouldReturnFalseForNowNotEqNextDate()
-    {
-        var nextDate = new DateOnly(2022, 9, 1);
-        var lastDate = new DateOnly(2022, 9, 1);
-        var now = new DateTime(2022, 8, 1, 0, 0, 0);
-
-        var result = _refresher.ItsTimeToRefresh(nextDate, lastDate, now);
-        
-        Assert.That(result, Is.False);
-    }
-
-    [Test]
-    public void ShouldReturnFalseForNowNotZeroHour()
-    {
-        var nextDate = new DateOnly(2022, 9, 1);
-        var lastDate = new DateOnly(2022, 6, 1);
-        var now = new DateTime(2022, 9, 1, 1, 0, 0);
-
-        var result = _refresher.ItsTimeToRefresh(nextDate, lastDate, now);
-        
-        Assert.That(result, Is.False);
-    }
-
-    [Test]
     public void ShouldReturnNextUpdateDate()
     {
         var now = new DateTime(2022, 9, 2, 0, 0, 0);
 
         var result = _refresher.GetNextUpdateDate(now);
         
-        Assert.That(result, Is.EqualTo(new DateOnly(2022, 12, 1)));
+        Assert.That(result == new DateTime(2022, 12, 1), Is.True);
     }
 
     [Test]
@@ -156,10 +108,19 @@ public class TokenRefresherTests
 
         var result = _refresher.GetNextUpdateDate(now);
         
-        Assert.That(result, Is.EqualTo(new DateOnly(2022, 9, 1)));
+        Assert.That(result == new DateTime(2022, 9, 1), Is.True);
+    }
+
+    [Test]
+    public void ShouldReturnNextYear()
+    {
+        var now = new DateTime(2022, 12, 2, 0, 0, 0);
+
+        var result = _refresher.GetNextUpdateDate(now);
+        
+        Assert.That(result == new DateTime(2023, 3, 1), Is.True);
     }
     
-
     [Test]
     public async Task ShouldHandleInvalidToken()
     {
@@ -179,5 +140,18 @@ public class TokenRefresherTests
         _telegramClient.Verify(target => target.SendMessage(2517, 
             "У вас истек токен для отправки почты!\n\n" +
             $"Выполните команду /registermail для адреса a.pushkin@infinnity.ru"));
+    }
+    
+    [Test]
+    public void ShouldReturnHealthData()
+    {
+        _refresher.LastDateCheck = DateTime.Now.AddMinutes(-1);
+
+        var result = _refresher.GetHealthData();
+        
+        Assert.That(result.Version, Is.EqualTo(TokenRefresher.Version));
+        Assert.That(result.DeployTime, Is.EqualTo(TokenRefresher.Uptime));
+        Assert.That(result.PingTime, Is.EqualTo(_refresher.LastDateCheck));
+        Assert.That(result.NextRefreshDate == _refresher.NextRefreshDate, Is.True);
     }
 }
