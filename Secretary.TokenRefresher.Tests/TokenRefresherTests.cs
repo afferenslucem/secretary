@@ -98,7 +98,7 @@ public class TokenRefresherTests
 
         var result = _refresher.GetNextUpdateDate(now);
         
-        Assert.That(result == new DateTime(2022, 12, 1), Is.True);
+        Assert.That(result == new DateTime(2022, 12, 1).ToUniversalTime(), Is.True);
     }
 
     [Test]
@@ -108,7 +108,7 @@ public class TokenRefresherTests
 
         var result = _refresher.GetNextUpdateDate(now);
         
-        Assert.That(result == new DateTime(2022, 9, 1), Is.True);
+        Assert.That(result == new DateTime(2022, 9, 1).ToUniversalTime(), Is.True);
     }
 
     [Test]
@@ -118,7 +118,7 @@ public class TokenRefresherTests
 
         var result = _refresher.GetNextUpdateDate(now);
         
-        Assert.That(result == new DateTime(2023, 3, 1), Is.True);
+        Assert.That(result == new DateTime(2023, 3, 1).ToUniversalTime(), Is.True);
     }
     
     [Test]

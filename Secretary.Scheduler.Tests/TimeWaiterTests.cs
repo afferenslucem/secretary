@@ -1,6 +1,6 @@
 namespace Secretary.Scheduler.Tests;
 
-public class SchedulerTests
+public class TimeWaiterTests
 {
     private TimeWaiter _timeWaiter = null!;
     

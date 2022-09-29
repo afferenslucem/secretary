@@ -1,5 +1,6 @@
 ﻿using Secretary.HealthCheck.Data;
 using Secretary.Logging;
+using Secretary.Scheduler;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram;
@@ -11,7 +12,7 @@ namespace Secretary.LogTimeReminder;
 
 public class LogTimeReminder
 {
-    public static string Version = "v1.0.0";
+    public static string Version = "v1.1.0";
     public static DateTime Uptime = DateTime.UtcNow;
     
     private readonly ILogger _logger = LogPoint.GetLogger<LogTimeReminder>();
@@ -19,14 +20,14 @@ public class LogTimeReminder
     private readonly IUserStorage _userStorage;
     private readonly ITelegramClient _telegramClient;
     private readonly CancellationTokenSource _cancellationTokenSource;
-    
     public DateTime LastAliveCheckTime { get; set; }
-    public DateOnly LastNotifyDate { get; set; }
-    public DateOnly NextNotifyDate { get; set; }
+
+    private TimeWaiter _timeWaiter;
+    public DateTime NextNotifyDate => _timeWaiter.TargetDate;
 
     public ICalendarReader CalendarReader;
 
-    public bool ShouldSkipDelay { get; set; } = false;
+    public bool ShouldSkipDelay { get; set; }
     
     public LogTimeReminder(
         IUserStorage userStorage,
@@ -40,47 +41,50 @@ public class LogTimeReminder
         _userStorage = userStorage;
         _telegramClient = telegramClient;
         CalendarReader = new CalendarReader();
+
+        _timeWaiter = new TimeWaiter()
+        {
+            TargetDate = GetNextNotifyDate(DateTime.UtcNow)
+        };
+
+        _timeWaiter.OnTime += Routine;
     }
 
     public async Task RunThread()
     {
         _logger.Information("Run notify thread");
         
-        Uptime = DateTime.UtcNow;
-
-        NextNotifyDate = GetNextNotifyDate(DateTime.UtcNow);
-        
         while (!_cancellationTokenSource.IsCancellationRequested)
         {
-            await this.Notify();
+            await CheckTimer();
         }
     }
-
-    public async Task Notify()
+    public async Task CheckTimer()
     {
         try
         {
-            var now = DateTime.UtcNow;
-
-            LastAliveCheckTime = now;
+            _logger.Debug("Check time");
             
-            if (ItsTimeToNotify(NextNotifyDate, LastNotifyDate, now))
-            {
-                _logger.Information("Run token refreshing");
-                
-                await NotifyAllUsers();
-
-                LastNotifyDate = NextNotifyDate;
-                NextNotifyDate = GetNextNotifyDate(now.AddDays(1));
-            }
+            LastAliveCheckTime = DateTime.UtcNow;
+            
+            _timeWaiter.Check();
             
             await Sleep(TimeSpan.FromMinutes(1), _cancellationTokenSource.Token);
         }
         catch (Exception e)
         {
-            _logger.Error(e, "Could not refresh tokens");
+            _logger.Error(e, "Could not notify users");
             await Sleep(TimeSpan.FromMinutes(5), _cancellationTokenSource.Token);
         }
+    }
+
+    public async Task Routine()
+    {
+        _logger.Information("Start notifying user");
+                
+        await NotifyAllUsers();
+
+        _timeWaiter.TargetDate = GetNextNotifyDate(DateTime.UtcNow.AddDays(1));
     }
     
     public async Task NotifyAllUsers()
@@ -109,19 +113,7 @@ public class LogTimeReminder
         }
     }
     
-    public bool ItsTimeToNotify(DateOnly nextDate, DateOnly prevDate, DateTime now)
-    {
-        if (nextDate == prevDate) return false;
-        
-        if (nextDate == DateOnly.FromDateTime(now) && now.Hour == 8)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    public DateOnly GetNextNotifyDate(DateTime now)
+    public DateTime GetNextNotifyDate(DateTime now)
     {
         DateOnly bound;
         
@@ -140,7 +132,7 @@ public class LogTimeReminder
         
         _logger.Information($"Next date to notify {result}");
         
-        return result;
+        return result.ToDateTime(new TimeOnly(8, 00)).ToUniversalTime();
     }
 
     public DateOnly GetLastWorkingDayBefore(DateTime startBound, DateOnly bound)
@@ -169,7 +161,7 @@ public class LogTimeReminder
         var result = new ReminderHealthData();
 
         result.PingTime = LastAliveCheckTime;
-        result.NextNotifyDate = NextNotifyDate.ToDateTime(TimeOnly.MinValue);
+        result.NextNotifyDate = NextNotifyDate;
         result.DeployTime = Uptime;
         result.Version = Version;
 

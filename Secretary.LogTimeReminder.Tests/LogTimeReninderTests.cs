@@ -55,7 +55,10 @@ public class LogTimeReminderTests
     {
         var result = _reminder.GetNextNotifyDate(new DateTime(2022, 5, 11));
         
-        Assert.That(result, Is.EqualTo(new DateOnly(2022, 5, 13)));
+        Assert.That(
+            result == new DateTime(2022, 5, 13, 8, 0, 0).ToUniversalTime(),
+            Is.True
+        );
     }
     
     [Test]
@@ -63,7 +66,10 @@ public class LogTimeReminderTests
     {
         var result = _reminder.GetNextNotifyDate(new DateTime(2022, 9, 16));
         
-        Assert.That(result, Is.EqualTo(new DateOnly(2022, 9, 30)));
+        Assert.That(
+            result == new DateTime(2022, 9, 30, 8, 0, 0).ToUniversalTime(),
+            Is.True
+        );
     }
     
     [Test]
@@ -71,7 +77,10 @@ public class LogTimeReminderTests
     {
         var result = _reminder.GetNextNotifyDate(new DateTime(2022, 2, 20));
         
-        Assert.That(result, Is.EqualTo(new DateOnly(2022, 2, 28)));
+        Assert.That(
+            result == new DateTime(2022, 2, 28, 8, 0, 0).ToUniversalTime(),
+            Is.True
+        );
     }
 
     [Test]
@@ -79,55 +88,10 @@ public class LogTimeReminderTests
     {
         var result = _reminder.GetNextNotifyDate(new DateTime(2022, 8, 10));
         
-        Assert.That(result, Is.EqualTo(new DateOnly(2022, 8, 15)));
-    }
-
-    [Test]
-    public void ShouldReturnTrueForNextDate()
-    {
-        var nextDate = new DateOnly(2022, 9, 1);
-        var lastDate = new DateOnly(2022, 6, 1);
-        var now = new DateTime(2022, 9, 1, 8, 32, 0);
-
-        var result = _reminder.ItsTimeToNotify(nextDate, lastDate, now);
-        
-        Assert.That(result, Is.True);
-    }
-
-    [Test]
-    public void ShouldReturnFalseForNextDateEqPrevDate()
-    {
-        var nextDate = new DateOnly(2022, 9, 1);
-        var lastDate = new DateOnly(2022, 9, 1);
-        var now = new DateTime(2022, 9, 1, 8, 43, 0);
-
-        var result = _reminder.ItsTimeToNotify(nextDate, lastDate, now);
-        
-        Assert.That(result, Is.False);
-    }
-
-    [Test]
-    public void ShouldReturnFalseForNowNotEqNextDate()
-    {
-        var nextDate = new DateOnly(2022, 9, 1);
-        var lastDate = new DateOnly(2022, 9, 1);
-        var now = new DateTime(2022, 8, 1, 8, 32, 0);
-
-        var result = _reminder.ItsTimeToNotify(nextDate, lastDate, now);
-        
-        Assert.That(result, Is.False);
-    }
-
-    [Test]
-    public void ShouldReturnFalseForNowNotEightHour()
-    {
-        var nextDate = new DateOnly(2022, 9, 1);
-        var lastDate = new DateOnly(2022, 6, 1);
-        var now = new DateTime(2022, 9, 1, 9, 0, 0);
-
-        var result = _reminder.ItsTimeToNotify(nextDate, lastDate, now);
-        
-        Assert.That(result, Is.False);
+        Assert.That(
+            result == new DateTime(2022, 8, 15, 8, 0, 0).ToUniversalTime(),
+            Is.True
+        );
     }
 
     [Test]

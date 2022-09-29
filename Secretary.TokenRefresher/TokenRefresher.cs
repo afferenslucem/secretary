@@ -164,7 +164,7 @@ public class TokenRefresher
 
         _logger.Information($"Next refresh date: {result}");
         
-        return result;
+        return result.ToUniversalTime();
     }
 
     public RefresherHealthData GetHealthData()
