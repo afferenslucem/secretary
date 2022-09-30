@@ -130,7 +130,7 @@ public class LogTimeReminder
 
         var lastWorkingDay = GetLastWorkingDayBefore(now, bound);
 
-        var result = lastWorkingDay.ToDateTime(new TimeOnly(8, 00)).ToUniversalTime();
+        var result = lastWorkingDay.ToDateTime(new TimeOnly(11, 45)).ToUniversalTime();
         
         _logger.Information($"Next date to notify {result}");
         

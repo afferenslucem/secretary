@@ -56,7 +56,7 @@ public class LogTimeReminderTests
         var result = _reminder.GetNextNotifyDate(new DateTime(2022, 5, 11));
         
         Assert.That(
-            result == new DateTime(2022, 5, 13, 8, 0, 0).ToUniversalTime(),
+            result == new DateTime(2022, 5, 13, 11, 45, 0).ToUniversalTime(),
             Is.True
         );
     }
@@ -67,7 +67,7 @@ public class LogTimeReminderTests
         var result = _reminder.GetNextNotifyDate(new DateTime(2022, 9, 16));
         
         Assert.That(
-            result == new DateTime(2022, 9, 30, 8, 0, 0).ToUniversalTime(),
+            result == new DateTime(2022, 9, 30, 11, 45, 0).ToUniversalTime(),
             Is.True
         );
     }
@@ -78,7 +78,7 @@ public class LogTimeReminderTests
         var result = _reminder.GetNextNotifyDate(new DateTime(2022, 2, 20));
         
         Assert.That(
-            result == new DateTime(2022, 2, 28, 8, 0, 0).ToUniversalTime(),
+            result == new DateTime(2022, 2, 28, 11, 45, 0).ToUniversalTime(),
             Is.True
         );
     }
@@ -89,7 +89,7 @@ public class LogTimeReminderTests
         var result = _reminder.GetNextNotifyDate(new DateTime(2022, 8, 10));
         
         Assert.That(
-            result == new DateTime(2022, 8, 15, 8, 0, 0).ToUniversalTime(),
+            result == new DateTime(2022, 8, 15, 11, 45, 0).ToUniversalTime(),
             Is.True
         );
     }
