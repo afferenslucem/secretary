@@ -12,7 +12,7 @@ namespace Secretary.LogTimeReminder;
 
 public class LogTimeReminder
 {
-    public static string Version = "v1.1.0";
+    public static string Version = "v1.1.1";
     public static DateTime Uptime = DateTime.UtcNow;
     
     private readonly ILogger _logger = LogPoint.GetLogger<LogTimeReminder>();
