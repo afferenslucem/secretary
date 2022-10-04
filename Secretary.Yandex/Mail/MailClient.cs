@@ -6,6 +6,7 @@ using MimeKit;
 using MimeKit.Text;
 using MimeKit.Utils;
 using Secretary.Logging;
+using Secretary.Yandex.Exceptions;
 using Secretary.Yandex.Mail.Data;
 using Serilog;
 
@@ -83,10 +84,24 @@ public class MailClient: IMailClient
 
     public async Task SendMail(MailMessage messageConfig)
     {
-        _logger.Debug("Sending message");
-
         using var message = await SendEmail(messageConfig);
-        await PutToSent(message);
+            
+        try
+        {
+            _logger.Debug("Sending message");
+
+            await PutToSent(message);
+        }
+        catch (Exception e)
+        {
+            if (e.Message == "Could not find \"Sent\" folder")
+            {
+                await ForwardMessage(message, messageConfig);
+                return;
+            }
+            
+            _logger.Error(e, "Could not sent message");
+        }
     }
 
     private async Task<MimeMessage> SendEmail(MailMessage messageConfig)
@@ -130,11 +145,28 @@ public class MailClient: IMailClient
     private async Task PutToSent(MimeMessage message)
     {
         var personal = _imapClient.GetFolder(_imapClient.PersonalNamespaces[0]);
-        var sent = await personal.GetSubfolderAsync("Sent");
+        var sent = await GetFirstSubfolderAsync(personal, "Отправленные", "Sent");
 
         await sent.AppendAsync(message, MessageFlags.Seen);
 
         await _imapClient.DisconnectAsync(true).ConfigureAwait(false);
+    }
+
+    private async Task<IMailFolder> GetFirstSubfolderAsync(IMailFolder folder, params string[] names)
+    {
+        foreach (var name in names)
+        {
+            try
+            {
+                return await folder.GetSubfolderAsync(name);
+            } 
+            catch (Exception e)
+            {
+                _logger.Warning(e, "Could not find folder");
+            }
+        }
+
+        throw new YandexApiException("Could not find \"Sent\" folder");
     }
 
     private async Task ForwardMessage(MimeMessage message, MailMessage messageConfig)
