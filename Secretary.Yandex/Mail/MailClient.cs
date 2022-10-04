@@ -22,6 +22,8 @@ public class MailClient: IMailClient
     private ISmtpClient _smtpClient;
     private IImapClient _imapClient;
 
+    private string[] _commonSentNames = { "sent", "sent mails", "sent items", "отправленные" };
+
     public MailClient()
     {
         _smtpClient = new SmtpClient();
@@ -101,6 +103,7 @@ public class MailClient: IMailClient
             }
             
             _logger.Error(e, "Could not sent message");
+            throw;
         }
     }
 
@@ -145,33 +148,37 @@ public class MailClient: IMailClient
     private async Task PutToSent(MimeMessage message)
     {
         var personal = _imapClient.GetFolder(_imapClient.PersonalNamespaces[0]);
-        var sent = await GetFirstSubfolderAsync(personal, "Отправленные", "Sent");
+        var sent = await GetSentSubfolderAsync(personal);
+        
+        _logger.Information($"Found {sent.Name} folder");
 
         await sent.AppendAsync(message, MessageFlags.Seen);
-
-        await _imapClient.DisconnectAsync(true).ConfigureAwait(false);
     }
 
-    private async Task<IMailFolder> GetFirstSubfolderAsync(IMailFolder folder, params string[] names)
+    private async Task<IMailFolder> GetSentSubfolderAsync(IMailFolder folder)
     {
-        foreach (var name in names)
+        var subfolders = await folder.GetSubfoldersAsync();
+        
+        foreach (var subfolder in subfolders)
         {
-            try
+            if (_commonSentNames.Contains(subfolder.Name.ToLower()))
             {
-                return await folder.GetSubfolderAsync(name);
-            } 
-            catch (Exception e)
-            {
-                _logger.Warning(e, "Could not find folder");
+                return subfolder;
             }
         }
 
-        throw new YandexApiException("Could not find \"Sent\" folder");
+        var subfoldersCollection = string.Join(", ", subfolders.Select(item => item.Name));
+        
+        _logger.Error($"Could not find \"Sent\" folder in {subfoldersCollection}");
+        
+        throw new YandexApiException($"Could not find \"Sent\" folder");
     }
 
     private async Task ForwardMessage(MimeMessage message, MailMessage messageConfig)
     {
         var sender = messageConfig.Sender.ToMailkitAddress();
+        
+        _logger.Debug($"Forward email to {sender}");
         
         message.ResentFrom.Add (sender);
         message.ResentTo.Add (sender);
