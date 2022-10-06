@@ -1,3 +1,5 @@
+using Telegram.Bot.Types.ReplyMarkups;
+
 namespace Secretary.Telegram.Wrappers;
 
 public class TelegramClientWrapper
@@ -11,19 +13,27 @@ public class TelegramClientWrapper
         _telegramClient = telegramClient;
     }
 
-    public Task SendMessage(string message)
+    public Task SendMessage(
+        string message
+    )
     {
         return _telegramClient.SendMessage(_chatId, message);
     }
 
-    public Task SendMessageWithKeyBoard(string message, string[] choices)
+    public Task SendMessage(
+        string message, 
+        ReplyKeyboardMarkup replyMarkup
+    )
     {
-        return _telegramClient.SendMessageWithKeyBoard(_chatId, message, choices);
+        return _telegramClient.SendMessage(_chatId, message, replyMarkup);
     }
 
-    public Task SendMessageWithKeyBoard(string message, string[][] choices)
+    public Task SendMessage(
+        string message, 
+        InlineKeyboardMarkup inlineKeyboardMarkup
+    )
     {
-        return _telegramClient.SendMessageWithKeyBoard(_chatId, message, choices);
+        return _telegramClient.SendMessage(_chatId, message, inlineKeyboardMarkup);
     }
 
     public Task SendDocument(string path, string fileName)

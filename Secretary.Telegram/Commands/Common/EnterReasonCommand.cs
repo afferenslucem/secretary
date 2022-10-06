@@ -1,6 +1,7 @@
 ﻿using Secretary.Telegram.Commands.Caches;
 using Secretary.Telegram.Commands.Caches.Interfaces;
 using Secretary.Telegram.Exceptions;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Secretary.Telegram.Commands.Common;
 
@@ -9,10 +10,11 @@ public class EnterReasonCommand<T> : Command
 {
     public override Task Execute()
     {
-        return TelegramClient.SendMessageWithKeyBoard( 
+        return TelegramClient.SendMessage( 
             "Введите причину, это опционально, если вы нажмете \"Пропустить\", то этой графы не будет в заявлении.\n" +
             "А если укажете, то это будет строка вида\n<code>Причина: {{причина}}</code>",
-            new [] {"Пропустить"});
+            (ReplyKeyboardMarkup)"Пропустить"!
+        );
     }
 
     public override async Task<int> OnMessage()

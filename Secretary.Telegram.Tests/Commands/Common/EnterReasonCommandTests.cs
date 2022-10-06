@@ -40,10 +40,10 @@ public class EnterReasonCommandTests
         
         await this._command.Execute();
         
-        this._client.Verify(target => target.SendMessageWithKeyBoard(2517, 
+        this._client.Verify(target => target.SendMessage(2517, 
             "Введите причину, это опционально, если вы нажмете \"Пропустить\", то этой графы не будет в заявлении.\n" +
             "А если укажете, то это будет строка вида\n<code>Причина: {{причина}}</code>",
-            new [] {"Пропустить"}));
+            TestUtils.IsItSameKeyBoards("Пропустить")));
     }
     
     [Test]

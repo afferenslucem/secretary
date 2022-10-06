@@ -40,12 +40,12 @@ public class EnterWorkingOffCommandTests
         
         await this._command.Execute();
         
-        this._client.Verify(target => target.SendMessageWithKeyBoard(2517, 
+        this._client.Verify(target => target.SendMessage(2517, 
             "Введите данные об отработке в свободном формате.\n" +
             "Например: <i>Отгул обязуюсь отработать</i>\n" +
             "Или: Отгул <i>без отработки</i>\n\n" +
             "Если вы нажмете \"Пропустить\", то эти данные просто не будут указаны в документе.",
-            new [] { "Пропустить" }));
+            TestUtils.IsItSameKeyBoards("Пропустить" )));
     }
     
     [Test]

@@ -2,6 +2,7 @@
 using Secretary.Telegram.Commands.Caches.Interfaces;
 using Secretary.Telegram.Commands.TimeOff;
 using Secretary.Telegram.Exceptions;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Secretary.Telegram.Commands.Common;
 
@@ -25,7 +26,7 @@ public class CheckEmailsCommand<T> : Command
                       "\n" +
                       "Все верно?";
         
-        await TelegramClient.SendMessageWithKeyBoard(message, new [] { "Верно", "Нет, нужно поправить" });
+        await TelegramClient.SendMessage(message, (ReplyKeyboardMarkup) new [] { "Верно", "Нет, нужно поправить" }!);
     }
 
     public override async Task<int> OnMessage()

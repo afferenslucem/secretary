@@ -110,7 +110,7 @@ public class SetEmailsCommandTests
 
         await _command.Execute();
 
-        _client.Verify(target => target.SendMessageWithKeyBoard(
+        _client.Verify(target => target.SendMessage(
             2517,
             "В прошлый раз вы сделали рассылку на эти адреса:\n" +
             "<code>\n" +
@@ -120,7 +120,7 @@ public class SetEmailsCommandTests
             "</code>\n" +
             "\n" +
             "Повторить?",
-            new []{ "Повторить" }
+            TestUtils.IsItSameKeyBoards("Повторить" )
         ));
         
         _documentStorage.Verify(target => target.GetOrCreateDocument(2517, "/key"));

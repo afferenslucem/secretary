@@ -4,6 +4,7 @@ using Secretary.Telegram.Commands.Caches.Interfaces;
 using Secretary.Telegram.Commands.TimeOff;
 using Secretary.Telegram.Exceptions;
 using Secretary.Telegram.Utils;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Secretary.Telegram.Commands.Common;
 
@@ -53,7 +54,7 @@ public class SetReceiversCommand<T> : Command
                       "\n" +
                       "Повторить?";
         
-        return TelegramClient.SendMessageWithKeyBoard(message, new [] { "Повторить" });
+        return TelegramClient.SendMessage(message, (ReplyKeyboardMarkup)"Повторить"!);
     }
 
     public override async Task<int> OnMessage()

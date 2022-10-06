@@ -58,7 +58,7 @@ public class CheckEmailsCommandTests
 
         await _command.Execute();
         
-        _client.Verify(target => target.SendMessageWithKeyBoard(2517, 
+        _client.Verify(target => target.SendMessage(2517, 
             "Заявление будет отправлено на следующие адреса:\n" +
             "<code>\n" +
             "a.pushkin@infinnity.ru (Александр Пушкин)\n" +
@@ -67,7 +67,7 @@ public class CheckEmailsCommandTests
             "</code>\n" +
             "\n" +
             "Все верно?",
-            new [] { "Верно", "Нет, нужно поправить" }));
+            TestUtils.IsItSameKeyBoards(new [] { "Верно", "Нет, нужно поправить" })));
     }
     
     [Test]

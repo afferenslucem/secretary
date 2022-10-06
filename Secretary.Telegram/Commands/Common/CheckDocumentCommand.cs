@@ -1,6 +1,7 @@
 ﻿using Secretary.Telegram.Commands.Caches.Interfaces;
 using Secretary.Telegram.Documents;
 using Secretary.Telegram.Exceptions;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Secretary.Telegram.Commands.Common;
 
@@ -23,7 +24,10 @@ public class CheckDocumentCommand<T> : Command
         await CacheService.SaveEntity(cache);
         await TelegramClient.SendMessage("Проверьте документ");
         await TelegramClient.SendDocument(path, documentContext.DisplayName);
-        await TelegramClient.SendMessageWithKeyBoard("Отправить заявление?", new [] {"Да", "Нет"});
+
+        var keyBoard = new ReplyKeyboardMarkup(new KeyboardButton[] { new("Да"), new("Нет") });
+        
+        await TelegramClient.SendMessage("Отправить заявление?", keyBoard);
     }
 
     public override async Task<int> OnMessage()

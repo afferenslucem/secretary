@@ -1,6 +1,7 @@
 ﻿using Secretary.Telegram.Commands.Caches;
 using Secretary.Telegram.Commands.Caches.Interfaces;
 using Secretary.Telegram.Exceptions;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Secretary.Telegram.Commands.Common;
 
@@ -9,12 +10,13 @@ public class EnterWorkingOffCommand<T> : Command
 {
     public override Task Execute()
     {
-        return TelegramClient.SendMessageWithKeyBoard( 
+        return TelegramClient.SendMessage(
             "Введите данные об отработке в свободном формате.\n" +
             "Например: <i>Отгул обязуюсь отработать</i>\n" +
             "Или: Отгул <i>без отработки</i>\n\n" +
             "Если вы нажмете \"Пропустить\", то эти данные просто не будут указаны в документе.",
-            new [] { "Пропустить" });
+            (ReplyKeyboardMarkup) "Пропустить"!
+        );
     }
     
     public override async Task<int> OnMessage()

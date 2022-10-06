@@ -4,6 +4,7 @@ using Secretary.Telegram.Commands.Validation;
 using Secretary.Telegram.Documents;
 using Secretary.Telegram.Exceptions;
 using Serilog;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Secretary.Telegram.Commands.SetEmails;
 
@@ -16,7 +17,10 @@ public class ChooseDocumentCommand: Command
         
         var allDocs = DocumentContextProvider.AllDocuments.Select(item => item.MailTheme);
 
-        await TelegramClient.SendMessageWithKeyBoard("Выберете документ для установки получателей", allDocs.Chunk(2).ToArray());
+        await TelegramClient.SendMessage(
+            "Выберете документ для установки получателей", 
+            (ReplyKeyboardMarkup)allDocs.Chunk(2).ToArray()!
+        );
     }
 
     public override async Task<int> OnMessage()

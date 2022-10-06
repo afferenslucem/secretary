@@ -8,6 +8,7 @@ using Secretary.Telegram.Commands.Caches;
 using Secretary.Telegram.Commands.Common;
 using Secretary.Telegram.Exceptions;
 using Secretary.Telegram.Utils;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Secretary.Telegram.Tests.Commands.Common;
 
@@ -57,7 +58,10 @@ public class CheckDocumentCommandTests
         
         _client.Verify(target => target.SendMessage(2517, "Проверьте документ"));
         _client.Verify(target => target.SendDocument(2517, "timeoff-path.docx", "Заявление на отгул.docx"));
-        _client.Verify(target => target.SendMessageWithKeyBoard(2517, "Отправить заявление?", new [] {"Да", "Нет"}));
+        _client.Verify(target => target.SendMessage(
+            2517, 
+            "Отправить заявление?", 
+            TestUtils.IsItSameKeyBoards((ReplyKeyboardMarkup) new [] { "Да", "Нет" } )));
         _cacheService.Verify(
             target => target.SaveEntity(
                 2517, 

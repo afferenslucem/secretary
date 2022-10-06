@@ -83,35 +83,48 @@ public class TelegramClient: ITelegramClient
         return Task.CompletedTask;
     }
     
-    public Task SendMessage(long chatId, string message)
-    {
-        return _botClient.SendTextMessageAsync(chatId, message, cancellationToken: _cancellationToken, parseMode: ParseMode.Html, replyMarkup: new ReplyKeyboardRemove());
+    public Task SendMessage(
+        long chatId, 
+        string message
+    ) {
+        return _botClient.SendTextMessageAsync(
+            chatId,
+            message, 
+            cancellationToken: _cancellationToken, 
+            parseMode: ParseMode.Html,
+            replyMarkup: new ReplyKeyboardRemove()
+        );
     }
-
-    public Task SendMessageWithKeyBoard(long chatId, string message, string[] choices)
-    {
-        var buttons = choices.Select(text => new KeyboardButton(text)).ToArray();
+    
+    public Task SendMessage(
+        long chatId, 
+        string message, 
+        ReplyKeyboardMarkup replyMarkup
+    ) {
+        replyMarkup.ResizeKeyboard = true;
+        replyMarkup.OneTimeKeyboard = true;
         
-        var keyboard = new ReplyKeyboardMarkup(buttons)
-        {
-            ResizeKeyboard = true,
-            OneTimeKeyboard = true
-        };
-
-        return _botClient.SendTextMessageAsync(chatId, message, parseMode: ParseMode.Html, replyMarkup: keyboard, cancellationToken: _cancellationToken);
+        return _botClient.SendTextMessageAsync(
+            chatId,
+            message, 
+            cancellationToken: _cancellationToken, 
+            parseMode: ParseMode.Html, 
+            replyMarkup: replyMarkup
+        );
     }
-
-    public Task SendMessageWithKeyBoard(long chatId, string message, string[][] choices)
-    {
-        var buttons = choices.Select(row => row.Select(text => new KeyboardButton(text))).ToArray();
-        
-        var keyboard = new ReplyKeyboardMarkup(buttons)
-        {
-            ResizeKeyboard = true,
-            OneTimeKeyboard = true
-        };
-
-        return _botClient.SendTextMessageAsync(chatId, message, parseMode: ParseMode.Html, replyMarkup: keyboard, cancellationToken: _cancellationToken);
+    
+    public Task SendMessage(
+        long chatId, 
+        string message,
+        InlineKeyboardMarkup inlineKeyboardMarkup
+    ) {
+        return _botClient.SendTextMessageAsync(
+            chatId,
+            message, 
+            cancellationToken: _cancellationToken, 
+            parseMode: ParseMode.Html, 
+            replyMarkup: inlineKeyboardMarkup
+        );
     }
 
     public async Task SendDocument(long chatId, string path, string fileName)

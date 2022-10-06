@@ -1,5 +1,6 @@
 using Moq;
 using Secretary.Telegram.Wrappers;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Secretary.Telegram.Tests.Wrappers;
 
@@ -26,9 +27,9 @@ public class TelegramClientWrapperTests
     [Test]
     public async Task ShouldSendMessageWithChoiсes()
     {
-        await _wrapper.SendMessageWithKeyBoard("message", new [] { "one", "two" });
+        await _wrapper.SendMessage("message", new [] { "one", "two" }!);
         
-        _telegramClient.Verify(target => target.SendMessageWithKeyBoard(2517, "message", new [] { "one", "two" }));
+        _telegramClient.Verify(target => target.SendMessage(2517, "message", TestUtils.IsItSameKeyBoards(new [] { "one", "two" })));
     }
 
     [Test]
