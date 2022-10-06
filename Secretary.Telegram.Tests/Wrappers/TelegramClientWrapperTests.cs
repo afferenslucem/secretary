@@ -29,7 +29,7 @@ public class TelegramClientWrapperTests
     {
         await _wrapper.SendMessage("message", new [] { "one", "two" }!);
         
-        _telegramClient.Verify(target => target.SendMessage(2517, "message", TestUtils.IsItSameKeyBoards(new [] { "one", "two" })));
+        _telegramClient.Verify(target => target.SendMessage(2517, "message", TestUtils.ItIsReplayKeyBoard(new [] { "one", "two" })));
     }
 
     [Test]

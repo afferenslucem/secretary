@@ -14,12 +14,15 @@ public class ChooseDocumentCommand: Command
     public override async Task Execute()
     {
         await ValidateUser();
-        
-        var allDocs = DocumentContextProvider.AllDocuments.Select(item => item.MailTheme);
+
+        var allDocs = DocumentContextProvider.AllDocuments
+            .Select(item => InlineKeyboardButton.WithCallbackData(item.MailTheme))
+            .Select(item => new [] { item })
+            .ToArray();
 
         await TelegramClient.SendMessage(
             "Выберете документ для установки получателей", 
-            (ReplyKeyboardMarkup)allDocs.Chunk(2).ToArray()!
+            allDocs
         );
     }
 
@@ -27,14 +30,15 @@ public class ChooseDocumentCommand: Command
     {
         try
         {
-            var key = DocumentContextProvider
+            var context = DocumentContextProvider
                 .AllDocuments
-                .First(item => item.MailTheme == Message)
-                .Key;
+                .First(item => item.MailTheme == Message);
+
+            await TelegramClient.SendMessage($"Выбран документ \"{context.MailTheme}\"");
 
             var cache = new SetEmailsCache
             {
-                DocumentKey = key
+                DocumentKey = context.Key
             };
 
             await CacheService.SaveEntity(cache);

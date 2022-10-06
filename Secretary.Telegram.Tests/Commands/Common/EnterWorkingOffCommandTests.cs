@@ -45,7 +45,7 @@ public class EnterWorkingOffCommandTests
             "Например: <i>Отгул обязуюсь отработать</i>\n" +
             "Или: Отгул <i>без отработки</i>\n\n" +
             "Если вы нажмете \"Пропустить\", то эти данные просто не будут указаны в документе.",
-            TestUtils.IsItSameKeyBoards("Пропустить" )));
+            TestUtils.ItIsReplayKeyBoard("Пропустить" )));
     }
     
     [Test]

@@ -35,7 +35,7 @@ public class TelegramClient: ITelegramClient
         
         var receiverOptions = new ReceiverOptions
         {
-            AllowedUpdates = new [] { UpdateType.Message }
+            AllowedUpdates = new [] { UpdateType.Message, UpdateType.CallbackQuery }
         };
 
         _botClient.OnApiResponseReceived += SaveLifeTime;
@@ -54,20 +54,32 @@ public class TelegramClient: ITelegramClient
     {
         LastCheckTime = DateTime.UtcNow;
 
-        var message = update.Message;
-
-        if (message?.Text == null)
-        {
-            return Task.CompletedTask;
-        }
-        
-        var botMessage = new BotMessage(message.Chat.Id, message.Text);
+        var botMessage = GetMessageFromUpdate(update);
         
         _logger.Debug($"({botMessage.ChatId}): {botMessage.Text}");
         
         var task = OnMessage?.Invoke(botMessage);
 
         return task ?? Task.CompletedTask;
+    }
+
+    private BotMessage? GetMessageFromUpdate(Update update)
+    {
+        var message = update.Message;
+
+        if (message?.Text != null)
+        {
+            return new BotMessage(message.Chat.Id, message.Text);
+        }
+
+        var callback = update.CallbackQuery;
+
+        if (callback?.Data != null)
+        {
+            return new BotMessage(callback.From.Id, callback.Data);
+        }
+
+        return null;
     }
 
     Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)

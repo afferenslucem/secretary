@@ -61,7 +61,7 @@ public class CheckDocumentCommandTests
         _client.Verify(target => target.SendMessage(
             2517, 
             "Отправить заявление?", 
-            TestUtils.IsItSameKeyBoards((ReplyKeyboardMarkup) new [] { "Да", "Нет" } )));
+            TestUtils.ItIsReplayKeyBoard((ReplyKeyboardMarkup) new [] { "Да", "Нет" } )));
         _cacheService.Verify(
             target => target.SaveEntity(
                 2517, 

@@ -120,7 +120,7 @@ public class SetEmailsCommandTests
             "</code>\n" +
             "\n" +
             "Повторить?",
-            TestUtils.IsItSameKeyBoards("Повторить" )
+            TestUtils.ItIsReplayKeyBoard("Повторить" )
         ));
         
         _documentStorage.Verify(target => target.GetOrCreateDocument(2517, "/key"));

@@ -43,7 +43,7 @@ public class EnterReasonCommandTests
         this._client.Verify(target => target.SendMessage(2517, 
             "Введите причину, это опционально, если вы нажмете \"Пропустить\", то этой графы не будет в заявлении.\n" +
             "А если укажете, то это будет строка вида\n<code>Причина: {{причина}}</code>",
-            TestUtils.IsItSameKeyBoards("Пропустить")));
+            TestUtils.ItIsReplayKeyBoard("Пропустить")));
     }
     
     [Test]

@@ -67,7 +67,7 @@ public class CheckEmailsCommandTests
             "</code>\n" +
             "\n" +
             "Все верно?",
-            TestUtils.IsItSameKeyBoards(new [] { "Верно", "Нет, нужно поправить" })));
+            TestUtils.ItIsReplayKeyBoard(new [] { "Верно", "Нет, нужно поправить" })));
     }
     
     [Test]
