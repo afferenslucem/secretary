@@ -1,6 +1,8 @@
 ﻿using Secretary.Logging;
 using Secretary.Telegram.Commands.Caches.Interfaces;
+using Secretary.Telegram.Commands.Vacation;
 using Secretary.Telegram.Commands.Validation;
+using Secretary.Telegram.Documents;
 using Secretary.Telegram.Exceptions;
 using Secretary.Telegram.Utils;
 using Serilog;
@@ -17,6 +19,9 @@ public class EnterDistantPeriodCommand<T> : Command
         await ValidateUser();
         
         _logger.Information($"{ChatId}: Started time off");
+        
+        var context = DocumentContextProvider.GetContext(DistantCommand.Key);
+        await TelegramClient.SendMessage($"Вы выбрали документ \"{context.MailTheme}\"");
 
         await TelegramClient.SendMessage("Введите период удаленной работы в одном из форматов:\n\n" +
                                          "Если на один день:\n<strong>DD.MM.YYYY[ с HH:mm до HH:mm]</strong>\n" +

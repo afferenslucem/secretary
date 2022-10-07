@@ -1,6 +1,7 @@
 ﻿using Secretary.Logging;
 using Secretary.Telegram.Commands.Caches.Interfaces;
 using Secretary.Telegram.Commands.Validation;
+using Secretary.Telegram.Documents;
 using Secretary.Telegram.Exceptions;
 using Secretary.Telegram.Utils;
 using Serilog;
@@ -15,9 +16,11 @@ public class EnterTimeOffPeriodCommand<T> : Command
     public override async Task Execute()
     {
         await ValidateUser();
+
+        var context = DocumentContextProvider.GetContext(TimeOffCommand.Key);
+        await TelegramClient.SendMessage($"Вы выбрали документ \"{context.MailTheme}\"");
         
         _logger.Information($"{ChatId}: Started time off");
-
         await TelegramClient.SendMessage("Введите период отгула в одном из форматов:\n\n" +
                                          "Если отгул на один день:\n<strong>DD.MM.YYYY[ с HH:mm до HH:mm]</strong>\n" +
                                          "Например: <i>26.04.2020 c 9:00 до 13:00</i>\n\n" +

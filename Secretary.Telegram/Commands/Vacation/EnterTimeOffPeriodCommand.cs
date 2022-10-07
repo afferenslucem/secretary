@@ -1,6 +1,8 @@
 ﻿using Secretary.Logging;
 using Secretary.Telegram.Commands.Caches.Interfaces;
+using Secretary.Telegram.Commands.TimeOff;
 using Secretary.Telegram.Commands.Validation;
+using Secretary.Telegram.Documents;
 using Secretary.Telegram.Exceptions;
 using Secretary.Telegram.Utils;
 using Serilog;
@@ -15,6 +17,9 @@ public class EnterVacationPeriodCommand<T> : Command
     public override async Task Execute()
     {
         await ValidateUser();
+
+        var context = DocumentContextProvider.GetContext(VacationCommand.Key);
+        await TelegramClient.SendMessage($"Вы выбрали документ \"{context.MailTheme}\"");
         
         _logger.Information($"{ChatId}: Started vacation");
 

@@ -21,6 +21,7 @@ public class CommandsListeningChain
         _commandsChain.Add(TimeOffCommand.Key, new CommandFactory<TimeOffCommand>());
         _commandsChain.Add(VacationCommand.Key, new CommandFactory<VacationCommand>());
         _commandsChain.Add(DistantCommand.Key, new CommandFactory<DistantCommand>());
+        _commandsChain.Add(SendDocumentRedirectCommand.Key, new CommandFactory<SendDocumentRedirectCommand>());
         _commandsChain.Add(CancelCommand.Key, new CommandFactory<CancelCommand>());
         _commandsChain.Add(MeCommand.Key, new CommandFactory<MeCommand>());
         _commandsChain.Add(SetEmailsCommand.Key, new CommandFactory<SetEmailsCommand>());

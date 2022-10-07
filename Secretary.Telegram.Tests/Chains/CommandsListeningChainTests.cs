@@ -114,4 +114,12 @@ public class CommandsListeningChainTests
         
         Assert.IsInstanceOf<RemindLogTimeCommand>(result);
     }
+
+    [Test]
+    public void ShouldReturnSendDocumentRedirectCommandCommand()
+    {
+        var result = _chain.Get(SendDocumentRedirectCommand.Key);
+        
+        Assert.IsInstanceOf<SendDocumentRedirectCommand>(result);
+    }
 }

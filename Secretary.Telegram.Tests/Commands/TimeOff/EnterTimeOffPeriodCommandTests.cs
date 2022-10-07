@@ -48,6 +48,17 @@ public class EnterTimeOffPeriodCommandTests
     }
     
     [Test]
+    public async Task ShouldSendGreetingCommand()
+    {
+        _client.Setup(obj => obj.SendMessage(It.IsAny<long>(), It.IsAny<string>()));
+        
+        await this._command.Execute();
+        
+        this._client.Verify(target => target.SendMessage(2517, 
+            "Вы выбрали документ \"Отгул\""));
+    }
+    
+    [Test]
     public async Task ShouldSendEnterPeriodCommand()
     {
         _client.Setup(obj => obj.SendMessage(It.IsAny<long>(), It.IsAny<string>()));
