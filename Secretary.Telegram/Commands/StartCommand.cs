@@ -1,4 +1,5 @@
 ﻿using Secretary.Logging;
+using Secretary.Storage.Models;
 using Serilog;
 
 namespace Secretary.Telegram.Commands;
@@ -11,6 +12,8 @@ public class StartCommand: Command
     
     public override async Task Execute()
     {
+        await RegisterUserOnFirstRunning();
+        
         _logger.Information($"{ChatId}: Started work");
 
         await TelegramClient.SendMessage(
@@ -21,5 +24,20 @@ public class StartCommand: Command
             "2./registermail – зарегистрировать рабочую почту\n" +
             "3. <a href=\"https://mail.yandex.ru/#setup/client\">Разрешить доступ по протоколу IMAP</a>"
         );
+    }
+
+    private async Task RegisterUserOnFirstRunning()
+    {
+        var existingUser = await UserStorage.GetUser();
+
+        if (existingUser == null)
+        {
+            var user = new User
+            {
+                ChatId = ChatId
+            };
+
+            await UserStorage.SetUser(user);
+        }
     }
 }
