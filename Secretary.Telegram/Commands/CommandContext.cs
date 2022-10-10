@@ -12,6 +12,7 @@ namespace Secretary.Telegram.Commands;
 public class CommandContext
 {
     public long ChatId;
+    public string TelegramUserName;
 
     public ITelegramClient TelegramClient = null!;
 
@@ -35,6 +36,7 @@ public class CommandContext
 
     public CommandContext(
         long chatId, 
+        string telegramUserName, 
         ITelegramClient telegramClient, 
         ISessionStorage sessionStorage, 
         IUserStorage userStorage, 
@@ -47,6 +49,7 @@ public class CommandContext
         string message)
     {
         ChatId = chatId;
+        TelegramUserName = telegramUserName;
         TelegramClient = telegramClient;
         SessionStorage = sessionStorage;
         UserStorage = userStorage;

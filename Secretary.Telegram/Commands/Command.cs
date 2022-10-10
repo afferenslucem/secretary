@@ -26,6 +26,7 @@ public abstract class Command
     protected StatisticService StatisticService => new (Context.EventLogStorage);
 
     protected long ChatId => Context.ChatId;
+    protected string TelegramUserName => Context.TelegramUserName;
 
     protected string Message => Context.Message;
 

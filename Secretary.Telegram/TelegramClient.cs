@@ -55,8 +55,10 @@ public class TelegramClient: ITelegramClient
         LastCheckTime = DateTime.UtcNow;
 
         var botMessage = GetMessageFromUpdate(update);
+
+        if (botMessage == null) return Task.CompletedTask;
         
-        _logger.Debug($"({botMessage.ChatId}): {botMessage.Text}");
+        _logger.Debug($"{botMessage.From} ({botMessage.ChatId}): {botMessage.Text}");
         
         var task = OnMessage?.Invoke(botMessage);
 
@@ -67,16 +69,20 @@ public class TelegramClient: ITelegramClient
     {
         var message = update.Message;
 
-        if (message?.Text != null)
+        if (message?.Text != null && message.From != null)
         {
-            return new BotMessage(message.Chat.Id, message.Text);
+            var user = message.From!;
+            var username = user.Username ?? string.Join(' ', user.FirstName, user.LastName);
+            return new BotMessage(message.Chat.Id, username, message.Text);
         }
 
         var callback = update.CallbackQuery;
 
         if (callback?.Data != null)
         {
-            return new BotMessage(callback.From.Id, callback.Data);
+            var user = callback.From;
+            var username = user.Username ?? string.Join(' ', user.FirstName, user.LastName);
+            return new BotMessage(callback.From.Id, username, callback.Data);
         }
 
         return null;

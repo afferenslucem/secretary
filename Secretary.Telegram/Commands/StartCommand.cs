@@ -21,23 +21,30 @@ public class StartCommand: Command
             "\n" +
             "Перед началом работы вам необходимо:\n" +
             "1. /registeruser – зарегистрироваться\n" +
-            "2./registermail – зарегистрировать рабочую почту\n" +
+            "2. /registermail – зарегистрировать рабочую почту\n" +
             "3. <a href=\"https://mail.yandex.ru/#setup/client\">Разрешить доступ по протоколу IMAP</a>"
         );
     }
 
     private async Task RegisterUserOnFirstRunning()
     {
+        _logger.Debug("Check user existing");
         var existingUser = await UserStorage.GetUser();
 
         if (existingUser == null)
         {
             var user = new User
             {
-                ChatId = ChatId
+                ChatId = ChatId,
+                TelegramUsername = TelegramUserName,
             };
 
             await UserStorage.SetUser(user);
+            _logger.Debug($"Register user {ChatId}");
+        }
+        else
+        {
+            _logger.Debug($"User exists");
         }
     }
 }

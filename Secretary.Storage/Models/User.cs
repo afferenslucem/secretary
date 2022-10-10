@@ -9,6 +9,7 @@ namespace Secretary.Storage.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long ChatId { get; set; }
+        [MaxLength(256)] public string? TelegramUsername { get; set; }
 
         [MaxLength(256)] public string? Name { get; set; }
 

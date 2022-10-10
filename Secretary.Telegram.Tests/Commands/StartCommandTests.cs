@@ -27,6 +27,7 @@ public class StartCommandTests
         _context = new CommandContext()
         {
             ChatId = 2517,
+            TelegramUserName = "pushkin",
             TelegramClient = _client.Object,
             SessionStorage = _sessionStorage.Object,
             UserStorage = _userStorage.Object,
@@ -50,24 +51,24 @@ public class StartCommandTests
                                                           "\n" +
                                                           "Перед началом работы вам необходимо:\n" +
                                                           "1. /registeruser – зарегистрироваться\n" +
-                                                          "2./registermail – зарегистрировать рабочую почту\n" +
+                                                          "2. /registermail – зарегистрировать рабочую почту\n" +
                                                           "3. <a href=\"https://mail.yandex.ru/#setup/client\">Разрешить доступ по протоколу IMAP</a>"
             )
         );
     }
 
     [Test]
-    public async Task ShouldRegisterNewUsers()
+    public async Task ShouldRegisterNewUser()
     {
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync((User?)null);
         
         await _command.Execute();
 
-        _userStorage.Verify(target => target.SetUser(It.Is<User>(user => user.ChatId == 2517)), Times.Once);
+        _userStorage.Verify(target => target.SetUser(It.Is<User>(user => user.ChatId == 2517 && user.TelegramUsername == "pushkin")), Times.Once);
     }
 
     [Test]
-    public async Task ShouldSkipRegistersers()
+    public async Task ShouldSkipRegisterUser()
     {
         var oldUser = new User();
         

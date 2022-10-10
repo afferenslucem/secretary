@@ -66,6 +66,7 @@ public class TelegramBot
 
             var context = new CommandContext(
                 message.ChatId,
+                message.From,
                 _telegramClient,
                 _sessionStorage,
                 _database.UserStorage,

@@ -49,7 +49,7 @@ public class TelegramBotTests
     {
         _chain.Setup(target => target.Get(It.IsAny<string>())).Returns(new EmptyCommand());
         
-        await _bot.WorkWithMessage(new BotMessage(2517, "/command"));
+        await _bot.WorkWithMessage(new BotMessage(2517, "pushkin", "/command"));
         
         _chain.Verify(target => target.Get("/command"), Times.Once);
     }
@@ -63,7 +63,7 @@ public class TelegramBotTests
             target => target.Get(It.IsAny<string>())
         ).Returns(command.Object);
         
-        await _bot.WorkWithMessage(new BotMessage(2517, "/command"));
+        await _bot.WorkWithMessage(new BotMessage(2517, "pushkin", "/command"));
         
         command.Verify(target => target.Execute(), Times.Once);
     }
@@ -77,7 +77,7 @@ public class TelegramBotTests
             target => target.Get(It.IsAny<string>())
         ).Returns(command.Object);
         
-        await _bot.WorkWithMessage(new BotMessage(2517, "/command"));
+        await _bot.WorkWithMessage(new BotMessage(2517, "pushkin", "/command"));
         
         command.Verify(target => target.OnComplete(), Times.Once);
     }
@@ -95,7 +95,7 @@ public class TelegramBotTests
             target => target.Get(It.IsAny<string>())
         ).Returns(command.Object);
         
-        await _bot.WorkWithMessage(new BotMessage(2517, "/command"));
+        await _bot.WorkWithMessage(new BotMessage(2517, "pushkin", "/command"));
         
         _client.Verify(target => target.SendMessage(2517,
                 "Вы – незарегистрированный пользователь.\n\n" +
@@ -120,7 +120,7 @@ public class TelegramBotTests
             target => target.Get(It.IsAny<string>())
         ).Returns(command.Object);
         
-        await _bot.WorkWithMessage(new BotMessage(2517, "/command"));
+        await _bot.WorkWithMessage(new BotMessage(2517, "pushkin", "/command"));
         
         _client.Verify(target => target.SendMessage(2517,
                 "Произошла непредвиденная ошибка"), 
