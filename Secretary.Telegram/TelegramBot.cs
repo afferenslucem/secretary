@@ -16,7 +16,7 @@ namespace Secretary.Telegram;
 
 public class TelegramBot
 {
-    public static readonly string Version = "v4.2.3";
+    public static readonly string Version = "v4.3.0";
     
     public static readonly DateTime Uptime = DateTime.UtcNow;
     

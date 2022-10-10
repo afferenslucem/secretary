@@ -70,13 +70,13 @@ public class StartCommandTests
     [Test]
     public async Task ShouldSkipRegisterUser()
     {
-        var oldUser = new User();
+        var oldUser = new User() { ChatId = 2517};
         
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync(oldUser);
         
         await _command.Execute();
 
-        _userStorage.Verify(target => target.SetUser(It.Is<User>(user => user.ChatId == 2517)), Times.Never);
+        _userStorage.Verify(target => target.SetUser(It.Is<User>(user => user.ChatId == 2517 && user.TelegramUsername == "pushkin")), Times.Once);
     }
 
     [Test]

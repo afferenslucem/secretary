@@ -44,6 +44,9 @@ public class StartCommand: Command
         }
         else
         {
+            existingUser.TelegramUsername = TelegramUserName;
+            await UserStorage.SetUser(existingUser);
+            
             _logger.Debug($"User exists");
         }
     }
