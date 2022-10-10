@@ -87,20 +87,20 @@ public class SendDocumentCommand<T> : Command
         {
             _logger.Warning(e, "Yandex authentications exception");
             
-            if (e.Message.Contains("This user does not have access rights to this service"))
+            if (e.Message.Contains("This user does not have access rights to this service") || e.Message.Contains("Authentication failed"))
             {
                 await TelegramClient.SendMessage(
                     "Не достаточно прав для отправки письма!\n\n" +
-                    "Убедитесь, что токен выдан для вашего рабочего почтового ящика.\n" +
-                    "Если ящик нужный, то перейдите в <a href=\"https://mail.yandex.ru/#setup/client\">настройки</a> " +
+                    "Перейдите в <a href=\"https://mail.yandex.ru/#setup/client\">настройки</a> " +
                     "и разрешите отправку по OAuth-токену с сервера imap.\n" +
-                    "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке"
+                    "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке.\n\n" +
+                    "Если доступ разрешен, то выполните команду /renewtoken и проверьте, что токен выпускается для рабочей почты"
                 );
                 
                 return;
             }
             
-            if (e.Message.Contains("Invalid user or password") || e.Message.Contains("Authentication failed"))
+            if (e.Message.Contains("Invalid user or password"))
             {
                 await TelegramClient.SendMessage(
                     "Невалидный токен!\n\n" +

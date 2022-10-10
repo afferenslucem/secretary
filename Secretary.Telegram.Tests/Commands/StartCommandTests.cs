@@ -15,19 +15,19 @@ public class StartCommandTests
     [SetUp]
     public void Setup()
     {
-        this._client = new Mock<ITelegramClient>();
+        _client = new Mock<ITelegramClient>();
 
-        this._command = new StartCommand();
-        this._sessionStorage = new Mock<ISessionStorage>();
+        _command = new StartCommand();
+        _sessionStorage = new Mock<ISessionStorage>();
 
-        this._context = new CommandContext()
+        _context = new CommandContext()
         {
             ChatId = 2517,
-            TelegramClient = this._client.Object,
-            SessionStorage = this._sessionStorage.Object,
+            TelegramClient = _client.Object,
+            SessionStorage = _sessionStorage.Object,
         };
 
-        this._command.Context = _context;
+        _command.Context = _context;
     }
 
     [Test]
@@ -39,13 +39,16 @@ public class StartCommandTests
     [Test]
     public async Task ShouldSendExampleMessage()
     {
-        await this._command.Execute();
+        await _command.Execute();
 
-        this._client.Verify(target => target.SendMessage(2517, "Добро пожаловать!\n" +
+        _client.Verify(target => target.SendMessage(2517, "Добро пожаловать!\n" +
                                                                "\n" +
                                                                "Перед началом работы вам необходимо:\n" +
-                                                               "/registeruser – зарегистрироваться\n" +
-                                                               "/registermail – зарегистрировать рабочую почту"));
+                                                               "1. /registeruser – зарегистрироваться\n" +
+                                                               "2./registermail – зарегистрировать рабочую почту\n" +
+                                                               "3. <a href=\"https://mail.yandex.ru/#setup/client\">Разрешить доступ по протоколу IMAP</a>"
+                                                               )
+        );
     }
 
     [Test]

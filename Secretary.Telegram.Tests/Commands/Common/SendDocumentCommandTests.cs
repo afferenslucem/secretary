@@ -171,10 +171,10 @@ public class SendDocumentCommandTests
         _client.Verify(target => target.SendMessage(
             2517, 
             "Не достаточно прав для отправки письма!\n\n" +
-            "Убедитесь, что токен выдан для вашего рабочего почтового ящика.\n" +
-            "Если ящик нужный, то перейдите в <a href=\"https://mail.yandex.ru/#setup/client\">настройки</a> " +
+            "Перейдите в <a href=\"https://mail.yandex.ru/#setup/client\">настройки</a> " +
             "и разрешите отправку по OAuth-токену с сервера imap.\n" +
-            "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке"
+            "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке.\n\n" +
+            "Если доступ разрешен, то выполните команду /renewtoken и проверьте, что токен выпускается для рабочей почты"
         ));
     }
 
@@ -198,7 +198,7 @@ public class SendDocumentCommandTests
     }
 
     [Test]
-    public async Task ShouldProtectIncorrectPermissionScope()
+    public async Task ShouldProtectIncorrectAuth()
     {
         _mailSender.Setup(target => target.SendMail(It.IsAny<MailMessage>()))
             .ThrowsAsync(new AuthenticationException("Authentication failed"));
@@ -208,11 +208,12 @@ public class SendDocumentCommandTests
         
         _client.Verify(target => target.SendMessage(
             2517, 
-            "Невалидный токен!\n\n" +
-            "Выполните команду /renewtoken"
+            "Не достаточно прав для отправки письма!\n\n" +
+            "Перейдите в <a href=\"https://mail.yandex.ru/#setup/client\">настройки</a> " +
+            "и разрешите отправку по OAuth-токену с сервера imap.\n" +
+            "Не спешите пугаться незнакомых слов, вам просто нужно поставить одну галочку по ссылке.\n" +
+            "Если доступ разрешен, то выполните команду /renewtoken и проверьте, что токен выпускается для рабочей почты"
         ));
-        
-        _userStorage.Verify(target => target.RemoveTokens(2517));
     }
 
     [Test]

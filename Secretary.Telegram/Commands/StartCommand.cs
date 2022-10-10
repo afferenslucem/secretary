@@ -17,7 +17,9 @@ public class StartCommand: Command
             "Добро пожаловать!\n" +
             "\n" +
             "Перед началом работы вам необходимо:\n" +
-            "/registeruser – зарегистрироваться\n" +
-            "/registermail – зарегистрировать рабочую почту");
+            "1. /registeruser – зарегистрироваться\n" +
+            "2./registermail – зарегистрировать рабочую почту\n" +
+            "3. <a href=\"https://mail.yandex.ru/#setup/client\">Разрешить доступ по протоколу IMAP</a>"
+        );
     }
 }

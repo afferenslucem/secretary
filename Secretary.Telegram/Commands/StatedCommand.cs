@@ -19,8 +19,8 @@ public abstract class StatedCommand: Command
 
     protected StatedCommand()
     {
-        var states = this.ConfigureStates();
-        this.Clip = new CommandClip(states);
+        var states = ConfigureStates();
+        Clip = new CommandClip(states);
     }
     
     public abstract List<Command> ConfigureStates();
@@ -44,7 +44,7 @@ public abstract class StatedCommand: Command
 
     public override async Task<int> OnMessage()
     {
-        await this.Execute();
+        await Execute();
         return ExecuteDirection.RunNext;
     }
 
@@ -59,7 +59,7 @@ public abstract class StatedCommand: Command
     {
         if (IsCompleted)
         {
-            _logger.Debug($"{this.GetType().Name} completed");
+            _logger.Debug($"{GetType().Name} completed");
             await base.OnComplete();
         }
     }
