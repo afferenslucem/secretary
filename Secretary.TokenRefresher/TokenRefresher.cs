@@ -12,7 +12,7 @@ namespace Secretary.TokenRefresher;
 
 public class TokenRefresher
 {
-    public static string Version = "v1.1.0";
+    public static string Version = "v1.1.1";
     public static DateTime Uptime = DateTime.UtcNow;
     
     private readonly ILogger _logger = LogPoint.GetLogger<TokenRefresher>();
@@ -80,11 +80,11 @@ public class TokenRefresher
 
     public async Task Routine()
     {
+        _timeWaiter.TargetDate = GetNextUpdateDate(DateTime.UtcNow.AddDays(1));
+        
         _logger.Information("Run token refreshing");
                 
         await RefreshTokensForAllUsers();
-
-        _timeWaiter.TargetDate = GetNextUpdateDate(DateTime.UtcNow.AddDays(1));
     }
 
     public async Task RefreshTokensForAllUsers()

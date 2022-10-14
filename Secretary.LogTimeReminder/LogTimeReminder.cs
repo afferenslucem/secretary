@@ -12,7 +12,7 @@ namespace Secretary.LogTimeReminder;
 
 public class LogTimeReminder
 {
-    public static string Version = "v1.1.1";
+    public static string Version = "v1.1.2";
     public static DateTime Uptime = DateTime.UtcNow;
     
     private readonly ILogger _logger = LogPoint.GetLogger<LogTimeReminder>();
@@ -80,11 +80,11 @@ public class LogTimeReminder
 
     public async Task Routine()
     {
+        _timeWaiter.TargetDate = GetNextNotifyDate(DateTime.UtcNow.AddDays(1));
+        
         _logger.Information("Start notifying user");
                 
         await NotifyAllUsers();
-
-        _timeWaiter.TargetDate = GetNextNotifyDate(DateTime.UtcNow.AddDays(1));
     }
     
     public async Task NotifyAllUsers()
@@ -93,7 +93,7 @@ public class LogTimeReminder
 
         foreach (var user in users)
         {
-            await Notify(user);
+            _ = Notify(user);
         }
     }
 
@@ -101,7 +101,7 @@ public class LogTimeReminder
     {
         try
         {
-            _logger.Debug($"send notification for user {user.ChatId}");
+            _logger.Debug($"send notification for user {user.TelegramUsername} ({user.ChatId})");
 
             await _telegramClient.SendMessage(user.ChatId, "Не забудьте залоггировать время!");
 
@@ -144,7 +144,6 @@ public class LogTimeReminder
 
         var result = calendar.GetLastWorkingDayBefore(DateOnly.FromDateTime(startBound), bound);
         
-
         return result;
     }
     
