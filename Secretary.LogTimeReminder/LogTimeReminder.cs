@@ -22,11 +22,8 @@ public class LogTimeReminder
     private readonly CancellationTokenSource _cancellationTokenSource;
     public DateTime LastAliveCheckTime { get; set; }
 
-    private TimeWaiter _timeWaiter;
-    public DateTime NextNotifyDate => _timeWaiter.TargetDate;
-
-    public ICalendarReader CalendarReader;
-
+    private TimeWaiter _timeWaiter = null!;
+    public DateTime? NextNotifyDate => _timeWaiter?.TargetDate;
     public bool ShouldSkipDelay { get; set; }
     
     public LogTimeReminder(
@@ -40,18 +37,12 @@ public class LogTimeReminder
         _cancellationTokenSource = new CancellationTokenSource();
         _userStorage = userStorage;
         _telegramClient = telegramClient;
-        CalendarReader = new CalendarReader();
-
-        _timeWaiter = new TimeWaiter()
-        {
-            TargetDate = GetNextNotifyDate(DateTime.UtcNow)
-        };
-
-        _timeWaiter.OnTime += Routine;
     }
 
     public async Task RunThread()
     {
+        InitTimer();
+        
         _logger.Information("Run notify thread");
         
         while (!_cancellationTokenSource.IsCancellationRequested)
@@ -59,6 +50,17 @@ public class LogTimeReminder
             await CheckTimer();
         }
     }
+
+    private void InitTimer()
+    {
+        _timeWaiter = new TimeWaiter()
+        {
+            TargetDate = GetNextNotifyDate(DateTime.UtcNow)
+        };
+
+        _timeWaiter.OnTime += Routine;
+    }
+    
     public async Task CheckTimer()
     {
         try
@@ -115,36 +117,58 @@ public class LogTimeReminder
     
     public DateTime GetNextNotifyDate(DateTime now)
     {
-        DateOnly bound;
-        
-        if (now.Day > 15)
+        DateOnly bound = GetNextCheckPeriod(now);
+
+        DateOnly? lastWorkingDay;
+
+        do
         {
-            var lastDay = DateTime.DaysInMonth(now.Year, now.Month);
+            lastWorkingDay = GetLastWorkingDayBefore(now, bound);
+            bound = GetNextCheckPeriod(bound.AddDays(1));
+        } while (lastWorkingDay == null);
 
-            bound = new DateOnly(now.Year, now.Month, lastDay);
-        }
-        else
-        {
-            bound = new DateOnly(now.Year, now.Month, 15);
-        }
-
-        var lastWorkingDay = GetLastWorkingDayBefore(now, bound);
-
-        var result = lastWorkingDay.ToDateTime(new TimeOnly(11, 45)).ToUniversalTime();
+        var result = lastWorkingDay.Value.ToDateTime(new TimeOnly(11, 45)).ToUniversalTime();
         
         _logger.Information($"Next date to notify {result}");
         
         return result;
     }
 
-    public DateOnly GetLastWorkingDayBefore(DateTime startBound, DateOnly bound)
+    public DateOnly GetNextCheckPeriod(DateTime now)
     {
-        var calendar = CalendarReader.Read(startBound.Year);
-        _logger.Debug($"Read calendar {calendar.Year}");
+        if (now.Day > 15)
+        {
+            var lastDay = DateTime.DaysInMonth(now.Year, now.Month);
 
-        var result = calendar.GetLastWorkingDayBefore(DateOnly.FromDateTime(startBound), bound);
-        
-        return result;
+            return new DateOnly(now.Year, now.Month, lastDay);
+        }
+        else
+        {
+            return new DateOnly(now.Year, now.Month, 15);
+        }
+    }
+
+    public DateOnly GetNextCheckPeriod(DateOnly now) => GetNextCheckPeriod(now.ToDateTime(TimeOnly.MinValue));
+
+    public DateOnly? GetLastWorkingDayBefore(DateTime startBound, DateOnly bound)
+    {
+        if (IsWorkingDay(bound)) return bound;
+
+        var startDate = DateOnly.FromDateTime(startBound);
+
+        var calendar = CalendarStorage.GetCalendar(bound);
+
+        return calendar.GetLastWorkingDayBefore(startDate, bound);
+    }
+
+
+    public bool IsWorkingDay(DateOnly date)
+    {
+        var calendar = CalendarStorage.GetCalendar(date);
+
+        var day = calendar.FindOrCreate(date);
+
+        return day.IsWorkingDay();
     }
     
     public Task Sleep(TimeSpan span, CancellationToken cancellationToken)

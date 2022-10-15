@@ -82,6 +82,17 @@ public class LogTimeReminderTests
             Is.True
         );
     }
+    
+    [Test]
+    public void NextDateShouldBe31October2022For15October2022()
+    {
+        var result = _reminder.GetNextNotifyDate(new DateTime(2022, 10, 15));
+        
+        Assert.That(
+            result == new DateTime(2022, 10, 31, 11, 45, 0).ToUniversalTime(),
+            Is.True
+        );
+    }
 
     [Test]
     public void NextDateShouldUse15For10August2022()
@@ -141,5 +152,23 @@ public class LogTimeReminderTests
         Assert.That(result.DeployTime, Is.EqualTo(LogTimeReminder.Uptime));
         Assert.That(result.PingTime, Is.EqualTo(_reminder.LastAliveCheckTime));
         Assert.That(result.NextNotifyDate == _reminder.NextNotifyDate, Is.True);
+    }
+    
+    
+    [Test]
+    public void ShouldReturn15OctoberLikeNextCheckPeriod()
+    {
+        var result = _reminder.GetNextCheckPeriod(new DateOnly(2022, 10, 15));
+        
+        Assert.That(result, Is.EqualTo(new DateOnly(2022, 10, 15)));
+    }
+    
+    
+    [Test]
+    public void ShouldReturn31OctoberLikeNextCheckPeriod()
+    {
+        var result = _reminder.GetNextCheckPeriod(new DateTime(2022, 10, 16));
+        
+        Assert.That(result, Is.EqualTo(new DateOnly(2022, 10, 31)));
     }
 }
