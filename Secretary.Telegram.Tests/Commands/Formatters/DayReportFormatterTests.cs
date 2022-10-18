@@ -1,3 +1,4 @@
+using System.Globalization;
 using Secretary.JiraManager.Data;
 using Secretary.JiraManager.Reports;
 using Secretary.Telegram.Commands.Formatters;
@@ -6,6 +7,12 @@ namespace Secretary.Telegram.Tests.Commands.Formatters;
 
 public class DayReportFormatterTests
 {
+    [SetUp]
+    public void Setup()
+    {
+        Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+    }
+    
     [Test]
     public void ShouldContainsDate()
     {
@@ -45,7 +52,7 @@ public class DayReportFormatterTests
         
         var result = new DayReportFormatter().GetHtmlView(report);
 
-        var contains = result.Contains("3,00h - <a href=\"https://jira.pushkin.ru/browse/ONG-1234\">ONG-1234</a> Опечатка в третьей строфе");
+        var contains = result.Contains("3.00h - <a href=\"https://jira.pushkin.ru/browse/ONG-1234\">ONG-1234</a> Опечатка в третьей строфе");
         
         Assert.That(contains, Is.True);
     }
@@ -59,7 +66,7 @@ public class DayReportFormatterTests
         
         var result = new DayReportFormatter().GetHtmlView(report);
 
-        var contains = result.Contains("Всего времени: 5,56h");
+        var contains = result.Contains("Всего времени: 5.56h");
         
         Assert.That(contains, Is.True);
     }
