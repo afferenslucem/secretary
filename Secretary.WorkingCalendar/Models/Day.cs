@@ -19,7 +19,7 @@ public class Day
     {
         var dateString = $"{year}.{Date}";
         
-        this.FullDate = DateOnly.ParseExact(dateString, "yyyy.MM.dd");
+        FullDate = DateOnly.ParseExact(dateString, "yyyy.MM.dd");
     }
 
     public override string ToString()

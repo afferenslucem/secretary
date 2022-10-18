@@ -1,11 +1,18 @@
 ﻿using Secretary.Telegram.Commands;
-using Secretary.Telegram.Commands.Distant;
+using Secretary.Telegram.Commands.Abstractions;
+using Secretary.Telegram.Commands.Documents;
+using Secretary.Telegram.Commands.Documents.Distant;
+using Secretary.Telegram.Commands.Documents.SetEmails;
+using Secretary.Telegram.Commands.Documents.TimeOff;
+using Secretary.Telegram.Commands.Documents.Vacation;
 using Secretary.Telegram.Commands.Factories;
+using Secretary.Telegram.Commands.Jira;
+using Secretary.Telegram.Commands.Jira.Lists;
+using Secretary.Telegram.Commands.Jira.LogTime;
+using Secretary.Telegram.Commands.Jira.RegisterJiraToken;
+using Secretary.Telegram.Commands.Menus;
 using Secretary.Telegram.Commands.RegisterMail;
 using Secretary.Telegram.Commands.RegisterUser;
-using Secretary.Telegram.Commands.SetEmails;
-using Secretary.Telegram.Commands.TimeOff;
-using Secretary.Telegram.Commands.Vacation;
 
 namespace Secretary.Telegram.chains;
 
@@ -27,6 +34,14 @@ public class CommandsListeningChain
         _commandsChain.Add(SetEmailsCommand.Key, new CommandFactory<SetEmailsCommand>());
         _commandsChain.Add(RemindLogTimeCommand.Key, new CommandFactory<RemindLogTimeCommand>());
         _commandsChain.Add(RenewTokenCommand.Key, new CommandFactory<RenewTokenCommand>());
+        _commandsChain.Add(JiraMenuCommand.Key, new CommandFactory<JiraMenuCommand>());
+        _commandsChain.Add(OpenIssuesListCommand.Key, new CommandFactory<OpenIssuesListCommand>());
+        _commandsChain.Add(ProgressIssuesListCommand.Key, new CommandFactory<ProgressIssuesListCommand>());
+        _commandsChain.Add(LogTimeCommand.Key, new CommandFactory<LogTimeCommand>());
+        _commandsChain.Add(DayReportCommand.Key, new CommandFactory<DayReportCommand>());
+        _commandsChain.Add(WeekReportCommand.Key, new CommandFactory<WeekReportCommand>());
+        _commandsChain.Add(EmptyCommand.Key, new CommandFactory<EmptyCommand>());
+        _commandsChain.Add(RegisterJiraTokenCommand.Key, new CommandFactory<RegisterJiraTokenCommand>());
         _commandsChain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
     }
 
@@ -35,7 +50,7 @@ public class CommandsListeningChain
         _commandsChain.Add(key, commandFactory);
     }
 
-    public virtual Command? Get(string key)
+    public virtual Command? Get(string? key)
     {
         return _commandsChain.Get(key);
     }

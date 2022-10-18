@@ -1,4 +1,5 @@
 using Secretary.Telegram.Commands;
+using Secretary.Telegram.Commands.Abstractions;
 using Secretary.Telegram.Sessions;
 
 namespace Secretary.Telegram.Wrappers;

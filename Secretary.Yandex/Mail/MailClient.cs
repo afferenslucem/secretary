@@ -41,7 +41,7 @@ public class MailClient: IMailClient
         _user = user;
         _token = token;
         
-        await Task.WhenAll(this.ConnectToSMTP(), this.ConnectToIMAP());
+        await Task.WhenAll(ConnectToSMTP(), ConnectToIMAP());
     }
 
     private async Task ConnectToSMTP()

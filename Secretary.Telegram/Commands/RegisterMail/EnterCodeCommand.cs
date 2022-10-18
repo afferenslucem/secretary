@@ -1,6 +1,7 @@
 ﻿using Secretary.Logging;
 using Secretary.Storage.Models;
-using Secretary.Telegram.Commands.Caches;
+using Secretary.Telegram.Commands.Abstractions;
+using Secretary.Telegram.Commands.Caches.Documents;
 using Secretary.Telegram.Exceptions;
 using Secretary.Yandex.Authentication;
 using Secretary.Yandex.Exceptions;
@@ -14,7 +15,7 @@ public class EnterCodeCommand: Command
 
     public override Task Execute()
     {
-        _ = this.RegisterMail();
+        _ = RegisterMail();
         
         return Task.CompletedTask;
     }
@@ -29,11 +30,11 @@ public class EnterCodeCommand: Command
                 "Пожалуйста, <strong>УБЕДИТЕСЬ</strong>, что вы авторизуетесь в рабочей почте!\n" +
                 $"Введите этот код: <code>{data.user_code}</code> в поле ввода по этой ссылке: {data.verification_url}. Регистрация может занять пару минут.");
 
-            var tokenData = await this.AskRegistration(YandexAuthenticator, data, DateTime.Now);
+            var tokenData = await AskRegistration(YandexAuthenticator, data, DateTime.Now);
 
             if (tokenData != null)
             {
-                await this.SetTokens(tokenData);
+                await SetTokens(tokenData);
                 await TelegramClient.SendMessage("Ура, токен для почты получен!");
                 _logger.Information($"{ChatId}: handled tokens");
             }
@@ -42,7 +43,7 @@ public class EnterCodeCommand: Command
         {
             _logger.Error(e, "Could not get auth info from server");
             
-            await this.TelegramClient.SendMessage(
+            await TelegramClient.SendMessage(
                 "При запросе токена для авторизации произошла ошибка:(\n" +
                 "Попробуйте через пару минут, если не сработает, то обратитесь по вот этому адресу @hrodveetnir");
         }
@@ -61,7 +62,7 @@ public class EnterCodeCommand: Command
         DateTime startTime)
     {
 
-        if (DateTime.Now >= startTime.AddSeconds(data.expires_in) || this.CancellationToken.IsCancellationRequested)
+        if (DateTime.Now >= startTime.AddSeconds(data.expires_in) || CancellationToken.IsCancellationRequested)
         {
             return null;
         }
@@ -72,7 +73,7 @@ public class EnterCodeCommand: Command
 
         await Task.Delay(data.interval * 1500, CancellationToken.Token);
 
-        return await this.AskRegistration(client, data, startTime);
+        return await AskRegistration(client, data, startTime);
     }
 
     protected virtual async Task SetTokens(TokenData data)

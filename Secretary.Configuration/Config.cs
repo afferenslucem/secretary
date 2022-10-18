@@ -20,6 +20,8 @@ public class Config
 
     public MailConfig MailConfig { get; init; } = null!;
 
+    public JiraConfig JiraConfig { get; init; } = null;
+
     public string DbConnectionString { get; init; } = null!;
 
     public string TemplatesPath { get; init; } = null!;

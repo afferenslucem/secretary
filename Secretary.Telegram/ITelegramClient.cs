@@ -1,8 +1,9 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Secretary.Telegram;
 
-public delegate Task MessageReceive(BotMessage message);
+public delegate Task MessageReceive(UserMessage message);
 
 public interface ITelegramClient
 {
@@ -12,23 +13,44 @@ public interface ITelegramClient
 
     Task RunDriver();
     
-    Task SendMessage(
+    Task<Message> SendMessage(
         long chatId, 
         string message
     );
     
-    Task SendMessage(
+    Task<Message> SendMessage(
         long chatId, 
         string message, 
         ReplyKeyboardMarkup replyMarkup = null
     );
     
-    Task SendMessage(
+    Task<Message> SendMessage(
         long chatId, 
         string message, 
         InlineKeyboardMarkup inlineMarkup = null
     );
+
+    Task EditMessage(
+        long chatId,
+        int messageId,
+        string message
+    );
+    
+    Task EditMessage(
+        long chatId, 
+        int messageId,
+        string message, 
+        InlineKeyboardMarkup inlineMarkup
+    );
+
+    public Task EditMessageKeyboard(
+        long chatId,
+        int messageId,
+        InlineKeyboardMarkup inlineKeyboardMarkup
+    );
     
     Task SendDocument(long chatId, string path, string fileName);
     Task SendSticker(long chatId, string stickerId);
+    
+    Task DeleteMessage(long chatId, int messageId);
 }

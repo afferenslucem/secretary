@@ -15,7 +15,7 @@ public class EmailParser
         var lines = message.Split("\n")
             .Select(item => item.Trim());
 
-        var result = lines.Select(item => this.Parse(item)).ToArray();
+        var result = lines.Select(item => Parse(item)).ToArray();
 
         return result;
     }

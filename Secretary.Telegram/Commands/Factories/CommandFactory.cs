@@ -1,4 +1,6 @@
-﻿namespace Secretary.Telegram.Commands.Factories;
+﻿using Secretary.Telegram.Commands.Abstractions;
+
+namespace Secretary.Telegram.Commands.Factories;
 
 public class CommandFactory<T>: ICommandFactory
     where T: Command, new()

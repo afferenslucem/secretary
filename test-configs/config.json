@@ -5,6 +5,9 @@
       "ClientSecret": "",
       "AllowedSenderDomains": ["infinnity.ru"]
     },
+    "JiraConfig":  {
+      "Host": "https://jira.pushkin.ru"
+    },
     "DbPath": "",
     "TemplatesPath": "../../../../templates",
     "CalendarsPath": "../../../../calendars"

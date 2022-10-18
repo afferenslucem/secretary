@@ -11,7 +11,7 @@ public class EmailParserTests
     [SetUp]
     public void Setup()
     {
-        this.Parser = new EmailParser();
+        Parser = new EmailParser();
     }
 
     [Test]

@@ -9,7 +9,7 @@ public class MessageAdapter
 
     public MessageAdapter(HtmlDocument doc)
     {
-        this.Doc = doc;
+        Doc = doc;
     }
 
     public void SetJobTitle(string value)
@@ -24,7 +24,7 @@ public class MessageAdapter
 
     public void SaveAs(TextWriter writer)
     {
-        this.Doc.Save(writer);
+        Doc.Save(writer);
     }
 
     protected void SetValue(string id, string placehoder, string? value)

@@ -1,7 +1,7 @@
 using Secretary.Telegram.chains;
 using Secretary.Telegram.Commands;
+using Secretary.Telegram.Commands.Documents.TimeOff;
 using Secretary.Telegram.Commands.Factories;
-using Secretary.Telegram.Commands.TimeOff;
 
 namespace Secretary.Telegram.Tests.Chains;
 
@@ -12,37 +12,37 @@ public class CommandsChainTests
     [SetUp]
     public void Setup()
     {
-        this._chain = new CommandsChain();
+        _chain = new CommandsChain();
     }
 
     [Test]
     public void ShouldReturnNullCommandForEveryString()
     {
-        this._chain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
-        this._chain.Add(TimeOffCommand.Key, new CommandFactory<TimeOffCommand>());
+        _chain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
+        _chain.Add(TimeOffCommand.Key, new CommandFactory<TimeOffCommand>());
         
-        var result = this._chain.Get("random string");
+        var result = _chain.Get("random string");
         Assert.IsInstanceOf<NullCommand>(result);
         
         
-        result = this._chain.Get("another random string");
+        result = _chain.Get("another random string");
         Assert.IsInstanceOf<NullCommand>(result);
         
         
-        result = this._chain.Get(TimeOffCommand.Key);
+        result = _chain.Get(TimeOffCommand.Key);
         Assert.IsInstanceOf<NullCommand>(result);
     }
 
     [Test]
     public void ShouldReturnTimeOffCommand()
     {
-        this._chain.Add(TimeOffCommand.Key, new CommandFactory<TimeOffCommand>());
-        this._chain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
+        _chain.Add(TimeOffCommand.Key, new CommandFactory<TimeOffCommand>());
+        _chain.Add(NullCommand.Key, new CommandFactory<NullCommand>());
         
-        var result = this._chain.Get(TimeOffCommand.Key);
+        var result = _chain.Get(TimeOffCommand.Key);
         Assert.IsInstanceOf<TimeOffCommand>(result);
         
-        result = this._chain.Get("random string");
+        result = _chain.Get("random string");
         Assert.IsInstanceOf<NullCommand>(result);
     }
 }

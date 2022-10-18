@@ -18,6 +18,7 @@ public class CalendarTests
         
         Assert.That(result.FullDate, Is.EqualTo(new DateOnly(2022, 10, 14)));
     }
+    
     [Test]
     public void FindOrCreateShouldCreateCalendarDay()
     {
@@ -98,5 +99,25 @@ public class CalendarTests
         );
         
         Assert.That(result, Is.True);
+    }
+    
+    [Test]
+    public void ShouldReturn11()
+    {
+        var calendar = CalendarStorage.GetCalendar(new DateOnly(2022, 10, 18));
+
+        var result = calendar.GetWorkingDays(new DateOnly(2022, 10, 16), new DateOnly(2022, 10, 31));
+        
+        Assert.That(result, Is.EqualTo(11));
+    }
+    
+    [Test]
+    public void ShouldReturn5()
+    {
+        var calendar = CalendarStorage.GetCalendar(new DateOnly(2023, 1, 13));
+
+        var result = calendar.GetWorkingDays(new DateOnly(2023, 1, 1), new DateOnly(2023, 1, 13));
+        
+        Assert.That(result, Is.EqualTo(5));
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Secretary.Telegram.Commands.RegisterUser;
+﻿using Secretary.Telegram.Commands.Abstractions;
+
+namespace Secretary.Telegram.Commands.RegisterUser;
 
 public class RegisterUserCommand: StatedCommand
 {

@@ -12,7 +12,7 @@ public class DocumentStorage: Storage, IDocumentStorage
 
         if (document != null) return document;
 
-        document = await this.SaveDocument(chatId, documentName);
+        document = await SaveDocument(chatId, documentName);
 
         return document;
     }

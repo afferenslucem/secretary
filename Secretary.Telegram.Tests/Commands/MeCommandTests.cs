@@ -19,21 +19,21 @@ public class MeCommandTests
     [SetUp]
     public void Setup()
     {
-        this._client = new Mock<ITelegramClient>();
-        this._userStorage = new Mock<IUserStorage>();
-        this._sessionStorage = new Mock<ISessionStorage>();
+        _client = new Mock<ITelegramClient>();
+        _userStorage = new Mock<IUserStorage>();
+        _sessionStorage = new Mock<ISessionStorage>();
 
-        this._command = new MeCommand();
+        _command = new MeCommand();
 
-        this._context = new CommandContext()
+        _context = new CommandContext()
         {
-            ChatId = 2517,
-            TelegramClient = this._client.Object,
+            UserMessage = new UserMessage { ChatId = 2517 },
+            TelegramClient = _client.Object,
             UserStorage = _userStorage.Object,
             SessionStorage = _sessionStorage.Object,
         };
 
-        this._command.Context = _context;
+        _command.Context = _context;
     }
 
     [Test]

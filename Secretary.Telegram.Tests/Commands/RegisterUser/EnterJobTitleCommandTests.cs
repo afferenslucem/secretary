@@ -1,7 +1,7 @@
 ﻿using Moq;
 using Secretary.Cache;
 using Secretary.Telegram.Commands;
-using Secretary.Telegram.Commands.Caches;
+using Secretary.Telegram.Commands.Caches.Documents;
 using Secretary.Telegram.Commands.RegisterUser;
 
 namespace Secretary.Telegram.Tests.Commands.RegisterUser;
@@ -25,7 +25,7 @@ public class EnterJobTitleCommandTests
 
         _context = new CommandContext()
         { 
-            ChatId = 2517, 
+            UserMessage = new UserMessage { ChatId = 2517},
             TelegramClient = _client.Object, 
             CacheService = _cacheService.Object,
         };
@@ -54,7 +54,7 @@ public class EnterJobTitleCommandTests
         
         _cacheService.Setup(obj => obj.GetEntity<RegisterUserCache>(It.IsAny<long>())).ReturnsAsync(oldCache);
 
-        _context.Message = "поэт";
+        _context.UserMessage.Text ="поэт";
         
         await _command.OnMessage();
         

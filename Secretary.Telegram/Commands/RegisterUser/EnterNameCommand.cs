@@ -1,5 +1,6 @@
 ﻿using Secretary.Logging;
-using Secretary.Telegram.Commands.Caches;
+using Secretary.Telegram.Commands.Abstractions;
+using Secretary.Telegram.Commands.Caches.Documents;
 using Serilog;
 
 namespace Secretary.Telegram.Commands.RegisterUser;

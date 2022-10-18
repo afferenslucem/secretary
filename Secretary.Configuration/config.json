@@ -6,6 +6,9 @@
     "ClientSecret": "",
     "AllowedSenderDomains": []
   },
+  "JiraConfig":  {
+    "Host": ""
+  },
   "DbConnectionString": "",
   "TemplatesPath": "",
   "CalendarsPath": "",

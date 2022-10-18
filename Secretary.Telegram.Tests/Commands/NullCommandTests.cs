@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Secretary.Telegram.Commands;
+using Secretary.Telegram.Commands.Abstractions;
 using Secretary.Telegram.Sessions;
 
 namespace Secretary.Telegram.Tests.Commands;
@@ -15,19 +16,19 @@ public class NullCommandTests
     [SetUp]
     public void Setup()
     {
-        this._sessionStorage = new Mock<ISessionStorage>();
-        this._client = new Mock<ITelegramClient>();
+        _sessionStorage = new Mock<ISessionStorage>();
+        _client = new Mock<ITelegramClient>();
 
-        this._command = new NullCommand();
+        _command = new NullCommand();
         
-        this._context = new CommandContext()
+        _context = new CommandContext()
         { 
-            ChatId = 2517, 
-            SessionStorage = this._sessionStorage.Object, 
-            TelegramClient = this._client.Object,
+            UserMessage = new UserMessage { ChatId = 2517},
+            SessionStorage = _sessionStorage.Object, 
+            TelegramClient = _client.Object,
         };
         
-        this._command.Context = _context;
+        _command.Context = _context;
     }
 
     [Test]
@@ -43,9 +44,9 @@ public class NullCommandTests
 
         _command.Context = _context;
         
-        await this._command.Execute();
+        await _command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Извините, я не понял\nОтправьте команду"));
+        _client.Verify(target => target.SendMessage(2517, "Извините, я не понял\nОтправьте команду"));
     }
     
     [Test]
@@ -57,7 +58,7 @@ public class NullCommandTests
             .Setup(target => target.GetSession(It.IsAny<long>()))
             .ReturnsAsync(new Session(2517, lastCommand.Object));
         
-        await this._command.Execute();
+        await _command.Execute();
         
         lastCommand.Verify(target => target.OnMessage());
     }
@@ -71,7 +72,7 @@ public class NullCommandTests
             .Setup(target => target.GetSession(It.IsAny<long>()))
             .ReturnsAsync(new Session(2517, lastCommand.Object));
         
-        await this._command.Execute();
+        await _command.Execute();
         
         lastCommand.Verify(target => target.OnComplete(), Times.Once);
     }

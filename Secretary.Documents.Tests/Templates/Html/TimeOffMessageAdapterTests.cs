@@ -12,13 +12,13 @@ namespace Secretary.Documents.Tests.Templates.Html
         public void Setup()
         {
             DocumentTemplatesStorage.Initialize(Config.Instance.TemplatesPath);
-            this.Document = DocumentTemplatesStorage.Instance.GetTimeOffMessageTemplate();
+            Document = DocumentTemplatesStorage.Instance.GetTimeOffMessageTemplate();
         }
 
         [Test]
         public void ShouldCreateInstance()
         {
-            var adapter = new TimeOffMessageAdapter(this.Document);
+            var adapter = new TimeOffMessageAdapter(Document);
             
             Assert.Pass();
         }
@@ -26,11 +26,11 @@ namespace Secretary.Documents.Tests.Templates.Html
         [Test]
         public void ShouldSetJobTitle()
         {
-            var adapter = new TimeOffMessageAdapter(this.Document);
+            var adapter = new TimeOffMessageAdapter(Document);
             
             adapter.SetJobTitle("инженер-программист");
 
-            var node = this.Document.GetElementbyId("signature_job-title");
+            var node = Document.GetElementbyId("signature_job-title");
             
             Assert.That(node.InnerHtml, Is.EqualTo("инженер-программист"));
         }
@@ -38,11 +38,11 @@ namespace Secretary.Documents.Tests.Templates.Html
         [Test]
         public void ShouldSetPersonName()
         {
-            var adapter = new TimeOffMessageAdapter(this.Document);
+            var adapter = new TimeOffMessageAdapter(Document);
             
             adapter.SetPersonName("Александр Пушкин");
 
-            var node = this.Document.GetElementbyId("signature_name");
+            var node = Document.GetElementbyId("signature_name");
             
             Assert.That(node.InnerHtml, Is.EqualTo("Александр Пушкин"));
         }
@@ -50,11 +50,11 @@ namespace Secretary.Documents.Tests.Templates.Html
         [Test]
         public void ShouldSetTimeOffDateWithExtraPoint()
         {
-            var adapter = new TimeOffMessageAdapter(this.Document);
+            var adapter = new TimeOffMessageAdapter(Document);
             
             adapter.SetTimeOffPeriod("26.12.1825");
 
-            var node = this.Document.GetElementbyId("time-off_period");
+            var node = Document.GetElementbyId("time-off_period");
             
             Assert.That(node.InnerHtml, Is.EqualTo("Прошу предоставить отгул 26.12.1825."));
         }
@@ -62,11 +62,11 @@ namespace Secretary.Documents.Tests.Templates.Html
         [Test]
         public void ShouldSetTimeOffDateWithoutExtraPoint()
         {
-            var adapter = new TimeOffMessageAdapter(this.Document);
+            var adapter = new TimeOffMessageAdapter(Document);
             
             adapter.SetTimeOffPeriod("26.12.1825.");
 
-            var node = this.Document.GetElementbyId("time-off_period");
+            var node = Document.GetElementbyId("time-off_period");
             
             Assert.That(node.InnerHtml, Is.EqualTo("Прошу предоставить отгул 26.12.1825."));
         }
@@ -74,11 +74,11 @@ namespace Secretary.Documents.Tests.Templates.Html
         [Test]
         public void ShouldSetReasonWithExtraPoint()
         {
-            var adapter = new TimeOffMessageAdapter(this.Document);
+            var adapter = new TimeOffMessageAdapter(Document);
             
             adapter.SetReason("Нужно съездить на восстание");
 
-            var node = this.Document.GetElementbyId("time-off_reason");
+            var node = Document.GetElementbyId("time-off_reason");
             
             Assert.That(node.InnerHtml, Is.EqualTo("<br>Причина: Нужно съездить на восстание."));
         }
@@ -86,11 +86,11 @@ namespace Secretary.Documents.Tests.Templates.Html
         [Test]
         public void ShouldSetReasonWithoutExtraPoint()
         {
-            var adapter = new TimeOffMessageAdapter(this.Document);
+            var adapter = new TimeOffMessageAdapter(Document);
             
             adapter.SetReason("Нужно съездить на восстание.");
 
-            var node = this.Document.GetElementbyId("time-off_reason");
+            var node = Document.GetElementbyId("time-off_reason");
             
             Assert.That(node.InnerHtml, Is.EqualTo("<br>Причина: Нужно съездить на восстание."));
         }
@@ -98,11 +98,11 @@ namespace Secretary.Documents.Tests.Templates.Html
         [Test]
         public void ShouldSetReasonWithoutRedundantWhitespaces()
         {
-            var adapter = new TimeOffMessageAdapter(this.Document);
+            var adapter = new TimeOffMessageAdapter(Document);
             
             adapter.SetReason("Нужно   съездить на  восстание.");
 
-            var node = this.Document.GetElementbyId("time-off_reason");
+            var node = Document.GetElementbyId("time-off_reason");
             
             Assert.That(node.InnerHtml, Is.EqualTo("<br>Причина: Нужно съездить на восстание."));
         }
@@ -110,11 +110,11 @@ namespace Secretary.Documents.Tests.Templates.Html
         [Test]
         public void ShouldDeleteReasonIfSetNull()
         {
-            var adapter = new TimeOffMessageAdapter(this.Document);
+            var adapter = new TimeOffMessageAdapter(Document);
             
             adapter.SetReason(null);
 
-            var node = this.Document.GetElementbyId("time-off_reason");
+            var node = Document.GetElementbyId("time-off_reason");
             
             Assert.IsNull(node);
         }
@@ -122,11 +122,11 @@ namespace Secretary.Documents.Tests.Templates.Html
         [Test]
         public void ShouldSetWorkingOffWithExtraPoint()
         {
-            var adapter = new TimeOffMessageAdapter(this.Document);
+            var adapter = new TimeOffMessageAdapter(Document);
             
             adapter.SetWorkingOff("Отработаю в ссылке");
 
-            var node = this.Document.GetElementbyId("time-off_working-off");
+            var node = Document.GetElementbyId("time-off_working-off");
             
             Assert.That(node.InnerHtml, Is.EqualTo("<br>Отработаю в ссылке."));
         }
@@ -134,11 +134,11 @@ namespace Secretary.Documents.Tests.Templates.Html
         [Test]
         public void ShouldSetWorkingOffWithoutExtraPoint()
         {
-            var adapter = new TimeOffMessageAdapter(this.Document);
+            var adapter = new TimeOffMessageAdapter(Document);
             
             adapter.SetWorkingOff("Отработаю в ссылке.");
 
-            var node = this.Document.GetElementbyId("time-off_working-off");
+            var node = Document.GetElementbyId("time-off_working-off");
             
             Assert.That(node.InnerHtml, Is.EqualTo("<br>Отработаю в ссылке."));
         }
@@ -150,7 +150,7 @@ namespace Secretary.Documents.Tests.Templates.Html
             
             adapter.SetWorkingOff("отработаю в ссылке.");
 
-            var node = this.Document.GetElementbyId("time-off_working-off");
+            var node = Document.GetElementbyId("time-off_working-off");
             
             Assert.That(node.InnerHtml, Is.EqualTo("<br>Отработаю в ссылке."));
         }
@@ -158,11 +158,11 @@ namespace Secretary.Documents.Tests.Templates.Html
         [Test]
         public void ShouldDeleteWorkingOffIfSetNull()
         {
-            var adapter = new TimeOffMessageAdapter(this.Document);
+            var adapter = new TimeOffMessageAdapter(Document);
             
             adapter.SetWorkingOff(null);
 
-            var node = this.Document.GetElementbyId("time-off_working-off");
+            var node = Document.GetElementbyId("time-off_working-off");
             
             Assert.IsNull(node);
         }
@@ -170,7 +170,7 @@ namespace Secretary.Documents.Tests.Templates.Html
         [Test]
         public void ShouldSave()
         {
-            var adapter = new TimeOffMessageAdapter(this.Document);
+            var adapter = new TimeOffMessageAdapter(Document);
             
             var writer = new StringWriter();
             

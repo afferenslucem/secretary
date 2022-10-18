@@ -1,5 +1,6 @@
 ﻿using Secretary.Logging;
 using Secretary.Storage.Models;
+using Secretary.Telegram.Commands.Abstractions;
 using Serilog;
 
 namespace Secretary.Telegram.Commands;

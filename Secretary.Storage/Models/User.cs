@@ -32,6 +32,8 @@ namespace Secretary.Storage.Models
         [DefaultValue(false)]
         public bool RemindLogTime { get; set; }
         
+        [MaxLength(256)] public string? JiraPersonalAccessToken { get; set; }
+        
         public IEnumerable<Document> Documents = null;
 
         

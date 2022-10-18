@@ -1,5 +1,6 @@
 using Moq;
 using Secretary.Telegram.Commands;
+using Secretary.Telegram.Commands.Abstractions;
 using Secretary.Telegram.Sessions;
 using Secretary.Telegram.Wrappers;
 

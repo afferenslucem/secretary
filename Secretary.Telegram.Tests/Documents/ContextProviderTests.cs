@@ -1,6 +1,6 @@
-using Secretary.Telegram.Commands.Distant;
-using Secretary.Telegram.Commands.TimeOff;
-using Secretary.Telegram.Commands.Vacation;
+using Secretary.Telegram.Commands.Documents.Distant;
+using Secretary.Telegram.Commands.Documents.TimeOff;
+using Secretary.Telegram.Commands.Documents.Vacation;
 using Secretary.Telegram.Documents;
 
 namespace Secretary.Telegram.Tests.Documents;

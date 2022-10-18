@@ -1,3 +1,5 @@
+using Secretary.Telegram.Commands.Abstractions;
+
 namespace Secretary.Telegram.Commands.Executors;
 
 public class CommandExecutor
@@ -8,7 +10,7 @@ public class CommandExecutor
     {
         Command = command;
 
-        this.Command.Context = context;
+        Command.Context = context;
     }
 
     public Task Execute()

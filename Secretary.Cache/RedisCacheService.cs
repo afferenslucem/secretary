@@ -83,7 +83,7 @@ public class RedisCacheService : ICacheService
     {
         try
         {
-            _logger.Debug($"Delete entity {typeof(T).Name}:{key}");
+            _logger.Debug($"Delete entity {typeof(T)}:{key}");
 
             var db = _connectionMultiplexer.GetDatabase();
 

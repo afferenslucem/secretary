@@ -4,7 +4,7 @@ using Secretary.Storage;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
-using Secretary.Telegram.Commands.Caches;
+using Secretary.Telegram.Commands.Caches.Documents;
 using Secretary.Telegram.Commands.RegisterMail;
 using Secretary.Telegram.Sessions;
 using Secretary.Yandex.Authentication;
@@ -25,25 +25,25 @@ public class EnterCodeCommandTests
     [SetUp]
     public void Setup()
     {
-        this._client = new Mock<ITelegramClient>();
-        this._userStorage = new Mock<IUserStorage>();
-        this._sessionStorage = new Mock<ISessionStorage>();
-        this._yandexAuthenticator = new Mock<IYandexAuthenticator>();
-        this._cacheService = new Mock<ICacheService>();
+        _client = new Mock<ITelegramClient>();
+        _userStorage = new Mock<IUserStorage>();
+        _sessionStorage = new Mock<ISessionStorage>();
+        _yandexAuthenticator = new Mock<IYandexAuthenticator>();
+        _cacheService = new Mock<ICacheService>();
 
-        this._context = new CommandContext()
+        _context = new CommandContext()
         {
-            ChatId = 2517, 
-            TelegramClient = this._client.Object, 
+            UserMessage = new UserMessage { ChatId = 2517},
+            TelegramClient = _client.Object, 
             YandexAuthenticator = _yandexAuthenticator.Object, 
             UserStorage = _userStorage.Object,
             SessionStorage = _sessionStorage.Object,
             CacheService = _cacheService.Object,
         };
 
-        this._command = new EnterCodeCommand();
+        _command = new EnterCodeCommand();
         
-        this._command.Context = _context;
+        _command.Context = _context;
     }
     
     [Test]
@@ -60,9 +60,9 @@ public class EnterCodeCommandTests
         _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TokenData() { access_token = "token"});
         
-        await this._command.Execute();
+        await _command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Пожалуйста, <strong>УБЕДИТЕСЬ</strong>, что вы авторизуетесь в рабочей почте!\n" +
+        _client.Verify(target => target.SendMessage(2517, "Пожалуйста, <strong>УБЕДИТЕСЬ</strong>, что вы авторизуетесь в рабочей почте!\n" +
                                                               "Введите этот код: <code>code</code> в поле ввода по этой ссылке: url. Регистрация может занять пару минут."));
     }
         
@@ -73,9 +73,9 @@ public class EnterCodeCommandTests
             .Setup(target => target.GetAuthenticationCode(It.IsAny<CancellationToken>()))
             .ThrowsAsync(new YandexAuthenticationException());
         
-        await this._command.Execute();
+        await _command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, 
+        _client.Verify(target => target.SendMessage(2517, 
             "При запросе токена для авторизации произошла ошибка:(\n" +
             "Попробуйте через пару минут, если не сработает, то обратитесь по вот этому адресу @hrodveetnir"));
     }
@@ -107,9 +107,9 @@ public class EnterCodeCommandTests
         _yandexAuthenticator.Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TokenData() { access_token = "token"});
         
-        await this._command.Execute();
+        await _command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Ура, токен для почты получен!"));
+        _client.Verify(target => target.SendMessage(2517, "Ура, токен для почты получен!"));
     }
     
     [Test]
@@ -137,7 +137,7 @@ public class EnterCodeCommandTests
         _cacheService.Setup(target => target.GetEntity<RegisterMailCache>(It.IsAny<long>()))
             .ReturnsAsync(new RegisterMailCache("a.pushkin@infinnity.ru"));
         
-        await this._command.Execute();
+        await _command.Execute();
         
         _userStorage.Verify(target => target.SetUser(It.Is<User>(
             user => user.ChatId == 2517 
@@ -147,7 +147,7 @@ public class EnterCodeCommandTests
                     && user.Email == "a.pushkin@infinnity.ru"
         )));
         
-        this._cacheService.Verify(target => target.DeleteEntity<RegisterMailCache>(2517), Times.Once);
+        _cacheService.Verify(target => target.DeleteEntity<RegisterMailCache>(2517), Times.Once);
     }
     
         
@@ -172,7 +172,7 @@ public class EnterCodeCommandTests
         _cacheService.Setup(target => target.GetEntity<RegisterMailCache>(It.IsAny<long>()))
             .ReturnsAsync(new RegisterMailCache("a.pushkin@infinnity.ru"));
         
-        await this._command.Execute();
+        await _command.Execute();
         
         _userStorage.Verify(target => target.SetUser(It.Is<User>(
             user => user.ChatId == 2517 
@@ -198,9 +198,9 @@ public class EnterCodeCommandTests
             .Setup(target =>  target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new YandexAuthenticationException());
         
-        await this._command.Execute();
+        await _command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, 
+        _client.Verify(target => target.SendMessage(2517, 
             "При запросе токена для авторизации произошла ошибка:(\n" +
             "Попробуйте через пару минут, если не сработает, то обратитесь по вот этому адресу @hrodveetnir"));
     }

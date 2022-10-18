@@ -4,7 +4,7 @@ using Secretary.Storage;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
-using Secretary.Telegram.Commands.Caches;
+using Secretary.Telegram.Commands.Caches.Documents;
 using Secretary.Telegram.Commands.RegisterMail;
 using Secretary.Telegram.Sessions;
 using Secretary.Yandex.Authentication;
@@ -24,25 +24,25 @@ public class RegisterMailCommandTests
     [SetUp]
     public void Setup()
     {
-        this._client = new Mock<ITelegramClient>();
-        this._userStorage = new Mock<IUserStorage>();
-        this._sessionStorage = new Mock<ISessionStorage>();
-        this._yandexAuthenticator = new Mock<IYandexAuthenticator>();
-        this._cacheService = new Mock<ICacheService>();
+        _client = new Mock<ITelegramClient>();
+        _userStorage = new Mock<IUserStorage>();
+        _sessionStorage = new Mock<ISessionStorage>();
+        _yandexAuthenticator = new Mock<IYandexAuthenticator>();
+        _cacheService = new Mock<ICacheService>();
 
-        this._context = new CommandContext()
+        _context = new CommandContext()
         {
-            ChatId = 2517, 
-            TelegramClient = this._client.Object, 
+            UserMessage = new UserMessage { ChatId = 2517},
+            TelegramClient = _client.Object, 
             YandexAuthenticator = _yandexAuthenticator.Object, 
             UserStorage = _userStorage.Object,
             SessionStorage = _sessionStorage.Object, 
             CacheService = _cacheService.Object,
         };
 
-        this._command = new RegisterMailCommand();
+        _command = new RegisterMailCommand();
         
-        this._command.Context = _context;
+        _command.Context = _context;
     }
 
     [Test]
@@ -63,7 +63,7 @@ public class RegisterMailCommandTests
         _yandexAuthenticator.Setup(target => target.IsUserDomainAllowed(It.IsAny<string>())).Returns(true);
         _userStorage.Setup(target => target.GetUser(2517)).ReturnsAsync(() => new User() {Name = "Александр Пушкин"} );
         
-        _context.Message = "/registermail";
+        _context.UserMessage.Text ="/registermail";
         await _command.Execute();
         
         _yandexAuthenticator
@@ -73,7 +73,7 @@ public class RegisterMailCommandTests
             .Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TokenData() { access_token = "access", refresh_token = "refresh"});
         
-        _context.Message = "a.pushkin@infinnity.ru";
+        _context.UserMessage.Text ="a.pushkin@infinnity.ru";
         
         _cacheService.Setup(target => target.GetEntity<RegisterMailCache>(It.IsAny<long>()))
             .ReturnsAsync(new RegisterMailCache("a.pushkin@infinnity.ru"));
@@ -95,10 +95,10 @@ public class RegisterMailCommandTests
     {
         _userStorage.Setup(target => target.GetUser(2517)).ReturnsAsync(() => new User());
         
-        _context.Message = "/registermail";
+        _context.UserMessage.Text ="/registermail";
         await _command.Execute();
 
-        _context.Message = "a.pushkin";
+        _context.UserMessage.Text ="a.pushkin";
 
         await _command.OnMessage();
         _client.Verify(target => target.SendMessage(2517, "Некорректный формат почты. Введите почту еще раз"));
@@ -110,12 +110,12 @@ public class RegisterMailCommandTests
         _yandexAuthenticator.Setup(target => target.IsUserDomainAllowed(It.IsAny<string>())).Returns(true);
         _userStorage.Setup(target => target.GetUser(2517)).ReturnsAsync(() => new User());
         
-        _context.Message = "/registermail";
+        _context.UserMessage.Text ="/registermail";
         await _command.Execute();
         
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
 
-        _context.Message = "a.pushkin";
+        _context.UserMessage.Text ="a.pushkin";
 
         await _command.OnMessage();
         
@@ -129,7 +129,7 @@ public class RegisterMailCommandTests
             .Setup(target => target.CheckToken(It.IsAny<AuthenticationData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TokenData() { access_token = "access", refresh_token = "refresh"});
         
-        _context.Message = "a.pushkin@infinnity.ru";
+        _context.UserMessage.Text ="a.pushkin@infinnity.ru";
         
         _cacheService.Setup(target => target.GetEntity<RegisterMailCache>(It.IsAny<long>()))
             .ReturnsAsync(new RegisterMailCache("a.pushkin@infinnity.ru"));

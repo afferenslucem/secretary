@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Secretary.Telegram.Commands;
+using Secretary.Telegram.Commands.Abstractions;
 using Secretary.Telegram.Sessions;
 
 namespace Secretary.Telegram.Tests.Commands;
@@ -15,19 +16,19 @@ public class CancelCommandTests
     [SetUp]
     public void Setup()
     {
-        this._sessionStorage = new Mock<ISessionStorage>();
-        this._client = new Mock<ITelegramClient>();
+        _sessionStorage = new Mock<ISessionStorage>();
+        _client = new Mock<ITelegramClient>();
 
-        this._command = new CancelCommand();
+        _command = new CancelCommand();
         
-        this._context = new CommandContext()
+        _context = new CommandContext()
         { 
-            ChatId = 2517, 
-            SessionStorage = this._sessionStorage.Object, 
-            TelegramClient = this._client.Object,
+            UserMessage = new UserMessage { ChatId = 2517},
+            SessionStorage = _sessionStorage.Object, 
+            TelegramClient = _client.Object,
         };
 
-        this._command.Context = _context;
+        _command.Context = _context;
     }
 
     [Test]
@@ -43,10 +44,10 @@ public class CancelCommandTests
         var session = new Session(2517, commandMock.Object);
         _sessionStorage.Setup(target => target.GetSession(It.IsAny<long>())).ReturnsAsync(session);
         
-        await this._command.Execute();
+        await _command.Execute();
         
         commandMock.Verify(target => target.OnForceComplete());
-        this._client.Verify(target => target.SendMessage(2517, "Дальнейшее выполнение команды прервано"));
+        _client.Verify(target => target.SendMessage(2517, "Дальнейшее выполнение команды прервано"));
     }
     
     [Test]
@@ -56,7 +57,7 @@ public class CancelCommandTests
         var session = new Session(2517, commandMock.Object);
         _sessionStorage.Setup(target => target.GetSession(It.IsAny<long>())).ReturnsAsync(session);
         
-        await this._command.Execute();
+        await _command.Execute();
         
         commandMock.Verify(target => target.Cancel(), Times.Once);
     }

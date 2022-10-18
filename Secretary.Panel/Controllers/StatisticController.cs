@@ -17,8 +17,8 @@ public class StatisticController : ControllerBase
     {
         var result = new Statistic();
 
-        result.DocumentStatistic = await this.GetDocumentStatistic();
-        result.UserStatistic = await this.GetUserStatistic();
+        result.DocumentStatistic = await GetDocumentStatistic();
+        result.UserStatistic = await GetUserStatistic();
 
         return result;
     }

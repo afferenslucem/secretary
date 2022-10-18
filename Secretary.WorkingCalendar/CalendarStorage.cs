@@ -19,7 +19,7 @@ public class CalendarStorage
 
     private static Calendar? GetFromCache(int year)
     {
-        _logger.Debug("Try find calendar {year} in cache");
+        _logger.Debug($"Try find calendar {year} in cache");
         
         Calendar? result;
 

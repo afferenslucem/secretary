@@ -11,8 +11,12 @@ namespace Secretary.Telegram.Commands;
 
 public class CommandContext
 {
-    public long ChatId;
-    public string TelegramUserName;
+    public long ChatId => UserMessage.ChatId;
+    public string TelegramUserName => UserMessage.From;
+    public string Message => UserMessage.Text;
+    public int? CallbackMessageId => UserMessage.CallbackMessageId;
+
+    public UserMessage UserMessage = null!;
 
     public ITelegramClient TelegramClient = null!;
 
@@ -32,11 +36,8 @@ public class CommandContext
     
     public ICacheService CacheService = null!;
 
-    public string Message = null!;
-
     public CommandContext(
-        long chatId, 
-        string telegramUserName, 
+        UserMessage userMessage,
         ITelegramClient telegramClient, 
         ISessionStorage sessionStorage, 
         IUserStorage userStorage, 
@@ -45,11 +46,9 @@ public class CommandContext
         IEventLogStorage eventLogStorage,
         IYandexAuthenticator yandexAuthenticator, 
         IMailSender mailSender, 
-        ICacheService cacheService,
-        string message)
+        ICacheService cacheService)
     {
-        ChatId = chatId;
-        TelegramUserName = telegramUserName;
+        UserMessage = userMessage;
         TelegramClient = telegramClient;
         SessionStorage = sessionStorage;
         UserStorage = userStorage;
@@ -59,7 +58,6 @@ public class CommandContext
         MailSender = mailSender;
         EventLogStorage = eventLogStorage;
         CacheService = cacheService;
-        Message = message;
     }
     
     /**

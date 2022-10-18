@@ -11,7 +11,7 @@ public class DocumentAdapter : IDisposable
 
     public DocumentAdapter(DocX document)
     {
-        this.Document = document;
+        Document = document;
     }
 
     public void SetJobTitle(string value)
@@ -31,7 +31,7 @@ public class DocumentAdapter : IDisposable
 
     public void SaveAs(string name)
     {
-        this.Document.SaveAs(name);
+        Document.SaveAs(name);
     }
 
     public void Dispose()
@@ -41,7 +41,7 @@ public class DocumentAdapter : IDisposable
 
     protected void SetValue(string placeholder, string? value)
     {
-        var target = this.Document.Paragraphs.FirstOrDefault(paragraph => paragraph.Text.Contains(placeholder));
+        var target = Document.Paragraphs.FirstOrDefault(paragraph => paragraph.Text.Contains(placeholder));
 
         if (target == null)
         {

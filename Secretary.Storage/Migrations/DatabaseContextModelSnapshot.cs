@@ -113,6 +113,10 @@ namespace Secretary.Storage.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
+                    b.Property<string>("JiraPersonalAccessToken")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
                     b.Property<string>("JobTitle")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");

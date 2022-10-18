@@ -1,3 +1,4 @@
+using System.Text;
 using Secretary.Logging;
 using Serilog;
 using Telegram.Bot;
@@ -52,6 +53,8 @@ public class TelegramClient: ITelegramClient
     
     Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
+        _logger.Debug($"Handle {update.Type}");
+        
         LastCheckTime = DateTime.UtcNow;
 
         var botMessage = GetMessageFromUpdate(update);
@@ -65,7 +68,7 @@ public class TelegramClient: ITelegramClient
         return task ?? Task.CompletedTask;
     }
 
-    private BotMessage? GetMessageFromUpdate(Update update)
+    private UserMessage? GetMessageFromUpdate(Update update)
     {
         var message = update.Message;
 
@@ -73,16 +76,17 @@ public class TelegramClient: ITelegramClient
         {
             var user = message.From!;
             var username = user.Username ?? string.Join(' ', user.FirstName, user.LastName);
-            return new BotMessage(message.Chat.Id, username, message.Text);
+            
+            return new UserMessage(message.Chat.Id, username, message.Text, messageId: message.MessageId);
         }
 
         var callback = update.CallbackQuery;
 
-        if (callback?.Data != null)
+        if (callback?.Data != null && callback.Message != null)
         {
             var user = callback.From;
             var username = user.Username ?? string.Join(' ', user.FirstName, user.LastName);
-            return new BotMessage(callback.From.Id, username, callback.Data);
+            return new UserMessage(callback.From.Id, username, callback.Data, callback.Message.MessageId);
         }
 
         return null;
@@ -101,7 +105,7 @@ public class TelegramClient: ITelegramClient
         return Task.CompletedTask;
     }
     
-    public Task SendMessage(
+    public Task<Message> SendMessage(
         long chatId, 
         string message
     ) {
@@ -114,7 +118,21 @@ public class TelegramClient: ITelegramClient
         );
     }
     
-    public Task SendMessage(
+    public Task EditMessage(
+        long chatId, 
+        int messageId, 
+        string message
+    ) {
+        return _botClient.EditMessageTextAsync(
+            chatId,
+            messageId,
+            message, 
+            cancellationToken: _cancellationToken, 
+            parseMode: ParseMode.Html
+        );
+    }
+    
+    public Task<Message> SendMessage(
         long chatId, 
         string message, 
         ReplyKeyboardMarkup replyMarkup
@@ -131,7 +149,7 @@ public class TelegramClient: ITelegramClient
         );
     }
     
-    public Task SendMessage(
+    public Task<Message> SendMessage(
         long chatId, 
         string message,
         InlineKeyboardMarkup inlineKeyboardMarkup
@@ -141,6 +159,35 @@ public class TelegramClient: ITelegramClient
             message, 
             cancellationToken: _cancellationToken, 
             parseMode: ParseMode.Html, 
+            replyMarkup: inlineKeyboardMarkup
+        );
+    }
+    
+    public Task EditMessage(
+        long chatId, 
+        int messageId, 
+        string message,
+        InlineKeyboardMarkup replyMarkup
+    ) {
+        return _botClient.EditMessageTextAsync(
+            chatId,
+            messageId,
+            message, 
+            replyMarkup: replyMarkup,
+            cancellationToken: _cancellationToken, 
+            parseMode: ParseMode.Html
+        );
+    }
+    
+    public Task EditMessageKeyboard(
+        long chatId, 
+        int messageId,
+        InlineKeyboardMarkup inlineKeyboardMarkup
+    ) {
+        return _botClient.EditMessageReplyMarkupAsync(
+            chatId,
+            messageId, 
+            cancellationToken: _cancellationToken, 
             replyMarkup: inlineKeyboardMarkup
         );
     }
@@ -156,12 +203,17 @@ public class TelegramClient: ITelegramClient
 
     public async Task SendSticker(long chatId, string stickerId)
     {
-        await _botClient.SendStickerAsync(chatId, new InputOnlineFile(stickerId));
+        await _botClient.SendStickerAsync(chatId, new InputOnlineFile(stickerId), cancellationToken: _cancellationToken);
+    }
+
+    public Task DeleteMessage(long chatId, int messageId)
+    {
+        return _botClient.DeleteMessageAsync(chatId, messageId, cancellationToken: _cancellationToken);
     }
 
     private ValueTask SaveLifeTime(ITelegramBotClient client, ApiResponseEventArgs e, CancellationToken token)
     {
-        this.LastCheckTime = DateTime.UtcNow;
+        LastCheckTime = DateTime.UtcNow;
         
         _logger.Debug("Received answer");
         

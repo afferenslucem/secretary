@@ -4,7 +4,7 @@ using Secretary.Storage;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
-using Secretary.Telegram.Commands.Caches;
+using Secretary.Telegram.Commands.Caches.Documents;
 using Secretary.Telegram.Commands.RegisterUser;
 using Secretary.Telegram.Sessions;
 
@@ -22,22 +22,22 @@ public class RegisterUserCommandTests
     [SetUp]
     public void Setup()
     {
-        this._client = new Mock<ITelegramClient>();
-        this._userStorage = new Mock<IUserStorage>();
-        this._cacheService = new Mock<ICacheService>();
-        this._sessionStorage = new Mock<ISessionStorage>();
+        _client = new Mock<ITelegramClient>();
+        _userStorage = new Mock<IUserStorage>();
+        _cacheService = new Mock<ICacheService>();
+        _sessionStorage = new Mock<ISessionStorage>();
 
-        this._context = new CommandContext()
+        _context = new CommandContext()
         {
-            ChatId = 2517, 
-            TelegramClient = this._client.Object, 
+            UserMessage = new UserMessage { ChatId = 2517},
+            TelegramClient = _client.Object, 
             SessionStorage = _sessionStorage.Object, 
             UserStorage = _userStorage.Object,
             CacheService = _cacheService.Object,
         };
 
-        this._command = new RegisterUserCommand();
-        this._command.Context = _context;
+        _command = new RegisterUserCommand();
+        _command.Context = _context;
     }
 
     [Test]
@@ -57,9 +57,9 @@ public class RegisterUserCommandTests
     {
         _sessionStorage.Setup(obj => obj.SaveSession(It.IsAny<long>(), It.IsAny<Session>()));
 
-        await this._command.Execute();
+        await _command.Execute();
         
-        this._sessionStorage.Verify(target => target.SaveSession(2517, It.Is<Session>(session => session.ChatId == 2517 && session.LastCommand == _command)));
+        _sessionStorage.Verify(target => target.SaveSession(2517, It.Is<Session>(session => session.ChatId == 2517 && session.LastCommand == _command)));
     }
 
     [Test]
@@ -68,16 +68,16 @@ public class RegisterUserCommandTests
         _cacheService.Setup(obj => obj.GetEntity<RegisterUserCache>(It.IsAny<long>())).ReturnsAsync(new RegisterUserCache());
         _userStorage.Setup(target => target.GetUser(2517)).ReturnsAsync(() => new User());
         
-        _context.Message = "/registeruser";
+        _context.UserMessage.Text ="/registeruser";
         await _command.Execute();
         
-        _context.Message = "Александр Пушкин";
+        _context.UserMessage.Text ="Александр Пушкин";
         await _command.OnMessage();
 
-        _context.Message = "Пушкина Александра Сергеевича";
+        _context.UserMessage.Text ="Пушкина Александра Сергеевича";
         await _command.OnMessage();
 
-        _context.Message = "поэт";
+        _context.UserMessage.Text ="поэт";
         await _command.OnMessage();
         
         var oldCache = new RegisterUserCache
@@ -90,7 +90,7 @@ public class RegisterUserCommandTests
         _cacheService.Setup(obj => obj.GetEntity<RegisterUserCache>(It.IsAny<long>())).ReturnsAsync(oldCache);
         
         _sessionStorage.Verify(target => target.DeleteSession(2517), Times.Never);
-        _context.Message = "поэта";
+        _context.UserMessage.Text ="поэта";
         
         await _command.OnMessage();
         await _command.OnComplete();

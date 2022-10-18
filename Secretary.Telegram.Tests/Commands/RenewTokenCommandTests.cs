@@ -35,7 +35,7 @@ public class RenewTokenCommandTests
 
         _context = new CommandContext()
         {
-            ChatId = 2517, 
+            UserMessage = new UserMessage { ChatId = 2517},
             TelegramClient = _client.Object, 
             YandexAuthenticator = _yandexAuthenticator.Object, 
             UserStorage = _userStorage.Object,

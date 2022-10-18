@@ -53,4 +53,20 @@ public class Calendar
 
         return day ?? new Day() { FullDate = date };
     }
+
+    public int GetWorkingDays(DateOnly firstDate, DateOnly lastDate)
+    {
+        var firstDT = firstDate.ToDateTime(TimeOnly.MinValue);
+        var lastDT = lastDate.ToDateTime(TimeOnly.MinValue);
+        
+        var days = Enumerable.Range(0, lastDT.Subtract(firstDT).Days + 1)
+            .Select(offset => firstDT.AddDays(offset))
+            .Select(dt => DateOnly.FromDateTime(dt))
+            .Select(date => FindOrCreate(date))
+            .ToArray();
+
+        var count = days.Count(day => day.IsWorkingDay());
+
+        return count;
+    }
 }

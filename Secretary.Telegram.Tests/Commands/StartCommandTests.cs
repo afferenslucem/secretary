@@ -26,8 +26,7 @@ public class StartCommandTests
 
         _context = new CommandContext()
         {
-            ChatId = 2517,
-            TelegramUserName = "pushkin",
+            UserMessage = new UserMessage { ChatId = 2517, From = "pushkin" },
             TelegramClient = _client.Object,
             SessionStorage = _sessionStorage.Object,
             UserStorage = _userStorage.Object,

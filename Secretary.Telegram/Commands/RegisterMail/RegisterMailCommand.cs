@@ -1,4 +1,6 @@
-﻿namespace Secretary.Telegram.Commands.RegisterMail
+﻿using Secretary.Telegram.Commands.Abstractions;
+
+namespace Secretary.Telegram.Commands.RegisterMail
 ;
 
 public class RegisterMailCommand: StatedCommand

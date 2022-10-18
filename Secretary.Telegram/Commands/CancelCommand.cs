@@ -1,4 +1,5 @@
 ﻿using Secretary.Logging;
+using Secretary.Telegram.Commands.Abstractions;
 using Secretary.Telegram.Commands.Executors;
 using Serilog;
 
@@ -23,7 +24,6 @@ public class CancelCommand: Command
         await new CommandExecutor(session.LastCommand, Context).Cancel();
 
         await TelegramClient.SendMessage("Дальнейшее выполнение команды прервано");
-
 
         await new CommandExecutor(session.LastCommand, Context).OnForceComplete();
         

@@ -4,6 +4,7 @@ using Secretary.Logging;
 using Secretary.Storage;
 using Secretary.Telegram.chains;
 using Secretary.Telegram.Commands;
+using Secretary.Telegram.Commands.Abstractions;
 using Secretary.Telegram.Commands.ExceptionHandlers;
 using Secretary.Telegram.Commands.Executors;
 using Secretary.Telegram.Exceptions;
@@ -54,9 +55,9 @@ public class TelegramBot
         _telegramClient.OnMessage += WorkWithMessage;
     }
 
-    public async Task WorkWithMessage(BotMessage message)
+    public async Task WorkWithMessage(UserMessage message)
     {
-        var command = Chain.Get(message.Text)!;
+        var command = Chain.Get(message.CommandText)!;
 
         ReceivedMessages++;
         
@@ -65,8 +66,7 @@ public class TelegramBot
             LogCommand(command, $"{message.ChatId}: execute command {command.GetType().Name}");
 
             var context = new CommandContext(
-                message.ChatId,
-                message.From,
+                message,
                 _telegramClient,
                 _sessionStorage,
                 _database.UserStorage,
@@ -75,8 +75,7 @@ public class TelegramBot
                 _database.EventLogStorage,
                 _yandexAuthenticator,
                 _mailSender,
-                _cacheService,
-                message.Text
+                _cacheService
             );
 
             await new CommandExecutor(command, context).Execute();

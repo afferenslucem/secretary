@@ -4,7 +4,7 @@ using Secretary.Storage;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram.Commands;
-using Secretary.Telegram.Commands.Caches;
+using Secretary.Telegram.Commands.Caches.Documents;
 using Secretary.Telegram.Commands.RegisterUser;
 
 namespace Secretary.Telegram.Tests.Commands.RegisterUser;
@@ -21,30 +21,30 @@ public class EnterJobTitleGenitiveCommandTests
     [SetUp]
     public void Setup()
     {
-        this._client = new Mock<ITelegramClient>();
+        _client = new Mock<ITelegramClient>();
 
-        this._command = new EnterJobTitleGenitiveCommand();
+        _command = new EnterJobTitleGenitiveCommand();
         
-        this._userStorage = new Mock<IUserStorage>();
-        this._cacheService = new Mock<ICacheService>();
+        _userStorage = new Mock<IUserStorage>();
+        _cacheService = new Mock<ICacheService>();
 
-        this._context = new CommandContext()
+        _context = new CommandContext()
         { 
-            ChatId = 2517, 
+            UserMessage = new UserMessage { ChatId = 2517},
             TelegramClient = _client.Object, 
             UserStorage = _userStorage.Object,
             CacheService = _cacheService.Object,
         };
         
-        this._command.Context = _context;
+        _command.Context = _context;
     }
     
     [Test]
     public async Task ShouldSendJobTitleGenitiveCommand()
     {
-        await this._command.Execute();
+        await _command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Введите вашу должность в родительном падеже.\n" +
+        _client.Verify(target => target.SendMessage(2517, "Введите вашу должность в родительном падеже.\n" +
                                                               "Так она будут указана в графе \"от кого\".\n" +
                                                               @"Например: От <i>поэта</i> Пушкина Александра Сергеевича"));
     }
@@ -62,11 +62,11 @@ public class EnterJobTitleGenitiveCommandTests
         _cacheService.Setup(obj => obj.GetEntity<RegisterUserCache>(It.IsAny<long>())).ReturnsAsync(oldCache);
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync((User?)null);
 
-        _context.Message = "поэта";
+        _context.UserMessage.Text ="поэта";
         
-        await this._command.OnMessage();
+        await _command.OnMessage();
         
-        this._userStorage.Verify(target => target.SetUser(
+        _userStorage.Verify(target => target.SetUser(
             It.Is<User>(user => user.ChatId == 2517 
                                 && user.Name == "Александр Пушкин"
                                 && user.NameGenitive == "Пушкина Александра Сергеевича" 
@@ -75,9 +75,9 @@ public class EnterJobTitleGenitiveCommandTests
             )
         ));
         
-        this._client.Verify(target => target.SendMessage(2517, "Ваш пользователь успешно сохранен"));
+        _client.Verify(target => target.SendMessage(2517, "Ваш пользователь успешно сохранен"));
         
-        this._cacheService.Verify(target => target.DeleteEntity<RegisterUserCache>(2517));
+        _cacheService.Verify(target => target.DeleteEntity<RegisterUserCache>(2517));
     }
     
     [Test]
@@ -101,11 +101,11 @@ public class EnterJobTitleGenitiveCommandTests
         };
         _userStorage.Setup(target => target.GetUser(It.IsAny<long>())).ReturnsAsync((User?)null);
 
-        _context.Message = "поэта";
+        _context.UserMessage.Text ="поэта";
         
-        await this._command.OnMessage();
+        await _command.OnMessage();
         
-        this._userStorage.Verify(target => target.SetUser(
+        _userStorage.Verify(target => target.SetUser(
             It.Is<User>(user => user.ChatId == 2517 
                                 && user.Name == "Александр Пушкин"
                                 && user.NameGenitive == "Пушкина Александра Сергеевича" 
@@ -114,8 +114,8 @@ public class EnterJobTitleGenitiveCommandTests
             )
         ));
         
-        this._client.Verify(target => target.SendMessage(2517, "Ваш пользователь успешно сохранен"));
+        _client.Verify(target => target.SendMessage(2517, "Ваш пользователь успешно сохранен"));
         
-        this._cacheService.Verify(target => target.DeleteEntity<RegisterUserCache>(2517));
+        _cacheService.Verify(target => target.DeleteEntity<RegisterUserCache>(2517));
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Secretary.Logging;
 using Secretary.Storage.Models;
-using Secretary.Telegram.Commands.Caches;
+using Secretary.Telegram.Commands.Abstractions;
+using Secretary.Telegram.Commands.Caches.Documents;
 using Secretary.Telegram.Exceptions;
 using Serilog;
 

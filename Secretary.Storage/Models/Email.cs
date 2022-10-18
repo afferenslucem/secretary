@@ -38,7 +38,7 @@ namespace Secretary.Storage.Models
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((Email)obj);
         }
 
@@ -49,7 +49,7 @@ namespace Secretary.Storage.Models
 
         public MailAddress ToMailAddress()
         {
-            return new MailAddress(this.Address, this.DisplayName);
+            return new MailAddress(Address, DisplayName);
         }
     }
 }

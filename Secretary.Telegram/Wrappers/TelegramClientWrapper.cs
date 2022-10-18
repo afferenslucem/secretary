@@ -1,3 +1,4 @@
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Secretary.Telegram.Wrappers;
@@ -13,14 +14,14 @@ public class TelegramClientWrapper
         _telegramClient = telegramClient;
     }
 
-    public Task SendMessage(
+    public Task<Message> SendMessage(
         string message
     )
     {
         return _telegramClient.SendMessage(_chatId, message);
     }
 
-    public Task SendMessage(
+    public Task<Message> SendMessage(
         string message, 
         ReplyKeyboardMarkup replyMarkup
     )
@@ -28,7 +29,7 @@ public class TelegramClientWrapper
         return _telegramClient.SendMessage(_chatId, message, replyMarkup);
     }
 
-    public Task SendMessage(
+    public Task<Message> SendMessage(
         string message, 
         InlineKeyboardMarkup inlineKeyboardMarkup
     )
@@ -44,5 +45,17 @@ public class TelegramClientWrapper
     public Task SendSticker(string stickerId)
     {
         return _telegramClient.SendSticker(_chatId, stickerId);
+    }
+    public Task DeleteMessage(int messageId)
+    {
+        return _telegramClient.DeleteMessage(_chatId, messageId);
+    }
+    public Task EditMessage(int messageId, string text)
+    {
+        return _telegramClient.EditMessage(_chatId, messageId, text);
+    }
+    public Task EditMessage(int messageId, string text, InlineKeyboardMarkup markup)
+    {
+        return _telegramClient.EditMessage(_chatId, messageId, text, markup);
     }
 }

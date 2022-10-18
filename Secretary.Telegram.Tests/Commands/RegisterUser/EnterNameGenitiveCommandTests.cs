@@ -1,7 +1,7 @@
 ﻿using Moq;
 using Secretary.Cache;
 using Secretary.Telegram.Commands;
-using Secretary.Telegram.Commands.Caches;
+using Secretary.Telegram.Commands.Caches.Documents;
 using Secretary.Telegram.Commands.RegisterUser;
 
 namespace Secretary.Telegram.Tests.Commands.RegisterUser;
@@ -17,28 +17,28 @@ public class EnterNameGenitiveCommandTests
     [SetUp]
     public void Setup()
     {
-        this._client = new Mock<ITelegramClient>();
+        _client = new Mock<ITelegramClient>();
 
-        this._command = new EnterNameGenitiveCommand();
+        _command = new EnterNameGenitiveCommand();
         
-        this._cacheService = new Mock<ICacheService>();
+        _cacheService = new Mock<ICacheService>();
 
-        this._context = new CommandContext()
+        _context = new CommandContext()
         { 
-            ChatId = 2517, 
-            TelegramClient = this._client.Object, 
-            CacheService = this._cacheService.Object,
+            UserMessage = new UserMessage { ChatId = 2517},
+            TelegramClient = _client.Object, 
+            CacheService = _cacheService.Object,
         };
         
-        this._command.Context = _context;
+        _command.Context = _context;
     }
     
     [Test]
     public async Task ShouldSendExample()
     {
-        await this._command.Execute();
+        await _command.Execute();
         
-        this._client.Verify(target => target.SendMessage(2517, "Введите ваши ФИО в родительном падеже.\n" +
+        _client.Verify(target => target.SendMessage(2517, "Введите ваши ФИО в родительном падеже.\n" +
                                                                "Так они будут указаны в отправляемом документе в графе \"от кого\".\n" +
                                                                @"Например: От <i>Пушкина Александра Сергеевича</i>"));
     }
@@ -53,13 +53,13 @@ public class EnterNameGenitiveCommandTests
         
         _cacheService.Setup(obj => obj.GetEntity<RegisterUserCache>(It.IsAny<long>())).ReturnsAsync(oldCache);
 
-        _context.Message = "Пушкина Александра Сергеевича";
+        _context.UserMessage.Text ="Пушкина Александра Сергеевича";
         
-        await this._command.OnMessage();
+        await _command.OnMessage();
         
         
 
-        this._cacheService.Verify(target => target.SaveEntity(
+        _cacheService.Verify(target => target.SaveEntity(
                 2517,
                 new RegisterUserCache()
                 {

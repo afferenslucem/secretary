@@ -9,7 +9,7 @@ public class StringCleanerTests
     [SetUp]
     public void Setup()
     {
-        this._cleaner = new StringCleaner();
+        _cleaner = new StringCleaner();
     }
 
     [Test]

@@ -16,7 +16,7 @@ namespace Secretary.Documents.Templates.Docx
                 value = new InsertStringFormatter().Format(value, extraPoint: false);
             }
             
-            this.SetValue(Placeholders.Period, value);
+            SetValue(Placeholders.Period, value);
         }
     }
 }
