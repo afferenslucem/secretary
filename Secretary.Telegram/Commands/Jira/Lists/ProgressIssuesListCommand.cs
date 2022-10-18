@@ -26,12 +26,12 @@ public class ProgressIssuesListCommand: IssuesListCommand<ProgressIssuesListNavi
 
     public override Task<Message> PrintNavigation(int page, int pageLength, int totalIssues)
     {
-        return new ProgressIssuesNavigationMenuPrinter(1, 5, totalIssues).Print(Context);
+        return new ProgressIssuesNavigationMenuPrinter(page, 5, totalIssues).Print(Context);
     }
 
     public override Task ReprintNavigation(int page, int pageLength, int totalIssues, int messageId)
     {
-        return new ProgressIssuesNavigationMenuPrinter(1, 5, totalIssues).Reprint(Context);
+        return new ProgressIssuesNavigationMenuPrinter(page, 5, totalIssues).Reprint(Context);
     }
 
     public override string GetListHeader()
