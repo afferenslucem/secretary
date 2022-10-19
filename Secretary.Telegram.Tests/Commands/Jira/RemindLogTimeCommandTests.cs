@@ -81,6 +81,8 @@ public class RemindLogTimeTests
     [Test]
     public async Task ShouldReprintTurnOnMessage()
     {
+        _context.UserMessage = new UserMessage(2517, "", "", 1);
+        
         _userStorage
             .Setup(target => target.GetUser(It.IsAny<long>()))
             .ReturnsAsync(new User() { RemindLogTime = false } );
@@ -95,6 +97,8 @@ public class RemindLogTimeTests
     [Test]
     public async Task ShouldReprintTurnOffMessage()
     {
+        _context.UserMessage = new UserMessage(2517, "", "", 1);
+        
         _userStorage
             .Setup(target => target.GetUser(It.IsAny<long>()))
             .ReturnsAsync(new User() { RemindLogTime = true } );

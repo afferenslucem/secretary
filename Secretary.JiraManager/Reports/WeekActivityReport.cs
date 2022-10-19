@@ -1,10 +1,12 @@
-using Atlassian.Jira;
 using Secretary.JiraManager.Data;
+using Secretary.Logging;
+using Serilog;
 
 namespace Secretary.JiraManager.Reports;
 
 public class WeekActivityReport
 { 
+    private readonly ILogger _logger = LogPoint.GetLogger<WeekActivityReport>();
     public DateOnly WeekStart { get; }
     
     public IEnumerable<DayActivityReport> DayReports { get; private set; }

@@ -1,4 +1,3 @@
-using System.Text;
 using Secretary.Logging;
 using Serilog;
 using Telegram.Bot;
@@ -53,8 +52,6 @@ public class TelegramClient: ITelegramClient
     
     Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
-        _logger.Debug($"Handle {update.Type}");
-        
         LastCheckTime = DateTime.UtcNow;
 
         var botMessage = GetMessageFromUpdate(update);
@@ -214,8 +211,6 @@ public class TelegramClient: ITelegramClient
     private ValueTask SaveLifeTime(ITelegramBotClient client, ApiResponseEventArgs e, CancellationToken token)
     {
         LastCheckTime = DateTime.UtcNow;
-        
-        _logger.Debug("Received answer");
         
         return ValueTask.CompletedTask;
     }

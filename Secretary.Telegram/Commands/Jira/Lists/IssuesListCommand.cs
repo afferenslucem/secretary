@@ -43,7 +43,7 @@ public abstract class IssuesListCommand<TCache>: Command
 
     public async Task RewritePage(int page)
     {
-        var issuesPage = await this.GetIssues(page);
+        var issuesPage = await GetIssues(page);
 
         var cache = await CacheService.GetEntity<TCache>();
 

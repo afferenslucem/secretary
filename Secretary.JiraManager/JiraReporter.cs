@@ -1,11 +1,15 @@
-using Atlassian.Jira;
+using System.Diagnostics;
 using Secretary.JiraManager.Data;
 using Secretary.JiraManager.Reports;
+using Secretary.Logging;
+using Serilog;
 
 namespace Secretary.JiraManager;
 
 public class JiraReporter: IJiraReporter
 {
+    private readonly ILogger _logger = LogPoint.GetLogger<JiraReporter>();
+    
     public IJiraConnector JiraConnector;
 
     public JiraReporter(string url, string token)
@@ -85,23 +89,33 @@ public class JiraReporter: IJiraReporter
     {
         var user = await JiraConnector.GetMe();
 
-        var issues = await JiraConnector.GetWorkedIssuesBetween(from, to);
+        var sw = new Stopwatch();
+        sw.Start();
+
+        var periodStart = from.ToDateTime(TimeOnly.MinValue);
+        var periodEnd = to.ToDateTime(TimeOnly.MinValue);
         
+        var issues = await JiraConnector.GetWorkedIssuesBetween(from, to);
         var worklogsCollection = await Task.WhenAll(
             issues.Select(async issue =>
             {
                 var worklogs = await issue.GetWorklogsAsync();
                 worklogs = worklogs
                     .Where(worklog => worklog.Author == user.Username)
-                    .Where(worklog => worklog.StartDate.HasValue)
-                    .Where(worklog => worklog.StartDate >= from.ToDateTime(TimeOnly.MinValue))
-                    .Where(worklog => worklog.StartDate < to.ToDateTime(TimeOnly.MinValue));
+                    .Where(worklog => worklog.StartDate >= periodStart)
+                    .Where(worklog => worklog.StartDate < periodEnd)
+                    .Where(worklog => worklog.StartDate.HasValue);
 
                 return new WorkData(issue, worklogs);
             })
         );
-
         var result = worklogsCollection.Where(item => item.Worklogs.Count() > 0);
+        
+        sw.Stop();
+
+        _logger.Debug($"Got {result.Count()} issues " +
+                      $"for period {from:yyyy-MM-dd} - {to:yyyy-MM-dd} " +
+                      $"in {sw.ElapsedMilliseconds / 1000f}s");
 
         return result;
     }

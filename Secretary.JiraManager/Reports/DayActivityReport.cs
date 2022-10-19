@@ -1,10 +1,12 @@
-using Atlassian.Jira;
 using Secretary.JiraManager.Data;
+using Secretary.Logging;
+using Serilog;
 
 namespace Secretary.JiraManager.Reports;
 
 public class DayActivityReport
 { 
+    private readonly ILogger _logger = LogPoint.GetLogger<WeekActivityReport>();
     public DateOnly Date { get; }
     public IEnumerable<IssueInfo> Issues { get; set; }
     public Dictionary<string, float> Worklogs { get; init; }
@@ -12,12 +14,19 @@ public class DayActivityReport
 
     public DayActivityReport(IEnumerable<WorkData> workData, DateOnly date)
     {
+        _logger.Debug($"Creating report for {date:yyyy-MM-dd}");
+        
         Date = date;
         Worklogs = new();
 
+        var dayStart = date.ToDateTime(TimeOnly.MinValue);
+        var dayEnd = date.ToDateTime(TimeOnly.MaxValue);
+        
         var actualData = workData.Where(
-            data => data.Worklogs.Count(worklog => worklog.StartDate == date.ToDateTime(TimeOnly.MinValue)) > 0
+            data => data.Worklogs.Count(worklog => worklog.StartDate >= dayStart  && worklog.StartDate <= dayEnd) > 0
         );
+        
+        _logger.Debug($"Found {actualData.Count()} actual items for {date:yyyy-MM-dd}");
         
         foreach (var tuple in actualData)
         {

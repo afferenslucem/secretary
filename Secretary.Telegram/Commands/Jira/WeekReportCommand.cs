@@ -1,8 +1,5 @@
-using System.Text;
 using Secretary.Configuration;
 using Secretary.JiraManager;
-using Secretary.JiraManager.Data;
-using Secretary.JiraManager.Reports;
 using Secretary.Logging;
 using Secretary.Telegram.Commands.Abstractions;
 using Secretary.Telegram.Commands.Formatters;
@@ -33,7 +30,10 @@ public class WeekReportCommand: Command
             ? DateOnly.ParseExact(argument, "yyyy-MM-dd")
             : DateUtils.GetStartOfWeek(DateUtils.DateEKB);
         
+        _logger.Debug($"Week start {date:yyyy-MM-dd}");
+        
         var user = await UserStorage.GetUser();
+        
         var reporter = JiraReporterFactory.Create(Config.Instance.JiraConfig.Host, user.JiraPersonalAccessToken);
         var report = await reporter.GetWeekActivityReport(date);
 
