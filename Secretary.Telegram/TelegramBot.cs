@@ -18,7 +18,7 @@ namespace Secretary.Telegram;
 
 public class TelegramBot
 {
-    public static readonly string Version = "v4.5.3";
+    public static readonly string Version = "v4.6.0";
     
     public static readonly DateTime Uptime = DateTime.UtcNow;
     
@@ -99,7 +99,7 @@ public class TelegramBot
         
         sw.Stop();
         
-        LogCommand(command, $"{message.From} ({message.ChatId}): {command.GetType().Name} {sw.ElapsedMilliseconds}");
+        _logger.Information($"{message.From} ({message.ChatId}): {command.GetType().Name} {sw.ElapsedMilliseconds / 1000f}");
     }
     
     public Task Listen()

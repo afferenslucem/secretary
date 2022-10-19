@@ -19,11 +19,7 @@ public class Config
     public string TelegramApiKey { get; init; } = null!;
 
     public MailConfig MailConfig { get; init; } = null!;
-
-    public JiraConfig JiraConfig { get; init; } = null;
-
     public string DbConnectionString { get; init; } = null!;
-
     public string TemplatesPath { get; init; } = null!;
     public string CalendarsPath { get; init; } = null!;
 

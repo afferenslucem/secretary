@@ -1,14 +1,11 @@
 using Secretary.Telegram.chains;
 using Secretary.Telegram.Commands;
 using Secretary.Telegram.Commands.Abstractions;
-using Secretary.Telegram.Commands.Documents;
 using Secretary.Telegram.Commands.Documents.Distant;
 using Secretary.Telegram.Commands.Documents.SetEmails;
 using Secretary.Telegram.Commands.Documents.TimeOff;
 using Secretary.Telegram.Commands.Documents.Vacation;
 using Secretary.Telegram.Commands.Jira;
-using Secretary.Telegram.Commands.Jira.Lists;
-using Secretary.Telegram.Commands.Jira.RegisterJiraToken;
 using Secretary.Telegram.Commands.Menus;
 using Secretary.Telegram.Commands.RegisterMail;
 using Secretary.Telegram.Commands.RegisterUser;
@@ -104,47 +101,7 @@ public class CommandsListeningChainTests
         
         Assert.IsInstanceOf<RenewTokenCommand>(result);
     }
-
-    [Test]
-    public void ShouldReturnJiraCommand()
-    {
-        var result = _chain.Get(JiraMenuCommand.Key);
-        
-        Assert.IsInstanceOf<JiraMenuCommand>(result);
-    }
-
-    [Test]
-    public void ShouldReturnOpenIssuesCommand()
-    {
-        var result = _chain.Get(OpenIssuesListCommand.Key);
-        
-        Assert.IsInstanceOf<OpenIssuesListCommand>(result);
-    }
-
-    [Test]
-    public void ShouldReturnDayTimeCommandCommand()
-    {
-        var result = _chain.Get(DayReportCommand.Key);
-        
-        Assert.IsInstanceOf<DayReportCommand>(result);
-    }
-
-    [Test]
-    public void ShouldReturnRegisterJiraTokenCommandCommand()
-    {
-        var result = _chain.Get(RegisterJiraTokenCommand.Key);
-        
-        Assert.IsInstanceOf<RegisterJiraTokenCommand>(result);
-    }
-
-    [Test]
-    public void ShouldReturnProgressIssuesCommand()
-    {
-        var result = _chain.Get(ProgressIssuesListCommand.Key);
-        
-        Assert.IsInstanceOf<ProgressIssuesListCommand>(result);
-    }
-
+    
     [Test]
     public void ShouldReturnMeCommand()
     {
@@ -159,14 +116,6 @@ public class CommandsListeningChainTests
         var result = _chain.Get(DistantCommand.Key);
         
         Assert.IsInstanceOf<DistantCommand>(result);
-    }
-
-    [Test]
-    public void ShouldReturnWeekReportCommand()
-    {
-        var result = _chain.Get(WeekReportCommand.Key);
-        
-        Assert.IsInstanceOf<WeekReportCommand>(result);
     }
 
     [Test]

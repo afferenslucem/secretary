@@ -8,16 +8,10 @@ namespace Secretary.Telegram.Commands.Jira;
 
 public class RemindLogTimeCommand: Command
 {
-    public IMenuPrinter MenuPrinter;
-        
     private readonly ILogger _logger = LogPoint.GetLogger<RemindLogTimeCommand>();
     
     public const string Key = "/remindlogtime";
 
-    public RemindLogTimeCommand()
-    {
-        MenuPrinter = new JiraMenuPrinter();
-    }
     
     public override async Task Execute()
     {
@@ -38,11 +32,6 @@ public class RemindLogTimeCommand: Command
         else
         {
             await TelegramClient.SendMessage("Напоминания о логгировании времени выключены");
-        }
-
-        if (Context.UserMessage.IsCallback)
-        {
-            await MenuPrinter.Reprint(Context);
         }
     }
 }

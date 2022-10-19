@@ -33,8 +33,6 @@ public class RemindLogTimeTests
             UserStorage = _userStorage.Object,
         };
 
-        _command.MenuPrinter = _menuPrinter.Object;
-
         _command.Context = _context;
     }
 
@@ -76,37 +74,5 @@ public class RemindLogTimeTests
         await _command.Execute();
         
         _userStorage.Verify(target => target.SetUser(It.Is<User>(target => target.RemindLogTime == false)));
-    }
-
-    [Test]
-    public async Task ShouldReprintTurnOnMessage()
-    {
-        _context.UserMessage = new UserMessage(2517, "", "", 1);
-        
-        _userStorage
-            .Setup(target => target.GetUser(It.IsAny<long>()))
-            .ReturnsAsync(new User() { RemindLogTime = false } );
-
-        await _command.Execute();
-        
-        _client.Verify(target => target.SendMessage(2517, 
-            "Напоминания о логгировании времени включены"));
-        _menuPrinter.Verify(target => target.Reprint(It.IsAny<CommandContext>()));
-    }
-
-    [Test]
-    public async Task ShouldReprintTurnOffMessage()
-    {
-        _context.UserMessage = new UserMessage(2517, "", "", 1);
-        
-        _userStorage
-            .Setup(target => target.GetUser(It.IsAny<long>()))
-            .ReturnsAsync(new User() { RemindLogTime = true } );
-
-        await _command.Execute();
-        
-        _client.Verify(target => target.SendMessage(2517, 
-            "Напоминания о логгировании времени выключены"));
-        _menuPrinter.Verify(target => target.Reprint(It.IsAny<CommandContext>()));
     }
 }

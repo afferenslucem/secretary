@@ -162,20 +162,4 @@ public class LogTimeReminderTests
         
         Assert.That(result, Is.EqualTo(new DateOnly(2022, 10, 15)));
     }
-    
-    [Test]
-    public void ShouldReturn1OctoberLikeStartOfPeriod()
-    {
-        var result = _reminder.GetStartOfPeriod(new DateTime(2022, 10, 15));
-        
-        Assert.That(result, Is.EqualTo(new DateOnly(2022, 10, 1)));
-    }
-    
-    [Test]
-    public void ShouldReturn16FebruaryLikeStartOfPeriod()
-    {
-        var result = _reminder.GetStartOfPeriod(new DateTime(2022, 2, 28));
-        
-        Assert.That(result, Is.EqualTo(new DateOnly(2022, 2, 16)));
-    }
 }

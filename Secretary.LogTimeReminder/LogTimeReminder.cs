@@ -1,12 +1,9 @@
-﻿using Secretary.Configuration;
-using Secretary.HealthCheck.Data;
-using Secretary.JiraManager;
+﻿using Secretary.HealthCheck.Data;
 using Secretary.Logging;
 using Secretary.Scheduler;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram;
-using Secretary.Utils;
 using Secretary.WorkingCalendar;
 using Serilog;
 
@@ -94,24 +91,8 @@ public class LogTimeReminder
     public async Task NotifyAllUsers()
     {
         var users = await _userStorage.GetUsers(user => user.RemindLogTime);
-        var calendar = CalendarStorage.GetCalendar(DateUtils.DateEkb);
 
-        var startOfPeriod =  GetStartOfPeriod(DateUtils.DateTimeEkb);
-        var endOfPeriod = GetNextCheckPeriod(DateUtils.DateTimeEkb);
-
-        var workingDays = calendar.GetWorkingDays(startOfPeriod, endOfPeriod);
-
-        foreach (var user in users)
-        {
-            if (user.JiraPersonalAccessToken != null)
-            {
-                await SendReport(user, startOfPeriod, endOfPeriod, workingDays);
-            }
-            else
-            {
-                await Notify(user);
-            }
-        }
+        await Task.WhenAll(users.Select(user => Notify(user)));
     }
 
     public async Task Notify(User user)
@@ -122,30 +103,6 @@ public class LogTimeReminder
 
             await _telegramClient.SendMessage(user.ChatId, "Не забудьте залоггировать время!");
             
-            _logger.Debug($"Notified user {user.ChatId}");
-        }
-        catch (Exception e)
-        {
-            _logger.Warning(e, $"Could not notify user {user.ChatId}");
-        }
-    }
-
-    public async Task SendReport(User user, DateOnly startOfPeriod, DateOnly endOfPeriod, int workingDays)
-    {
-        try
-        {
-            _logger.Debug($"send notification for user {user.TelegramUsername} ({user.ChatId})");
-
-            var reporter =
-                new JiraReporterFactory().Create(Config.Instance.JiraConfig.Host, user.JiraPersonalAccessToken!);
-
-            var worklog = await reporter.GetWorkingHoursForPeriod(startOfPeriod, endOfPeriod.AddDays(1));
-            
-            await _telegramClient.SendMessage(user.ChatId, $"<b>Отчет по времени {startOfPeriod:yyyy-MM-dd} - {endOfPeriod:yyyy-MM-dd}</b>\n" +
-                                                           $"Отработано часов: {worklog:F}h\n" +
-                                                           $"Рабочих часов в периоде: {workingDays * 8}h\n" +
-                                                           $"Не забудьте проверить актуальность данных в JIRA");
-
             _logger.Debug($"Notified user {user.ChatId}");
         }
         catch (Exception e)
@@ -184,18 +141,6 @@ public class LogTimeReminder
         else
         {
             return new DateOnly(now.Year, now.Month, 15);
-        }
-    }
-
-    public DateOnly GetStartOfPeriod(DateTime now)
-    {
-        if (now.Day > 15)
-        {
-            return new DateOnly(now.Year, now.Month, 16);
-        }
-        else
-        {
-            return new DateOnly(now.Year, now.Month, 1);
         }
     }
 
