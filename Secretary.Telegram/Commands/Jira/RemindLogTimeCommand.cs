@@ -40,6 +40,9 @@ public class RemindLogTimeCommand: Command
             await TelegramClient.SendMessage("Напоминания о логгировании времени выключены");
         }
 
-        await MenuPrinter.Reprint(Context);
+        if (Context.UserMessage.IsCallback)
+        {
+            await MenuPrinter.Reprint(Context);
+        }
     }
 }
