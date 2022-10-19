@@ -32,7 +32,7 @@ public class DayActivityReport
         {
             var key = tuple.Issue.Key.Value;
             var timeSeconds = tuple.Worklogs
-                .Where(worklog => DateOnly.FromDateTime(worklog.StartDate!.Value) == date)
+                .Where(worklog => worklog.StartDate >= dayStart  && worklog.StartDate <= dayEnd)
                 .Aggregate(0L, (time, worklog) => time + worklog.TimeSpentInSeconds);
 
             var timeHours = timeSeconds / 60f / 60f;
