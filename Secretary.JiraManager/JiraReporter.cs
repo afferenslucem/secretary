@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Secretary.JiraManager.Data;
 using Secretary.JiraManager.Reports;
 using Secretary.Logging;
+using Secretary.Utils;
 using Serilog;
 
 namespace Secretary.JiraManager;
@@ -102,9 +103,9 @@ public class JiraReporter: IJiraReporter
                 var worklogs = await issue.GetWorklogsAsync();
                 worklogs = worklogs
                     .Where(worklog => worklog.Author == user.Username)
-                    .Where(worklog => worklog.StartDate >= periodStart)
-                    .Where(worklog => worklog.StartDate < periodEnd)
-                    .Where(worklog => worklog.StartDate.HasValue);
+                    .Where(worklog => worklog.StartDate.HasValue)
+                    .Where(worklog => DateUtils.ConvertToEkbTime(worklog.StartDate) >= periodStart)
+                    .Where(worklog => DateUtils.ConvertToEkbTime(worklog.StartDate) < periodEnd);
 
                 return new WorkData(issue, worklogs);
             })

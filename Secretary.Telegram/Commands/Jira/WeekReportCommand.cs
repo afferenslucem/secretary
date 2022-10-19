@@ -4,7 +4,7 @@ using Secretary.Logging;
 using Secretary.Telegram.Commands.Abstractions;
 using Secretary.Telegram.Commands.Formatters;
 using Secretary.Telegram.MenuPrinters;
-using Secretary.Telegram.Utils;
+using Secretary.Utils;
 using Serilog;
 
 namespace Secretary.Telegram.Commands.Jira;
@@ -28,7 +28,7 @@ public class WeekReportCommand: Command
 
         var date = argument != null
             ? DateOnly.ParseExact(argument, "yyyy-MM-dd")
-            : DateUtils.GetStartOfWeek(DateUtils.DateEKB);
+            : DateUtils.GetStartOfWeek(DateUtils.DateEkb);
         
         _logger.Debug($"Week start {date:yyyy-MM-dd}");
         

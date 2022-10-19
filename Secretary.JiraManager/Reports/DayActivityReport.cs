@@ -1,5 +1,6 @@
 using Secretary.JiraManager.Data;
 using Secretary.Logging;
+using Secretary.Utils;
 using Serilog;
 
 namespace Secretary.JiraManager.Reports;
@@ -23,7 +24,7 @@ public class DayActivityReport
         var dayEnd = date.ToDateTime(TimeOnly.MaxValue);
         
         var actualData = workData.Where(
-            data => data.Worklogs.Count(worklog => worklog.StartDate >= dayStart  && worklog.StartDate <= dayEnd) > 0
+            data => data.Worklogs.Count(worklog => DateUtils.ConvertToEkbTime(worklog.StartDate) >= dayStart && DateUtils.ConvertToEkbTime(worklog.StartDate) <= dayEnd) > 0
         );
         
         _logger.Debug($"Found {actualData.Count()} actual items for {date:yyyy-MM-dd}");
@@ -32,7 +33,7 @@ public class DayActivityReport
         {
             var key = tuple.Issue.Key.Value;
             var timeSeconds = tuple.Worklogs
-                .Where(worklog => worklog.StartDate >= dayStart  && worklog.StartDate <= dayEnd)
+                .Where(worklog => DateUtils.ConvertToEkbTime(worklog.StartDate) >= dayStart && DateUtils.ConvertToEkbTime(worklog.StartDate) <= dayEnd)
                 .Aggregate(0L, (time, worklog) => time + worklog.TimeSpentInSeconds);
 
             var timeHours = timeSeconds / 60f / 60f;

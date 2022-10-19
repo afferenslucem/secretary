@@ -6,7 +6,7 @@ using Secretary.Scheduler;
 using Secretary.Storage.Interfaces;
 using Secretary.Storage.Models;
 using Secretary.Telegram;
-using Secretary.Telegram.Utils;
+using Secretary.Utils;
 using Secretary.WorkingCalendar;
 using Serilog;
 
@@ -94,10 +94,10 @@ public class LogTimeReminder
     public async Task NotifyAllUsers()
     {
         var users = await _userStorage.GetUsers(user => user.RemindLogTime);
-        var calendar = CalendarStorage.GetCalendar(DateUtils.DateEKB);
+        var calendar = CalendarStorage.GetCalendar(DateUtils.DateEkb);
 
-        var startOfPeriod =  GetStartOfPeriod(DateUtils.DateTimeEKB);
-        var endOfPeriod = GetNextCheckPeriod(DateUtils.DateTimeEKB);
+        var startOfPeriod =  GetStartOfPeriod(DateUtils.DateTimeEkb);
+        var endOfPeriod = GetNextCheckPeriod(DateUtils.DateTimeEkb);
 
         var workingDays = calendar.GetWorkingDays(startOfPeriod, endOfPeriod);
 

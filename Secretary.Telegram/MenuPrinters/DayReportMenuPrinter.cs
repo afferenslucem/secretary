@@ -1,7 +1,7 @@
 using Secretary.Telegram.Commands;
 using Secretary.Telegram.Commands.Abstractions;
 using Secretary.Telegram.Commands.Jira;
-using Secretary.Telegram.Utils;
+using Secretary.Utils;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Secretary.Telegram.MenuPrinters;
@@ -22,7 +22,7 @@ public class DayReportMenuPrinter: MenuPrinter
         var previous =
             InlineKeyboardButton.WithCallbackData("◀",$"{DayReportCommand.Key} {Date.AddDays(-1):yyyy-MM-dd}");
         
-        var next = Date < DateUtils.DateEKB
+        var next = Date < DateUtils.DateEkb
             ? InlineKeyboardButton.WithCallbackData("▶", $"{DayReportCommand.Key} {Date.AddDays(1):yyyy-MM-dd}")
             : InlineKeyboardButton.WithCallbackData("🚫", $"{EmptyCommand.Key}");
         

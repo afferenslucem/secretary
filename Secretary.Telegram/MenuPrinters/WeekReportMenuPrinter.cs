@@ -1,7 +1,7 @@
 using Secretary.Telegram.Commands;
 using Secretary.Telegram.Commands.Abstractions;
 using Secretary.Telegram.Commands.Jira;
-using Secretary.Telegram.Utils;
+using Secretary.Utils;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Secretary.Telegram.MenuPrinters;
@@ -22,7 +22,7 @@ public class WeekReportMenuPrinter: MenuPrinter
         var previous =
             InlineKeyboardButton.WithCallbackData("◀",$"{WeekReportCommand.Key} {Date.AddDays(-7):yyyy-MM-dd}");
 
-        var weekStart = DateUtils.GetStartOfWeek(DateUtils.DateEKB);
+        var weekStart = DateUtils.GetStartOfWeek(DateUtils.DateEkb);
         
         var next = Date < weekStart
             ? InlineKeyboardButton.WithCallbackData("▶", $"{WeekReportCommand.Key} {Date.AddDays(7):yyyy-MM-dd}")
