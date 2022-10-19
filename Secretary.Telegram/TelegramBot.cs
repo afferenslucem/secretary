@@ -1,4 +1,5 @@
-﻿using Secretary.Cache;
+﻿using System.Diagnostics;
+using Secretary.Cache;
 using Secretary.HealthCheck.Data;
 using Secretary.Logging;
 using Secretary.Storage;
@@ -17,7 +18,7 @@ namespace Secretary.Telegram;
 
 public class TelegramBot
 {
-    public static readonly string Version = "v4.5.2";
+    public static readonly string Version = "v4.5.3";
     
     public static readonly DateTime Uptime = DateTime.UtcNow;
     
@@ -57,13 +58,16 @@ public class TelegramBot
 
     public async Task WorkWithMessage(UserMessage message)
     {
+        var sw = new Stopwatch();
+        sw.Start();
+        
         var command = Chain.Get(message.CommandText)!;
 
         ReceivedMessages++;
         
         try
         {
-            LogCommand(command, $"{message.ChatId}: execute command {command.GetType().Name}");
+            LogCommand(command, $"{message.From} ({message.ChatId}): execute command {command.GetType().Name}");
 
             var context = new CommandContext(
                 message,
@@ -92,6 +96,10 @@ public class TelegramBot
             _logger.Error(e, $"{message.ChatId}: Сommand execution fault {command.GetType().Name}");
             await _sessionStorage.DeleteSession(message.ChatId);
         }
+        
+        sw.Stop();
+        
+        LogCommand(command, $"{message.From} ({message.ChatId}): {command.GetType().Name} {sw.ElapsedMilliseconds}");
     }
     
     public Task Listen()
