@@ -123,7 +123,7 @@ public class LogTimeReminder
             bound = GetNextCheckPeriod(bound.AddDays(1));
         } while (lastWorkingDay == null);
 
-        var result = lastWorkingDay.Value.ToDateTime(new TimeOnly(11, 45)).ToUniversalTime();
+        var result = lastWorkingDay.Value.ToDateTime(new TimeOnly(10, 0)).ToUniversalTime();
         
         _logger.Information($"Next date to notify {result}");
         
