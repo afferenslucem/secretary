@@ -11,7 +11,7 @@ namespace Secretary.LogTimeReminder;
 
 public class LogTimeReminder
 {
-    public static string Version = "v1.2.0";
+    public static string Version = "v1.3.0";
     public static DateTime Uptime = DateTime.UtcNow;
     
     private readonly ILogger _logger = LogPoint.GetLogger<LogTimeReminder>();
