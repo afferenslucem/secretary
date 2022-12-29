@@ -3,9 +3,9 @@ using Secretary.Telegram.Commands.Caches.Documents.Interfaces;
 using Secretary.Telegram.Exceptions;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Secretary.Telegram.Commands.Documents.Common;
+namespace Secretary.Telegram.Commands.Documents.TimeOff;
 
-public class EnterReasonCommand<T> : Command
+public class EnterTimeOffReasonCommand<T> : Command
     where T : class, IReasonCache
 {
     public override Task Execute()

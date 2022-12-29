@@ -22,7 +22,7 @@ public class TimeOffCommand: StatedCommand
         {
             new EmptyCommand(), 
             new EnterTimeOffPeriodCommand<TimeOffCache>(),
-            new EnterReasonCommand<TimeOffCache>(),
+            new EnterTimeOffReasonCommand<TimeOffCache>(),
             new EnterWorkingOffCommand<TimeOffCache>(),
             new CheckDocumentCommand<TimeOffCache>(),
             new SetReceiversCommand<TimeOffCache>(),

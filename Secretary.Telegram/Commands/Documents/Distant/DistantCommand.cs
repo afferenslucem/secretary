@@ -22,7 +22,7 @@ public class DistantCommand: StatedCommand
         {
             new EmptyCommand(), 
             new EnterDistantPeriodCommand<DistantCache>(),
-            new EnterReasonCommand<DistantCache>(),
+            new EnterDistantReasonCommand<DistantCache>(),
             new CheckDocumentCommand<DistantCache>(),
             new SetReceiversCommand<DistantCache>(),
             new CheckEmailsCommand<DistantCache>(),

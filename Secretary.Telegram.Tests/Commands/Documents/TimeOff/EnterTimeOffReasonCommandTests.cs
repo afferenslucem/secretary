@@ -2,17 +2,17 @@
 using Secretary.Cache;
 using Secretary.Telegram.Commands;
 using Secretary.Telegram.Commands.Caches.Documents;
-using Secretary.Telegram.Commands.Documents.Common;
+using Secretary.Telegram.Commands.Documents.TimeOff;
 using Secretary.Telegram.Utils;
 
-namespace Secretary.Telegram.Tests.Commands.Documents.Common;
+namespace Secretary.Telegram.Tests.Commands.Documents.TimeOff;
 
-public class EnterReasonCommandTests
+public class EnterTimeOffReasonCommandTests
 {
     private Mock<ITelegramClient> _client = null!;
     private Mock<ICacheService> _cacheService = null!;
     
-    private EnterReasonCommand<TimeOffCache> _command = null!;
+    private EnterTimeOffReasonCommand<TimeOffCache> _command = null!;
     private CommandContext _context = null!;
         
     [SetUp]
@@ -21,7 +21,7 @@ public class EnterReasonCommandTests
         _client = new Mock<ITelegramClient>();
         _cacheService = new Mock<ICacheService>();
 
-        _command = new EnterReasonCommand<TimeOffCache>();
+        _command = new EnterTimeOffReasonCommand<TimeOffCache>();
 
         _context = new CommandContext()
         { 
