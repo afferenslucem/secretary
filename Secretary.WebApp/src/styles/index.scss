@@ -1,0 +1,45 @@
+@import '../../node_modules/@fontsource/roboto/300.css';
+@import '../../node_modules/@fontsource/roboto/400.css';
+@import '../../node_modules/@fontsource/roboto/500.css';
+@import '../../node_modules/@fontsource/roboto/700.css';
+
+@import 'forms';
+@import 'book';
+@import 'typography';
+
+body {
+  background-color: #80808018;
+
+  font-family: Roboto, serif;
+
+  margin: 0;
+  padding: 0;
+}
+
+[role=alert] {
+  margin-bottom: 1rem;
+}
+
+.page {
+  background-color: white;
+  border-radius: 2rem;
+  padding: 1rem 2rem 2rem 2rem;
+
+  margin: 2rem auto;
+
+  max-width: 1100px;
+}
+
+.info-row {
+  & > &__label {
+    margin: 0.5rem 0;
+  }
+
+  & > &__value {
+
+  }
+
+  & + & {
+    margin-top: 1.5rem;
+  }
+}

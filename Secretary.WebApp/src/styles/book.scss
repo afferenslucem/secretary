@@ -1,0 +1,48 @@
+.book {
+  cursor: pointer;
+
+  border-radius: 0.5rem;
+  background-color: white;
+  padding: 0.5rem 1rem;
+
+  & > * + * {
+    margin-top: 0.5rem;
+  }
+
+  &__header {
+    font-weight: 500;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .edit-icon {
+      cursor: pointer;
+    }
+  }
+
+  &__bottom {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__dates {
+    font-size: 0.75rem;
+  }
+}
+
+.book-list {
+  margin: 1rem 0;
+
+  & > * + * {
+    margin-top: 1rem;
+  }
+
+  & > &__add-icon {
+    position: fixed;
+
+    bottom: 1rem;
+    right: 1rem;
+  }
+}
+
